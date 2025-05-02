@@ -93,7 +93,10 @@ class AosExport implements FromCollection, WithHeadings, ShouldAutoSize, WithSty
 
     // Style untuk header (baris 1)
     $sheet->getStyle('A1:' . $highestColumn . '1')->applyFromArray([
-        'font' => ['bold' => true],
+        'font' => [
+            'bold' => true,
+            'size' => 12,
+        ],
         'alignment' => [
             'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
             'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
@@ -101,7 +104,7 @@ class AosExport implements FromCollection, WithHeadings, ShouldAutoSize, WithSty
         ],
         'fill' => [
             'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-            'startColor' => ['rgb' => 'D9D9D9']
+            'startColor' => ['rgb' => '0096FF']
         ],
         'borders' => [
             'allBorders' => [
