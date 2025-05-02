@@ -105,7 +105,7 @@ class AosExport implements FromCollection, WithHeadings, ShouldAutoSize, WithSty
     $sheet->getStyle('A1')->applyFromArray([
         'font' => [
             'bold' => true,
-            'size' => 20,
+            'size' => 24,
         ],
         'alignment' => [
             'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
@@ -116,7 +116,7 @@ class AosExport implements FromCollection, WithHeadings, ShouldAutoSize, WithSty
     // Style untuk Aircraft Type dan Period
     $sheet->getStyle('A2')->applyFromArray([
         'font' => [
-            'size' => 14,
+            'size' => 16,
         ],
         'alignment' => [
             'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
