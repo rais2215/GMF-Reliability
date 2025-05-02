@@ -40,7 +40,6 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 
-
 /* Route User Setting for Admin */
 Route::get('/user-setting', [UserController::class, 'index'])
     ->middleware(['auth', 'verified'])
@@ -65,7 +64,6 @@ Route::delete('/users/{user:id}', [UserController::class, 'destroy'])
     ->middleware(['auth', 'verified']);
 
 
-
 /* Route Authentication User */
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -74,7 +72,6 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
-
 
 
 /* Routes Modul pada Report */
@@ -106,6 +103,5 @@ Route::get('/report/cumulative', [ReportController::class, 'cumulativeContent'])
     ->name('report.cumulative')
     ->middleware(['auth', 'verified']);
 
-/* Routes Modul Export PDF */
-
-
+/* Routes Modul Export Excel */
+Route::post('/report/aos/export-excel', [ReportController::class, 'exportExcel'])->name('report.aos.export.excel');

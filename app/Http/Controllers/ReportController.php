@@ -13,6 +13,9 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
+use App\Exports\AosExport;
+use Maatwebsite\Excel\Facades\Excel;
+
 
 class ReportController extends Controller
 {
@@ -443,6 +446,23 @@ class ReportController extends Controller
         $pdf->setPaper('A4', 'landscape');
 
         return $pdf->download('AOS-Report-' . $year.'-'.$month . '.pdf');
+    }
+
+        public function exportExcel(Request $request)
+    {
+        $request->validate([
+            'period' => 'required',
+            'aircraft_type' => 'required',
+        ]);
+
+        $period = $request->period;
+        $aircraftType = $request->aircraft_type;
+
+        // Ambil ulang data seperti di aosStore
+        $result = $this->aosStore($request);
+        $reportData = $result->getData()['reportData'];
+
+        return Excel::download(new AosExport($reportData, $period, $aircraftType), 'AOS-Report-' . substr($period, 0, 7) . '.xlsx');
     }
     
 
