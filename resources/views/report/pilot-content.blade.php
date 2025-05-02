@@ -38,12 +38,6 @@
                 <x-third-button type="submit">
                     Display Report
                 </x-third-button>
-                <x-third-button type="submit" name="export_excel">
-                    Excel
-                </x-third-button>
-                <x-third-button type="submit" name="export_pdf">
-                    PDF
-                </x-third-button>
             </div> 
         </div>
     </form>
