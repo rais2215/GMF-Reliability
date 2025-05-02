@@ -10,7 +10,7 @@ use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Illuminate\Support\Collection;
 
-class AosExport implements FromCollection, WithHeadings, WithTitle, ShouldAutoSize, WithStyles
+class AosExport implements FromCollection, WithHeadings, ShouldAutoSize, WithStyles
 {
     protected $reportData;
     protected $period;
@@ -85,22 +85,46 @@ class AosExport implements FromCollection, WithHeadings, WithTitle, ShouldAutoSi
         ];
     }
 
-    public function title(): string
-    {
-        return 'AOS Report - ' . $this->aircraftType . ' - ' . $this->period;
-    }
-
     public function styles(Worksheet $sheet)
-    {
-        return [
-            // Style the first row (headings)
-            1 => [
-                'font' => ['bold' => true],
-                'fill' => [
-                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                    'startColor' => ['rgb' => 'D9D9D9']
-                ],
+{
+    $highestRow = $sheet->getHighestRow();
+    $highestColumn = $sheet->getHighestColumn();
+    $dataRange = 'A1:' . $highestColumn . $highestRow;
+
+    // Style untuk header (baris 1)
+    $sheet->getStyle('A1:' . $highestColumn . '1')->applyFromArray([
+        'font' => ['bold' => true],
+        'alignment' => [
+            'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+            'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            'wrapText' => true,
+        ],
+        'fill' => [
+            'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+            'startColor' => ['rgb' => 'D9D9D9']
+        ],
+        'borders' => [
+            'allBorders' => [
+                'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                'color' => ['rgb' => '000000'],
             ],
-        ];
-    }
+        ],
+    ]);
+
+    // Style untuk seluruh data (termasuk header agar seragam)
+    $sheet->getStyle($dataRange)->applyFromArray([
+        'alignment' => [
+            'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+            'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+        ],
+        'borders' => [
+            'allBorders' => [
+                'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                'color' => ['rgb' => '000000'],
+            ],
+        ],
+    ]);
+
+    return [];
+}
 }
