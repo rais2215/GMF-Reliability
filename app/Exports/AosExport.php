@@ -60,28 +60,33 @@ class AosExport implements FromCollection, WithHeadings, ShouldAutoSize, WithSty
     public function headings(): array
     {
         return [
-            'Period',
-            'A/C In Fleet',
-            'A/C In Service',
-            'Days In Service',
-            'Flying Hours - Total',
-            'Revenue Flying Hours',
-            'Take Off - Total',
-            'Revenue Take Off',
-            'Flight Hours per Take Off - Total',
-            'Revenue Flight Hours per Take Off',
-            'Daily Utilization - Flying Hours Total', 
-            'Revenue Daily Utilization - Flying Hours Total',
-            'Daily Utilization - Take Off Total',
-            'Revenue Daily Utilization - Take Off Total',
-            'Technical Delay - Total',
-            'Total Duration',
-            'Average Duration',
-            'Rate / 100 Take Off',
-            'Technical Incident - Total',
-            'Technical Incident Rate /100 FC',
-            'Technical Cancellation - Total',
-            'Dispatch Reliability (%)',
+            ['AIRCRAFT OPERATIONS SUMMARY REPORT'],
+            ['Aircraft Type: ' . $this->aircraftType],
+            ['Period: ' . $this->period],
+            [
+                'Period',
+                'A/C In Fleet',
+                'A/C In Service',
+                'A/C Days In Service',
+                'Flying Hours - Total',
+                'Revenue Flying Hours',
+                'Take Off - Total',
+                'Revenue Take Off',
+                'Flight Hours per Take Off - Total',
+                'Revenue Flight Hours per Take Off',
+                'Daily Utilization - Flying Hours Total', 
+                'Revenue Daily Utilization - Flying Hours Total',
+                'Daily Utilization - Take Off Total',
+                'Revenue Daily Utilization - Take Off Total',
+                'Technical Delay - Total',
+                'Total Duration',
+                'Average Duration',
+                'Rate / 100 Take Off',
+                'Technical Incident - Total',
+                'Technical Incident Rate /100 FC',
+                'Technical Cancellation - Total',
+                'Dispatch Reliability (%)'
+            ],
         ];
     }
 
@@ -89,10 +94,48 @@ class AosExport implements FromCollection, WithHeadings, ShouldAutoSize, WithSty
 {
     $highestRow = $sheet->getHighestRow();
     $highestColumn = $sheet->getHighestColumn();
-    $dataRange = 'A1:' . $highestColumn . $highestRow;
+    $dataRange = 'A4:' . $highestColumn . $highestRow; //Start from row 4
 
-    // Style untuk header (baris 1)
-    $sheet->getStyle('A1:' . $highestColumn . '1')->applyFromArray([
+    // Merge cell untuk Judul
+    $sheet->mergeCells("A1:{$highestColumn}1");
+    $sheet->mergeCells("A2:{$highestColumn}2");
+    $sheet->mergeCells("A3:{$highestColumn}3");    
+
+    // Style untuk judul
+    $sheet->getStyle('A1')->applyFromArray([
+        'font' => [
+            'bold' => true,
+            'size' => 20,
+        ],
+        'alignment' => [
+            'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+            'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+        ],
+    ]);
+
+    // Style untuk Aircraft Type dan Period
+    $sheet->getStyle('A2')->applyFromArray([
+        'font' => [
+            'size' => 14,
+        ],
+        'alignment' => [
+            'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+            'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+        ],
+    ]);
+    $sheet->getStyle('A3')->applyFromArray([
+        'font' => [
+            'italic' => true,
+            'size' => 14,
+        ],
+        'alignment' => [
+            'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+            'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+        ],
+    ]);
+
+    // Style untuk header (baris 4)
+    $sheet->getStyle('A4:' . $highestColumn . '4')->applyFromArray([
         'font' => [
             'bold' => true,
             'size' => 12,
