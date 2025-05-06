@@ -46,3 +46,8 @@
         </div>
     </form>
 </div>
+
+<!-- Display Report Placeholder -->
+<div class="mt-6 text-center text-gray-600" id="display-data">
+    <p>Please select Periode, Operator, and Aircraft Type to display the report.</p>
+</div>
