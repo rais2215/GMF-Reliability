@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use BcMath\Number;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithTitle;
@@ -47,9 +48,9 @@ class AosExport implements FromCollection, WithHeadings, ShouldAutoSize, WithSty
                 'Total Duration' => $metrics['totalDuration'],
                 'Average Duration' => $metrics['averageDuration'],
                 'Rate / 100 Take Off' => number_format($metrics['ratePer100TakeOff'], 2),
-                'Technical Incident - Total' => $metrics['technicalIncidentTotal'],
+                'Technical Incident - Total' => number_format($metrics['technicalIncidentTotal'], 2),
                 'Technical Incident Rate /100 FC' => number_format($metrics['technicalIncidentRate'], 2),
-                'Technical Cancellation - Total' => $metrics['technicalCancellationTotal'],
+                'Technical Cancellation - Total' => number_format($metrics['technicalCancellationTotal'], 2),
                 'Dispatch Reliability (%)' => number_format($metrics['dispatchReliability'], 2),
             ]);
         }
