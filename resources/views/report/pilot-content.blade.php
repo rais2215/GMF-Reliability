@@ -3,9 +3,11 @@
 <div class="container mx-auto px-4">
     <form action="{{ url('/report/pilot') }}" method="POST" class="bg-white p-6 rounded-xl shadow-md">
         @csrf
-        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+
+        <!-- Baris Dropdown -->
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
             <!-- Periode -->
-            <div class="w-full md:w-1/4">
+            <div class="w-full md:w-1/3">
                 <label for="period" class="block text-sm font-medium text-gray-700 mb-1">Periode</label>
                 <select name="period" id="period" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
                     <option value="">Select Periode</option>
@@ -16,7 +18,7 @@
             </div>
 
             <!-- Operator -->
-            <div class="w-full md:w-1/4">
+            <div class="w-full md:w-1/3">
                 <label for="operator" class="block text-sm font-medium text-gray-700 mb-1">Operator</label>
                 <select name="operator" id="operator" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
                     <option value="">Select Operator</option>
@@ -27,7 +29,7 @@
             </div>
 
             <!-- Aircraft Type -->
-            <div class="w-full md:w-1/4">
+            <div class="w-full md:w-1/3">
                 <label for="aircraft_type" class="block text-sm font-medium text-gray-700 mb-1">AC Type</label>
                 <select name="aircraft_type" id="aircraft_type" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
                     <option value="">Select Aircraft Type</option>
@@ -36,13 +38,13 @@
                     @endforeach
                 </select>
             </div>
+        </div>
 
-            <!-- Button -->
-            <div class="w-full md:w-1/6 flex md:justify-end">
-                <x-third-button type="submit" class="w-full md:w-auto">
-                    Display Report
-                </x-third-button>
-            </div>
+        <!-- Tombol di Tengah -->
+        <div class="flex justify-center mt-4">
+            <x-third-button type="submit" class="px-6">
+                Display Report
+            </x-third-button>
         </div>
     </form>
 </div>
