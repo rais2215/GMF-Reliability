@@ -22,8 +22,11 @@
                 <select name="operator" class="form-select" id="operator-dropdown">
                     <option value="">Select Operator</option>
                     @foreach($operators as $operator)
-                        <option value="{{ $operator->Operator }}">{{ $operator->Operator }}</option>
+                        @if(!empty($operator->Operator))
+                            <option value="{{ $operator->Operator }}">{{ $operator->Operator }}</option>
+                        @endif
                     @endforeach
+
                 </select>
             </div>
     
