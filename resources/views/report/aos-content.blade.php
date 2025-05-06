@@ -1,72 +1,65 @@
-{{-- aos-content.blade.php awal: --}}
+{{-- aos-content.blade.php --}}
 <h1 class="text-3xl font-bold mb-8 text-center">Aircraft Operation Summary</h1>
 
-<div class="container mx-auto">
-    <form action="{{ url('/report/aos') }}" method="POST">
-        @csrf
-        <div class="flex space-x-2">
-            <!-- Periode -->
-            <div class="flex space-x-1">
-                <p class="mt-2">Periode :</p>
-                <select name="period" class="form-select">
-                    <option value="">Select Periode</option>
-                    @foreach($periods as $period)
-                        <option value="{{ $period['original'] }}">{{ $period['formatted'] }}</option>
-                    @endforeach
-                </select>
-            </div>
-    
-            <!-- Operator -->
-            <div class="flex space-x-1">
-                <p class="mt-2">Operator :</p>
-                <select name="operator" class="form-select" id="operator-dropdown">
-                    <option value="">Select Operator</option>
-                    @foreach($operators as $operator)
-                        @if(!empty($operator->Operator))
-                            <option value="{{ $operator->Operator }}">{{ $operator->Operator }}</option>
-                        @endif
-                    @endforeach
+<div class="flex flex-wrap md:flex-nowrap gap-4">
+    <!-- Periode -->
+    <div class="flex flex-col w-full md:w-1/3">
+        <label for="period" class="mb-1">Periode:</label>
+        <select name="period" id="period" class="form-select w-full">
+            <option value="">Select Periode</option>
+            @foreach($periods as $period)
+                <option value="{{ $period['original'] }}">{{ $period['formatted'] }}</option>
+            @endforeach
+        </select>
+    </div>
 
-                </select>
-            </div>
-    
-            <!-- Aircraft Type -->
-            <div class="flex space-x-1">
-                <p class="mt-2">AC Type :</p>
-                <select name="aircraft_type" class="form-select" id="aircraft-type-dropdown">
-                    <option value="">Select Aircraft Type</option>
-                    @foreach($aircraftTypes as $type)
-                        <option value="{{ $type->ACType }}">{{ $type->ACType }}</option>
-                    @endforeach
-                </select>
-            </div>
-    
-            <!-- Buttons -->
-            <div class="flex space-x-1">
-                <x-third-button type="submit">
-                    Display Report
-                </x-third-button>
-            </div>
-        </div>
-    </form>
+    <!-- Operator -->
+    <div class="flex flex-col w-full md:w-1/3">
+        <label for="operator-dropdown" class="mb-1">Operator:</label>
+        <select name="operator" id="operator-dropdown" class="form-select w-full">
+            <option value="">Select Operator</option>
+            @foreach($operators as $operator)
+                @if(!empty($operator->Operator))
+                    <option value="{{ $operator->Operator }}">{{ $operator->Operator }}</option>
+                @endif
+            @endforeach
+        </select>
+    </div>
+
+    <!-- Aircraft Type -->
+    <div class="flex flex-col w-full md:w-1/3">
+        <label for="aircraft-type-dropdown" class="mb-1">AC Type:</label>
+        <select name="aircraft_type" id="aircraft-type-dropdown" class="form-select w-full">
+            <option value="">Select Aircraft Type</option>
+            @foreach($aircraftTypes as $type)
+                <option value="{{ $type->ACType }}">{{ $type->ACType }}</option>
+            @endforeach
+        </select>
+    </div>
 </div>
+
+<!-- Buttons -->
+<div class="mt-4 flex justify-end">
+    <x-third-button type="submit">
+        Display Report
+    </x-third-button>
+</div>
+
 
 <!-- Display Report -->
 <div class="mt-4" id="display-data">
     <p>Please Select Periode, Operator and Aircraft Type First</p>
 </div>
 
-<!-- Tambahkan script untuk handle perubahan operator -->
+<!-- Script handle perubahan operator -->
 <script>
     document.getElementById('operator-dropdown').addEventListener('change', function () {
         const operator = this.value;
         const aircraftTypeDropdown = document.getElementById('aircraft-type-dropdown');
         
-        // Kosongkan dropdown AC Type
         aircraftTypeDropdown.innerHTML = '<option value="">Select Aircraft Type</option>';
 
         if (operator) {
-            // Kirim permintaan AJAX
             fetch(`/get-aircraft-types?operator=${operator}`)
                 .then(response => response.json())
                 .then(data => {
