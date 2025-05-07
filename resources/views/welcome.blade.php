@@ -1,62 +1,76 @@
-{{-- welcome.blade.php --}}
+<script src="//unpkg.com/alpinejs" defer></script>
 
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="id">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>Reliability Dashboard</title>
-
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
-    <!-- Styles / Scripts -->
+    <meta charset="UTF-8">
+    <title>GMF | Reliability Report</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans text-gray-900 antialiased h-full bg-no-repeat bg-cover" style="background-image: url('/images/bglogin.jpg');">
-    <header class="max-w-[1440px] mx-auto p-4">
-        @if (Route::has('login'))
-            <nav class="flex justify-end space-x-4">
-                @auth
-                    <a href="{{ url('/dashboard') }}" class="rounded-md px-4 py-2 text-white bg-gray-800 hover:bg-gray-700 transition duration-300">Dashboard</a>
-                @else
-                    <a href="{{ route('login') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">Log in</a>
-                    @if (Route::has('register'))
-                        <a href="{{ route('register') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">Register</a>
-                    @endif
-                @endauth
-            </nav>
-        @endif
-    </header>
+<body class="bg-[#0F0826] text-white font-sans min-h-screen overflow-hidden relative">
 
-    <main class="py-12">
-        <div class="max-w-[1440px] mx-auto text-center">
-            <h1 class="text-4xl font-bold text-white mb-4">Reliability Report</h1>
-            <h3 class="text-lg text-white mb-8">Login for full access and great experience</h3>
+    {{-- Main Content --}}
+    <div class="flex flex-col md:flex-row items-center justify-between h-screen relative z-10">
+        {{-- Left Content --}}
+        <div class="px-8 md:px-24 md:w-1/2 text-left space-y-6">
+            <img src="{{ asset('images/gmfwhite.png') }}" alt="Logo GMF" class="h-28 mb-6">
+            <h4 class="text-sm uppercase tracking-wider text-gray-400">Selamat Datang di</h4>
+            <h1 class="text-5xl font-light leading-tight">Reliability Report</h1>
+            <p class="text-gray-300 max-w-md">Platform laporan keandalan pesawat yang membantu memantau performa operasional dan mendukung pengambilan keputusan berbasis data..</p>
+            <a href="{{ route('login') }}" class="inline-block bg-green-500 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded shadow-md transition duration-300">
+                MASUK
+            </a>
+            <p class="text-xs text-gray-500 mt-10">© {{ date('Y') }} PT Garuda Maintenance Facility Aero Asia Tbk</p>
         </div>
 
-        <div class="max-w-[1440px] mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-lg rounded-lg relative">
-                <div class="relative h-96">
-                    <!-- Power BI embed -->
-                    <img src="{{ asset('images/powerbi.png') }}" class="w-full h-full object-cover rounded-lg" alt="Power BI Image">
-                    
-                    <!-- Overlay for blur effect -->
-                    <div class="absolute inset-0 bg-white bg-opacity-50 backdrop-blur-sm pointer-events-none"></div>
+    {{-- Right Content --}}
+    <div class="md:w-3/4 h-full relative overflow-hidden flex items-center justify-center"
+        x-data="{
+            images: [
+                '{{ asset('images/hangar.png') }}',
+                '{{ asset('images/hangar1.png') }}',
+                '{{ asset('images/hangar2.png') }}',
+                '{{ asset('images/hangar3.png') }}',
+                '{{ asset('images/hangar4.png') }}'
+            ],
+            currentIndex: 0,
+            setIndex(index) {
+                this.currentIndex = index;
+            },
+            init() {
+                setInterval(() => {
+                    this.currentIndex = (this.currentIndex + 1) % this.images.length;
+                }, 4000); // Change image every 4 seconds
+            }
+        }"
+    >
+        <!-- Image Carousel -->
+        <template x-for="(image, index) in images" :key="index">
+            <img
+                x-show="currentIndex === index"
+                x-transition:enter="transition-all transform duration-1000 ease-in-out"
+                x-transition:enter-start="opacity-0 translate-x-10 scale-95"
+                x-transition:enter-end="opacity-100 translate-x-0 scale-100"
+                x-transition:leave="transition-all transform duration-1000 ease-in-out"
+                x-transition:leave-start="opacity-100 translate-x-0 scale-100"
+                x-transition:leave-end="opacity-0 -translate-x-10 scale-95"
+                :src="image"
+                alt="GMF Image"
+                class="absolute rounded-2xl shadow-lg object-cover w-[85%] h-[70%] z-10"
+            >
+        </template>
 
-                    <div class="absolute inset-0 flex flex-col items-center justify-center">
-                        <div class="opacity-50 text-gray-500 font-bold text-8xl">Login</div>
-                        <div class="opacity-50 text-gray-500 font-bold text-2xl mt-2">For Full Access</div>
-                    </div>
-                </div>
-            </div>
+        <!-- Dot Navigation -->
+        <div class="absolute bottom-4 flex space-x-3">
+            <template x-for="(image, index) in images" :key="index">
+                <button
+                    :class="{'bg-green-500': currentIndex === index, 'bg-gray-500': currentIndex !== index}"
+                    @click="setIndex(index)"
+                    class="w-3 h-3 rounded-full transition-all"
+                ></button>
+            </template>
         </div>
-    </main>
-
-    <footer class="text-center p-4 mt-8">
-        <p class="text-white">© 2024 Reliability Dashboard. All rights reserved.</p>
-    </footer>
+    </div>
 </body>
 </html>
