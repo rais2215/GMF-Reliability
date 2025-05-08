@@ -146,7 +146,7 @@
         <!-- Left: Login Form -->
         <div class="px-8 md:px-12 md:w-1/2 text-left flex justify-center py-8 md:py-0">
             <div class="w-full max-w-md space-y-6">
-                <img src="{{ asset('images/gmfwhite.png') }}" alt="Logo GMF" class="h-20 mb-4">
+                <img src="{{ asset('images/gmfwhite.png') }}" alt="Logo GMF" class="h-24 mb-4">
                 <h1 class="text-3xl md:text-4xl font-light">Sign in to your account</h1>
 
                 <!-- Session Status -->
