@@ -12,6 +12,12 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
 
     <style>
+        /* Base Styles */
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            overflow-x: hidden;
+        }
+
         /* Swiper Styles */
         .swiper {
             width: 100%;
@@ -37,18 +43,22 @@
 
         .custom-bullet {
             display: inline-block;
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             background-color: #ffffff;
             opacity: 0.5;
             margin: 0 5px;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
 
         .custom-bullet.active {
             background-color: #22c55e;
             opacity: 1;
+            width: 12px;
+            height: 12px;
+            transform: translateY(-2px);
         }
 
         /* Animated Background */
@@ -96,16 +106,16 @@
 
         @keyframes float {
             0%, 100% {
-                transform: translateY(0) rotate(0deg);
+                transform: translateY(0) rotate(0deg) scale(1);
             }
             25% {
-                transform: translateY(-20px) rotate(5deg);
+                transform: translateY(-20px) rotate(5deg) scale(1.05);
             }
             50% {
-                transform: translateY(0) rotate(0deg);
+                transform: translateY(0) rotate(0deg) scale(1);
             }
             75% {
-                transform: translateY(20px) rotate(-5deg);
+                transform: translateY(20px) rotate(-5deg) scale(0.95);
             }
         }
 
@@ -115,7 +125,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 0;
+            margin-bottom: 20px;
         }
 
         .slide-image {
@@ -130,7 +140,56 @@
         }
         
         .slide-text-content {
-            margin-top: 10px;
+            margin-top: 20px;
+        }
+
+        /* Form Styles */
+        .form-container {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            border: 1px solid #374151;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #111827;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #22c55e;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            border-radius: 0.375rem;
+            padding: 0.5rem 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #22c55e;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #16a34a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -144,22 +203,24 @@
     </div>
 
     <!-- Main Wrapper -->
-    <div class="flex flex-col md:flex-row items-center justify-between h-screen px-6 md:px-24 relative z-10">
+    <div class="flex flex-col md:flex-row items-center justify-between h-screen relative z-10 container mx-auto px-4 md:px-12">
         <!-- Left Content (Welcome / Login Transition) -->
-        <div class="w-full md:w-1/2 space-y-6" :class="{ 'mt-10': showLogin }">
+        <div class="w-full md:w-1/2 p-6 md:p-12 flex flex-col justify-center">
             <!-- Logo -->
-            <img src="{{ asset('images/gmfwhite.png') }}" alt="Logo GMF" class="h-24 mb-4">
+            <div class="mb-8">
+                <img src="{{ asset('images/gmfwhite.png') }}" alt="Logo GMF" class="h-16">
+            </div>
 
             <!-- Welcome Section -->
             <div 
                 x-show="!showLogin"
-                x-transition:enter="transition duration-500 ease-out"
-                x-transition:enter-start="opacity-0 translate-x-6"
-                x-transition:enter-end="opacity-100 translate-x-0"
-                x-transition:leave="transition duration-300 ease-in"
-                x-transition:leave-start="opacity-100 translate-x-0"
-                x-transition:leave-end="opacity-0 -translate-x-6"
-                class="space-y-6"
+                x-transition:enter="transition duration-700 ease-out"
+                x-transition:enter-start="opacity-0 translate-y-6"
+                x-transition:enter-end="opacity-100 translate-y-0"
+                x-transition:leave="transition duration-500 ease-in"
+                x-transition:leave-start="opacity-100 scale-100"
+                x-transition:leave-end="opacity-0 scale-95"
+                class="space-y-6 max-w-lg"
             >
                 <h4 class="text-sm uppercase tracking-wider text-gray-400">Selamat Datang di</h4>
                 <h1 class="text-5xl font-light leading-tight">Reliability Report</h1>
@@ -168,7 +229,7 @@
                 </p>
                 <button 
                     @click="showLogin = true"
-                    class="inline-block bg-green-500 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded shadow-md transition duration-300"
+                    class="inline-block bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-3 rounded shadow-md transition-all duration-300 hover:transform hover:-translate-y-1 hover:shadow-lg"
                 >
                     MASUK
                 </button>
@@ -180,71 +241,75 @@
             <!-- Login Section -->
             <div 
                 x-show="showLogin"
-                x-transition:enter="transition duration-500 ease-out"
-                x-transition:enter-start="opacity-0 translate-x-6"
-                x-transition:enter-end="opacity-100 translate-x-0"
-                x-transition:leave="transition duration-300 ease-in"
-                x-transition:leave-start="opacity-100 translate-x-0"
-                x-transition:leave-end="opacity-0 -translate-x-6"
-                class="space-y-6"
+                x-transition:enter="transition duration-700 ease-out"
+                x-transition:enter-start="opacity-0 -translate-y-6"
+                x-transition:enter-end="opacity-100 translate-y-0"
+                x-transition:leave="transition duration-500 ease-in"
+                x-transition:leave-start="opacity-100 scale-100"
+                x-transition:leave-end="opacity-0 scale-95"
+                class="w-full max-w-lg"
             >
-                <h2 class="text-5xl font-light leading-tight">Sign in to your account</h2>
+                <h2 class="text-4xl font-light leading-tight mb-8">Sign in to your account</h2>
                 
                 <!-- Form Wrapper -->
-                <div class="max-w-md mx-auto">
-                    <form method="POST" action="{{ route('login') }}" class="space-y-4 text-gray-900">
+                <div class="w-full max-w-md">
+                    <form method="POST" action="{{ route('login') }}" class="space-y-4">
                         @csrf
 
                         <!-- Email Address -->
-                        <div>
-                            <x-input-label for="email" :value="'Email'" class="text-white" />
-                            <x-text-input 
+                        <div class="space-y-2">
+                            <label for="email" class="block text-sm font-medium text-white">Email</label>
+                            <input 
                                 id="email" 
-                                class="block mt-1 w-full text-black" 
+                                class="form-input" 
                                 type="email" 
                                 name="email" 
-                                :value="old('email')" 
+                                value="{{ old('email') }}" 
                                 required 
                                 autofocus 
                                 autocomplete="username" 
                             />
-                            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                            @error('email')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         
                         <!-- Password -->
-                        <div>
-                            <x-input-label for="password" :value="'Password'" class="text-white" />
-                            <x-text-input 
+                        <div class="space-y-2">
+                            <label for="password" class="block text-sm font-medium text-white">Password</label>
+                            <input 
                                 id="password" 
-                                class="block mt-1 w-full text-black" 
+                                class="form-input" 
                                 type="password" 
                                 name="password" 
                                 required 
                                 autocomplete="current-password" 
                             />
-                            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                            @error('password')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         
                         <!-- Button Back to Home -->
                         <button 
                             @click="showLogin = false" 
                             type="button"
-                            class="text-sm text-blue-400 hover:underline"
+                            class="text-sm text-blue-400 hover:underline mt-2"
                         >
                             ← Kembali ke Halaman Utama
                         </button>
                         
                         <!-- Action Buttons -->
-                        <div class="mt-6 flex justify-center gap-4">
+                        <div class="mt-8 flex space-x-4">
                             <button 
                                 type="submit" 
-                                class="px-6 py-2 bg-green-500 text-white text-sm font-semibold rounded-lg shadow hover:bg-green-600 transition"
+                                class="btn btn-primary"
                             >
                                 LOG IN
                             </button>
                             <a 
                                 href="{{ route('register') }}" 
-                                class="inline-block px-6 py-2 bg-green-500 text-white text-sm font-semibold rounded-lg shadow hover:bg-green-600 transition"
+                                class="btn btn-primary"
                             >
                                 REGISTER
                             </a>
@@ -255,7 +320,7 @@
         </div>
 
         <!-- Right: Carousel -->
-        <div class="hidden md:block md:w-1/2 h-full bg-[#0F0826]/10 backdrop-blur-sm">
+        <div class="hidden md:block md:w-1/2 h-full bg-[#0F0826]/10 backdrop-blur-sm px-4 md:px-12">
             <div class="swiper mySwiper h-full w-full relative">
                 <div class="swiper-wrapper">
                     <!-- Slide 1 -->
@@ -299,7 +364,7 @@
                 </div>
 
                 <!-- Custom Pagination -->
-                <div class="custom-pagination absolute bottom-6 left-1/2 transform -translate-x-1/2 z-10">
+                <div class="custom-pagination absolute bottom-10 left-1/2 transform -translate-x-1/2 z-10">
                     <span class="custom-bullet" data-index="0"></span>
                     <span class="custom-bullet" data-index="1"></span>
                     <span class="custom-bullet" data-index="2"></span>
@@ -319,6 +384,7 @@
                         disableOnInteraction: false,
                     },
                     effect: "fade",
+                    speed: 1000,
                     fadeEffect: {
                         crossFade: true
                     },
