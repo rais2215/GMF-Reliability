@@ -64,6 +64,22 @@
             50% { transform: translateY(0) rotate(0deg) scale(1); }
             75% { transform: translateY(20px) rotate(-5deg) scale(0.95); }
         }
+
+        /* New Fade and Slide Up Animation */
+        @keyframes fadeSlideUp {
+            0% {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeSlideUp 1s ease-out forwards;
+        }
     </style>
 </head>
 
@@ -76,7 +92,7 @@
     </div>
 
     <!-- Register Form -->
-    <div class="w-full max-w-md bg-blur/10 backdrop-blur-lg rounded-xl p-8 z-10">
+    <div class="w-full max-w-md bg-blur/10 backdrop-blur-lg rounded-xl p-8 z-10 opacity-0 fade-in-up">
         <h2 class="text-3xl font-semibold text-center mb-6 text-green-400">Sign up your account</h2>
 
         <form method="POST" action="{{ route('register') }}" class="space-y-4">
