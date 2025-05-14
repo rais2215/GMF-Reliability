@@ -44,9 +44,9 @@
 
         <!-- Tombol di tengah -->
         <div class="flex justify-center mt-4">
-            <x-third-button type="submit" class="px-6">
+            <button type="submit" class="bg-green-500 hover:bg-green-800 text-white font-semibold py-2 px-6 rounded-lg shadow-md">
                 Display Report
-            </x-third-button>
+            </button>
         </div>
     </form>
 </div>
@@ -65,7 +65,7 @@
         aircraftTypeDropdown.innerHTML = '<option value="">Select Aircraft Type</option>';
 
         if (operator) {
-            fetch(`/get-aircraft-types?operator=${operator}`)
+            fetch(/get-aircraft-types?operator=${operator})
                 .then(response => response.json())
                 .then(data => {
                     data.forEach(type => {
