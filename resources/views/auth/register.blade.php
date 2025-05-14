@@ -1,64 +1,132 @@
-<x-guest-layout>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Register | GMF Reliability</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <x-slot name="header">
-        {{ __('Sign up your account') }}
-    </x-slot>
+    <style>
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background-color: #0F0826;
+            color: white;
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
 
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
+        .animated-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
 
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
-        </div>
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(34, 197, 94, 0.3), rgba(15, 8, 38, 0.1));
+            filter: blur(30px);
+            animation: float 20s infinite ease-in-out;
+        }
 
-        <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+        .bg-circle:nth-child(1) {
+            width: 500px;
+            height: 500px;
+            top: -100px;
+            right: -100px;
+            animation-delay: 0s;
+        }
 
-        <!-- Position/Role -->
-        <div class="mt-4">
-            <x-input-label for="Position" :value="__('Position')" />
-            <x-text-input id="Position" class="block mt-1 w-full" type="Position" name="Position" :value="old('Position')" required autocomplete="Position" />
-            <x-input-error :messages="$errors->get('Position')" class="mt-2" />
-        </div>
+        .bg-circle:nth-child(2) {
+            width: 300px;
+            height: 300px;
+            bottom: -50px;
+            left: 10%;
+            animation-delay: -5s;
+        }
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+        .bg-circle:nth-child(3) {
+            width: 200px;
+            height: 200px;
+            bottom: 30%;
+            right: 20%;
+            animation-delay: -10s;
+        }
 
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="new-password" />
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+            25% { transform: translateY(-20px) rotate(5deg) scale(1.05); }
+            50% { transform: translateY(0) rotate(0deg) scale(1); }
+            75% { transform: translateY(20px) rotate(-5deg) scale(0.95); }
+        }
+    </style>
+</head>
 
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
+<body class="flex items-center justify-center px-4">
+    <!-- Background -->
+    <div class="animated-bg">
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+    </div>
 
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
+    <!-- Register Form -->
+    <div class="w-full max-w-md bg-blur/10 backdrop-blur-lg rounded-xl p-8 z-10">
+        <h2 class="text-3xl font-semibold text-center mb-6 text-green-400">Sign up your account</h2>
 
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                            type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
+        <form method="POST" action="{{ route('register') }}" class="space-y-4">
+            @csrf
 
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
+            <!-- Name -->
+            <div>
+                <x-input-label for="name" :value="('Name')" class="text-white" />
+                <x-text-input id="name" class="block mt-1 w-full text-black" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
+                <x-input-error :messages="$errors->get('name')" class="mt-2" />
+            </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
+            <!-- Email -->
+            <div>
+                <x-input-label for="email" :value="('Email')" class="text-white"/>
+                <x-text-input id="email" class="block mt-1 w-full text-black" type="email" name="email" :value="old('email')" required autocomplete="username" />
+                <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            </div>
 
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+            <!-- Position -->
+            <div>
+                <x-input-label for="Position" :value="('Position')" class="text-white"/>
+                <x-text-input id="Position" class="block mt-1 w-full text-black" type="text" name="Position" :value="old('Position')" required />
+                <x-input-error :messages="$errors->get('Position')" class="mt-2" />
+            </div>
+
+            <!-- Password -->
+            <div>
+                <x-input-label for="password" :value="('Password')" class="text-white"/>
+                <x-text-input id="password" class="block mt-1 w-full text-black" type="password" name="password" required autocomplete="new-password" />
+                <x-input-error :messages="$errors->get('password')" class="mt-2" />
+            </div>
+
+            <!-- Confirm Password -->
+            <div>
+                <x-input-label for="password_confirmation" :value="('Confirm Password')" class="text-white"/>
+                <x-text-input id="password_confirmation" class="block mt-1 w-full text-black" type="password" name="password_confirmation" required autocomplete="new-password" />
+                <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center justify-between mt-6">
+                <a class="text-sm text-white hover:underline" href="/">
+                    Already registered?
+                </a>
+                <x-primary-button class="bg-green-500 hover:bg-green-600 text-white">
+                    Register
+                </x-primary-button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
