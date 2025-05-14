@@ -208,7 +208,7 @@
         <div class="w-full md:w-1/2 p-6 md:p-12 flex flex-col justify-center">
             <!-- Logo -->
             <div class="mb-8">
-                <img src="{{ asset('images/gmfwhite.png') }}" alt="Logo GMF" class="h-16">
+                <img src="{{ asset('images/gmfwhite.png') }}" alt="Logo GMF" class="h-24">
             </div>
 
             <!-- Welcome Section -->
@@ -253,68 +253,80 @@
                 
                 <!-- Form Wrapper -->
                 <div class="w-full max-w-md">
-                    <form method="POST" action="{{ route('login') }}" class="space-y-4">
-                        @csrf
+                    <form method="POST" action="{{ route('login') }}" class="space-y-6">
+                    @csrf
 
-                        <!-- Email Address -->
-                        <div class="space-y-2">
-                            <label for="email" class="block text-sm font-medium text-white">Email</label>
-                            <input 
-                                id="email" 
-                                class="form-input" 
-                                type="email" 
-                                name="email" 
-                                value="{{ old('email') }}" 
-                                required 
-                                autofocus 
-                                autocomplete="username" 
-                            />
-                            @error('email')
-                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                            @enderror
+                    <!-- Email Address -->
+                    <div>
+                        <label for="email" class="block text-sm text-white">Email</label>
+                        <input 
+                            id="email" 
+                            class="form-input mt-1" 
+                            type="email" 
+                            name="email" 
+                            value="{{ old('email') }}" 
+                            required 
+                            autofocus 
+                            autocomplete="username" 
+                        />
+                        @error('email')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    
+                    <!-- Password -->
+                    <div>
+                        <label for="password" class="block text-sm text-white">Password</label>
+                        <input 
+                            id="password" 
+                            class="form-input mt-1" 
+                            type="password" 
+                            name="password" 
+                            required 
+                            autocomplete="current-password" 
+                        />
+                        @error('password')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Remember Me & Forgot Password -->
+                    <div class="flex items-center justify-between text-sm text-gray-300">
+                        <div class="flex items-center">
+                            <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-green-500 shadow-sm focus:ring-green-500" name="remember">
+                            <label for="remember_me" class="ms-2">Remember me</label>
                         </div>
-                        
-                        <!-- Password -->
-                        <div class="space-y-2">
-                            <label for="password" class="block text-sm font-medium text-white">Password</label>
-                            <input 
-                                id="password" 
-                                class="form-input" 
-                                type="password" 
-                                name="password" 
-                                required 
-                                autocomplete="current-password" 
-                            />
-                            @error('password')
-                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        
-                        <!-- Button Back to Home -->
+
+                        @if (Route::has('password.request'))
+                            <a class="underline text-gray-400 hover:text-white" href="{{ route('password.request') }}">
+                                Forgot your password?
+                            </a>
+                        @endif
+                    </div>
+
+                    <!-- Action Button -->
+                    <div>
                         <button 
-                            @click="showLogin = false" 
-                            type="button"
-                            class="text-sm text-blue-400 hover:underline mt-2"
+                            type="submit" 
+                            class="btn btn-primary w-full"
                         >
-                            ← Kembali ke Halaman Utama
+                            LOG IN
                         </button>
-                        
-                        <!-- Action Buttons -->
-                        <div class="mt-8 flex space-x-4">
-                            <button 
-                                type="submit" 
-                                class="btn btn-primary"
-                            >
-                                LOG IN
-                            </button>
+                    </div>
+
+                    <!-- Link to Register aligned right -->
+                    <div class="text-left mt-4">
+                        <p>
+                            Belum punya akun?
                             <a 
                                 href="{{ route('register') }}" 
-                                class="btn btn-primary"
-                            >
-                                REGISTER
+                                class="text-sm text-white hover:underline"
+                                >
+                                <span class="text-green-500 font-semibold"> Daftar di sini</span>
                             </a>
-                        </div>
-                    </form>
+                        </p>
+                    </div>
+                </form>
                 </div>
             </div>
         </div>
