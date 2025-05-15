@@ -27,6 +27,16 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
+        
+        /* New fade-out animation */
+        .fade-out {
+            animation: fadeOut 0.4s ease forwards;
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
 
         .bullet-ripple {
             position: absolute;
@@ -284,6 +294,35 @@
         .animate-logo-entry {
             animation: logoEntry 0.5s ease forwards;
         }
+        
+        @keyframes logoPulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .logo-pulse {
+            animation: logoPulse 0.8s ease-in-out forwards;
+        }
+
+        @keyframes logoSpin {
+            0% {
+                transform: rotateY(0deg);
+            }
+            100% {
+                transform: rotateY(360deg);
+            }
+        }
+        
+        .logo-spin {
+            animation: logoSpin 1s ease-in-out;
+        }
 
         @keyframes float {
             0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
@@ -319,8 +358,8 @@
         <div class="w-full md:w-1/2 p-6 md:p-12 flex flex-col justify-center">
             <div class="mb-8">
                 <img src="{{ asset('images/gmfwhite.png') }}" alt="Logo GMF" 
-                    class="h-24 animate-logo-entry"
-                    :class="h-24 animate-logo-entry">
+                    :class="{'h-24 animate-logo-entry': !showLogin, 'h-24 logo-pulse': showLogin}"
+                    class="transition-all duration-500">
             </div>
 
 
@@ -329,9 +368,11 @@
                 x-transition:enter="transition duration-100 ease-out"
                 x-transition:enter-start="opacity-0 translate-y-2"
                 x-transition:enter-end="opacity-100 translate-y-0"
+                x-transition:leave="fade-out duration-400"
                 x-transition:leave-start="opacity-100"
                 x-transition:leave-end="opacity-0"
                 class="space-y-5 max-w-lg"
+                id="welcome-section"
             >
                 <h4 class="text-sm uppercase tracking-wider text-gray-400 fade-in">Selamat Datang di</h4>
                 <h1 class="text-5xl font-light leading-tight fade-in" style="animation-delay: 0.1s">Reliability Report</h1>
@@ -339,7 +380,7 @@
                     Platform laporan keandalan pesawat yang membantu memantau performa operasional dan mendukung pengambilan keputusan berbasis data.
                 </p>
                 <button 
-                    @click="showLogin = true"
+                    @click="showLogin = true; document.getElementById('welcome-section').classList.add('fade-out')"
                     class="inline-block bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-3 rounded shadow-sm transition-all duration-300 fade-in hover:shadow-md"
                     style="animation-delay: 0.3s"
                 >
