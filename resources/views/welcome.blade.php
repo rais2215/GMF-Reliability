@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -27,23 +28,6 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
-
-        /* .slide-up {
-            opacity: 0;
-            transform: translateY(10px);
-            animation: slideUp 0.5s ease forwards;
-        } */
-
-        /* @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        } */
 
         .bullet-ripple {
             position: absolute;
@@ -327,7 +311,7 @@
     </style>
 </head>
 
-<body class="bg-[#0F0826] text-white font-sans min-h-screen overflow-hidden relative" x-data="{ showLogin: false }">
+<body class="bg-[#0F0826] text-white font-sans min-h-screen overflow-hidden relative" x-data="{ showLogin: {{ $errors->any() || session('status') ? 'true' : 'false' }} }">
     <div class="animated-bg">
         <div class="bg-gradient"></div>
     </div>
