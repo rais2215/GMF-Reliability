@@ -117,7 +117,7 @@
                     <td class="style1">{{ round($totalFlyingHoursTotal)}}</td>
                 </tr>
                 <tr>
-                    <td>Revenue Flying Hours</td>
+                    <td>- Revenue</td>
                     @for ($i = 11; $i >= 0; $i--)
                         @php
                             $revenueFlyingHours = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['revenueFlyingHours'];
@@ -139,7 +139,7 @@
                         <td class="style1">{{ round($totalTakeOffTotal) }}</td>
                 </tr>
                 <tr>
-                    <td>Revenue Take Off</td>
+                    <td>- Revenue</td>
                     @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $revenueTakeOff = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['revenueTakeOff'];
@@ -160,7 +160,7 @@
                         <td class="style1">{{ $avgFlightHoursPerTakeOffTotal }}</td>
                 </tr>
                 <tr>
-                    <td>Revenue Flight Hours per Take Off</td>
+                    <td>- Revenue</td>
                     @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $revenueFlightHoursPerTakeOff = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['revenueFlightHoursPerTakeOff'];
@@ -170,7 +170,7 @@
                         <td class="style1">{{ $avgRevenueFlightHoursPerTakeOff }}</td>
                 </tr>
                 <tr>
-                    <td>Daily Utilization - Flying Hours Total</td>
+                    <td>Daily Utiliz - Total FH</td>
                     @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $dailyUtilizationFlyingHoursTotal = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['dailyUtilizationFlyingHoursTotal'];
@@ -180,7 +180,7 @@
                         <td class="style1">{{ $avgDailyUtilizationFlyingHoursTotal }}</td>
                 </tr>
                 <tr>
-                    <td>Revenue Daily Utilization - Flying Hours Total</td>
+                    <td>- Revenue FH</td>
                     @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $revenueDailyUtilizationFlyingHoursTotal = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['revenueDailyUtilizationFlyingHoursTotal'];
@@ -190,7 +190,7 @@
                         <td class="style1">{{ $avgRevenueDailyUtilizationFlyingHoursTotal }}</td>
                 </tr>
                 <tr>
-                    <td>Daily Utilization - Take Off Total</td>
+                    <td>- Total FC</td>
                     @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $dailyUtilizationTakeOffTotal = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['dailyUtilizationTakeOffTotal'];
@@ -201,7 +201,7 @@
                         <td class="style1">{{ number_format($totalDailyUtilizationTakeOffTotal / 12, 2) }}</td>
                 </tr>
                 <tr>
-                    <td>Revenue Daily Utilization - Take Off Total</td>
+                    <td>- Revenue FC</td>
                     @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $revenueDailyUtilizationTakeOffTotal = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['revenueDailyUtilizationTakeOffTotal'];
@@ -223,7 +223,7 @@
                     <td class="style1">{{ round($totalTechnicalDelayTotal) }}</td>
                 </tr>
                 <tr>
-                    <td>Total Duration</td>
+                    <td>- Tot Duration</td>
                     @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $totalDuration = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['totalDuration'];
@@ -233,7 +233,7 @@
                         <td class="style1">{{ $avgTotalDuration }}</td>
                 </tr>
                 <tr>
-                    <td>Average Duration</td>
+                    <td>- Avg Duration</td>
                     @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $averageDuration = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['averageDuration']
@@ -243,7 +243,7 @@
                         <td class="style1">{{ $avgAverageDuration }}</td>
                 </tr>
                 <tr>
-                    <td>Rate / 100 Take Off</td>
+                    <td>- Rate / 100 Take Off</td>
                     @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $ratePer100TakeOff = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['ratePer100TakeOff'];
@@ -265,7 +265,7 @@
                         <td class="style1">{{ round($totalTechnicalIncidentTotal / 12) }}</td>
                 </tr>
                 <tr>
-                    <td>Technical Incident Rate / 100 FC</td>
+                    <td>- Rate/100 FC</td>
                     @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $technicalIncidentRate = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['technicalIncidentRate'] ?? 0; // Use null coalescing operator
