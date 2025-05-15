@@ -1,4 +1,3 @@
-{{-- Ganti Logo Laravel Login-Register di guest.blade.php --}}
     <!DOCTYPE html>
     <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
         <head>
