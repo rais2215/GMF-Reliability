@@ -29,7 +29,7 @@ class PilotController extends Controller
             ];
         });
 
-        return view('report.pilot-content', compact('aircraftTypes', 'periods', 'operators'));
+        return view('report.pilot-content', compact('aircraftTypes', 'operators', 'periods'));
     }
 
     public function pilotStore(Request $request) { 
