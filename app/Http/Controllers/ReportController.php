@@ -465,10 +465,6 @@ class ReportController extends Controller
         return Excel::download(new AosExport($reportData, $period, $aircraftType), 'AOS-Report-' . substr($period, 0, 7) . '.xlsx');
     }
     
-
-    
-
-
     public function cumulativeContent()
     {
         return view('report.cumulative-content');
