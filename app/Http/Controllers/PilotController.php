@@ -187,7 +187,6 @@ class PilotController extends Controller
             $marepTrend = 'DOWN';
         }
 
-
         // ~~~~~ {{ Technical Delay }} ~~~~~
         // ~~~ COUNTING TECHNICAL DELAY ~~~
         $getDelayCount = function($aircraftType, $month, $year) {
@@ -208,8 +207,6 @@ class PilotController extends Controller
             $loopYear = \Carbon\Carbon::parse($period)->subMonths($i)->year;
             $delay12Month += $getDelayCount($aircraftType, $loopMonth, $loopYear);  // Fixed variable name
         }
-
-
 
         // ~~~ TECHNICAL DELAY RATE ~~~
         $delayRate = $delayCount * 1000 / ($flyingHoursTotal ?: 1);
@@ -247,8 +244,6 @@ class PilotController extends Controller
          } elseif ($delay1Rate < $delay2Rate && $delay1Rate > $delayRate) {
              $delayTrend = 'DOWN';
          }
-        
-
         
         // Mengirimkan semua variabel yang diperlukan ke view
         return view('report.pilot-result', [
