@@ -13,14 +13,35 @@
 
     <div class="flex min-h-screen bg-gray-100">
         <!-- Sidebar -->
-        <aside class="w-64 bg-white shadow-md p-4 hidden sm:block">
-            <h3 class="text-lg font-bold text-gray-700 mb-4">Menu</h3>
-            <ul class="space-y-2">
-                <li><a href="#" class="block text-gray-700 hover:text-blue-600">🏠 Dashboard</a></li>
-                <li><a href="#" class="block text-gray-700 hover:text-blue-600">📊 Laporan</a></li>
-                <li><a href="#" class="block text-gray-700 hover:text-blue-600">⚙️ Pengaturan</a></li>
-            </ul>
-        </aside>
+       <aside class="w-64 bg-white shadow-md p-4 hidden sm:block">
+    <h3 class="text-lg font-bold text-gray-700 mb-4">Menu</h3>
+    <ul class="space-y-2">
+        <li>
+            <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                🏠 Dashboard
+            </x-nav-link>
+        </li>
+        <li>
+            <x-nav-link :href="route('report')" :active="request()->routeIs('report')">
+                📊 Report
+            </x-nav-link>
+        </li>
+        @if(Auth::user()->Position === 'Admin')
+            <li>
+                <x-nav-link :href="route('user-setting')" :active="request()->routeIs('user-setting')">
+                    ⚙ User Setting
+                </x-nav-link>
+            </li>
+        @endif
+        <li>
+            <x-nav-link :href="'https://dashboard-reliability.gmf-aeroasia.co.id/'" target="_blank">
+                🛠 Techlog Delay
+            </x-nav-link>
+        </li>
+    </ul>
+</aside>
+
+
 
         <!-- Main Content -->
         <main class="flex-1 p-6">
