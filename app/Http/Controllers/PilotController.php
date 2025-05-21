@@ -102,14 +102,8 @@ class PilotController extends Controller
         $pirepAlertLevel = TblAlertLevel::where('actype', $aircraftType)
             ->where('ata', '21')
             ->where('type', 'ALP')
-            ->where(function($query) use ($period) {
-                $query->whereBetween('startmonth', [$period, $period])
-                    ->orWhereBetween('endmonth', [$period, $period])
-                    ->orWhere(function($query) use ($period) {
-                        $query->where('startmonth', '<=', $period)
-                              ->where('endmonth', '>=', $period);
-                    });
-            })
+            ->where('startmonth', '<=', $period)
+            ->where('endmonth', '>=', $period)
             ->pluck('alertlevel')
             ->first();
         // ~~~ PIREP ALERT STATUS ~~~
@@ -159,15 +153,9 @@ class PilotController extends Controller
         // ~~~ MAREP ALERT LEVEL ~~~
         $marepAlertLevel = TblAlertLevel::where('actype', $aircraftType)
             ->where('ata', '21')
-            ->where('type', 'ALM')
-            ->where(function($query) use ($period){
-                $query->whereBetween('startmonth', [$period, $period])
-                    ->orWhereBetween('endmonth', [$period, $period])
-                    ->orWhere(function($query) use ($period){
-                        $query->where('startmonth', '<=', $period)
-                            ->where('endmonth', '>=', $period);
-                    });
-            })
+            ->where('type', 'ALP')
+            ->where('startmonth', '<=', $period)
+            ->where('endmonth', '>=', $period)
             ->pluck('alertlevel')
             ->first();
         // ~~~ MAREP ALERT STATUS ~~~
@@ -217,15 +205,9 @@ class PilotController extends Controller
         // ~~~ TECHNICAL DELAY ALERT LEVEL ~~~
         $delayAlertLevel = TblAlertLevel::where('actype', $aircraftType)
             ->where('ata', '21')
-            ->where('type', 'ALD')
-            ->where(function($query) use ($period){
-                $query->whereBetween('startmonth', [$period, $period])
-                    ->orWhereBetween('endmonth', [$period, $period])
-                    ->orWhere(function($query) use ($period){
-                        $query->where('startmonth', '<=', $period)
-                            ->where('endmonth', '>=', $period);
-                    });
-            })
+            ->where('type', 'ALP')
+            ->where('startmonth', '<=', $period)
+            ->where('endmonth', '>=', $period)
             ->pluck('alertlevel')
             ->first();
          // ~~~ TECHNICAL DELAY ALERT STATUS ~~~
@@ -284,6 +266,7 @@ class PilotController extends Controller
     
         $aircraftType = $request->aircraft_type;
         $period = $request->period; // Format: YYYY-MM
+        
     
         // Mendapatkan bulan dan tahun dari periode
         $month = date('m', strtotime($period));
@@ -344,14 +327,8 @@ class PilotController extends Controller
         $pirepAlertLevel = TblAlertLevel::where('actype', $aircraftType)
             ->where('ata', '21')
             ->where('type', 'ALP')
-            ->where(function($query) use ($period) {
-                $query->whereBetween('startmonth', [$period, $period])
-                    ->orWhereBetween('endmonth', [$period, $period])
-                    ->orWhere(function($query) use ($period) {
-                        $query->where('startmonth', '<=', $period)
-                              ->where('endmonth', '>=', $period);
-                    });
-            })
+            ->where('startmonth', '<=', $period)
+            ->where('endmonth', '>=', $period)
             ->pluck('alertlevel')
             ->first();
         // ~~~ PIREP ALERT STATUS ~~~
@@ -401,15 +378,9 @@ class PilotController extends Controller
         // ~~~ MAREP ALERT LEVEL ~~~
         $marepAlertLevel = TblAlertLevel::where('actype', $aircraftType)
             ->where('ata', '21')
-            ->where('type', 'ALM')
-            ->where(function($query) use ($period){
-                $query->whereBetween('startmonth', [$period, $period])
-                    ->orWhereBetween('endmonth', [$period, $period])
-                    ->orWhere(function($query) use ($period){
-                        $query->where('startmonth', '<=', $period)
-                            ->where('endmonth', '>=', $period);
-                    });
-            })
+            ->where('type', 'ALP')
+            ->where('startmonth', '<=', $period)
+            ->where('endmonth', '>=', $period)
             ->pluck('alertlevel')
             ->first();
         // ~~~ MAREP ALERT STATUS ~~~
@@ -459,15 +430,9 @@ class PilotController extends Controller
         // ~~~ TECHNICAL DELAY ALERT LEVEL ~~~
         $delayAlertLevel = TblAlertLevel::where('actype', $aircraftType)
             ->where('ata', '21')
-            ->where('type', 'ALD')
-            ->where(function($query) use ($period){
-                $query->whereBetween('startmonth', [$period, $period])
-                    ->orWhereBetween('endmonth', [$period, $period])
-                    ->orWhere(function($query) use ($period){
-                        $query->where('startmonth', '<=', $period)
-                            ->where('endmonth', '>=', $period);
-                    });
-            })
+            ->where('type', 'ALP')
+            ->where('startmonth', '<=', $period)
+            ->where('endmonth', '>=', $period)
             ->pluck('alertlevel')
             ->first();
          // ~~~ TECHNICAL DELAY ALERT STATUS ~~~
