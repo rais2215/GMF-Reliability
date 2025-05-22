@@ -18,17 +18,9 @@
         <!-- Left Sidebar - User Profile and Navigation -->
         <div class="w-96 bg-white shadow-md flex flex-col">
             <!-- Logo and Toggle -->
-            <div class="p-4 bg-sky-200 flex items-center justify-between">
+            <div class="p-6 bg-sky-200 flex items-center justify-between">
                 <div class="flex items-center">
                     <img src="{{ asset('images/gmfblue.png') }}" alt="GMF AeroAsia" class="h-8">
-                </div>
-                <div class="flex gap-2">
-                    <button class="w-10 h-10 flex items-center justify-center rounded-full bg-sky-300 text-blue-800">
-                        <i data-lucide="moon" class="w-5 h-5"></i>
-                    </button>
-                    <button class="w-10 h-10 flex items-center justify-center rounded-full bg-pink-200 text-red-600">
-                        <i data-lucide="log-out" class="w-5 h-5"></i>
-                    </button>
                 </div>
             </div>
 
@@ -38,7 +30,6 @@
                     <img src="{{ asset('images/hangar1.png') }}" alt="Profile" class="w-full h-full object-cover">
                 </div>
                 <h2 class="text-xl font-bold text-gray-800">{{ Auth::user()->name ?? '' }}</h2>
-                <p class="text-gray-600">{{ Auth::user()->id ?? '' }}</p>
                 
                 <!-- Profile Buttons -->
                 <div class="w-full px-8 mt-4 space-y-2">
@@ -81,6 +72,20 @@
                             <span>Techlog Delay</span>
                         </a>
                     </li>
+
+                    <!-- Log Out -->
+                    <li>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="w-full flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-100">
+                                <div class="w-8 h-8 flex items-center justify-center mr-3 text-red-600">
+                                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                                </div>
+                                <span>Log Out</span>
+                            </button>
+                        </form>
+                    </li>
+
 
                     <!-- Only Admin: User Setting -->
                     @if(Auth::user()->Position === 'Admin')
