@@ -141,15 +141,54 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
                     <div class="bg-white p-4 rounded-xl shadow">
                         <h4 class="text-sm text-gray-500">Total Penerbangan</h4>
-                        <p class="text-2xl font-semibold text-blue-600">124</p>
+                        <p class="text-2xl font-semibold text-blue-600">
+                            {{ $totalFlights ?? '-' }}
+                        </p>
                     </div>
                     <div class="bg-white p-4 rounded-xl shadow">
                         <h4 class="text-sm text-gray-500">Delay Hari Ini</h4>
-                        <p class="text-2xl font-semibold text-red-500">3</p>
+                        <p class="text-2xl font-semibold text-red-500">
+                            {{ $todayDelays ?? '-' }}
+                        </p>
                     </div>
                     <div class="bg-white p-4 rounded-xl shadow">
                         <h4 class="text-sm text-gray-500">Dispatch Rate</h4>
-                        <p class="text-2xl font-semibold text-green-600">98.5%</p>
+                        <p class="text-2xl font-semibold text-green-600">
+                            {{ $dispatchRate ?? '-' }}%
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Detail Table: Delay Hari Ini -->
+                <div class="bg-white p-4 rounded-xl shadow mb-6">
+                    <h4 class="text-lg font-semibold text-gray-800 mb-4">Detail Delay Hari Ini</h4>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-sm text-left">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="px-4 py-2 font-medium text-gray-600">Flight No</th>
+                                    <th class="px-4 py-2 font-medium text-gray-600">Aircraft</th>
+                                    <th class="px-4 py-2 font-medium text-gray-600">Delay (min)</th>
+                                    <th class="px-4 py-2 font-medium text-gray-600">Reason</th>
+                                    <th class="px-4 py-2 font-medium text-gray-600">Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($todayDelayDetails ?? [] as $delay)
+                                    <tr class="border-b">
+                                        <td class="px-4 py-2">{{ $delay->flight_no }}</td>
+                                        <td class="px-4 py-2">{{ $delay->aircraft }}</td>
+                                        <td class="px-4 py-2">{{ $delay->duration }}</td>
+                                        <td class="px-4 py-2">{{ $delay->reason }}</td>
+                                        <td class="px-4 py-2">{{ $delay->time->format('H:i') }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="px-4 py-2 text-center text-gray-400">Tidak ada delay hari ini.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
@@ -163,15 +202,7 @@
                                 src="https://app.powerbi.com/view?r=eyJrIjoiNWYxNjYxZGItZTVjZS00YmQxLWIxMTctNjU3NDU0YmM0ODI5IiwidCI6ImIxNTAxOTBhLTE2ZjMtNGZiYS04YmY2LTNhNjIwYWI3NjA3OSIsImMiOjEwfQ%3D%3D"
                                 class="w-full h-full border-none"
                                 allowfullscreen></iframe>
-                        <div class="absolute bottom-2 right-2 flex items-center text-xs text-gray-500">
-                            <span>Microsoft Power BI</span>
-                            <button class="ml-2 p-1 hover:bg-gray-100 rounded">
-                                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                            </button>
-                            <button class="ml-1 p-1 hover:bg-gray-100 rounded">
-                                <i data-lucide="maximize-2" class="w-4 h-4"></i>
-                            </button>
-                        </div>
+
                     </div>
                 </div>
             </div>
