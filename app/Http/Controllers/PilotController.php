@@ -224,19 +224,27 @@ class PilotController extends Controller
 
         // ~~~ MAREP ALERT STATUS ~~~
         $marepAlertStatus = '';
-        if ($marepRate > $marepAlertLevel && $marep1Rate > $marepAlertLevel && $marep2Rate > $marepAlertLevel){
+        // RED-3: 3 bulan berturut-turut melebihi alert level
+        if ($marepRate > $marepAlertLevel && $marep1Rate > $marepAlertLevel && $marep2Rate > $marepAlertLevel) {
             $marepAlertStatus = 'RED-3';
-        } elseif ($marepRate > $marepAlertLevel && $marep1Rate > $marepAlertLevel){
+        }
+        // RED-2: 2 bulan terakhir berturut-turut melebihi alert level
+        elseif ($marepRate > $marepAlertLevel && $marep1Rate > $marepAlertLevel) {
             $marepAlertStatus = 'RED-2';
-        } elseif ($marepRate > $marepAlertLevel){
+        }
+        // RED-1: hanya bulan terakhir melebihi alert level
+        elseif ($marepRate > $marepAlertLevel) {
             $marepAlertStatus = 'RED-1';
         }
+        
         // ~~~ MAREP TREND ~~~
         $marepTrend = '';
-        if ($marep1Rate > $marep2Rate && $marep1Rate < $marepRate) {
-            $marepTrend = 'UP';
-        } elseif ($marep1Rate < $marep2Rate && $marep1Rate > $marepRate) {
+        if ($marepRate < $marep1Rate && $marep1Rate < $marep2Rate) {
             $marepTrend = 'DOWN';
+        } elseif ($marepRate > $marep1Rate && $marep1Rate < $marep2Rate) {
+            $marepTrend = null;
+        }elseif ($marepRate > $marep1Rate && $marep1Rate > $marep2Rate) {
+            $marepTrend = 'UP';
         }
 
         // ~~~~~ {{ Technical Delay }} ~~~~~
