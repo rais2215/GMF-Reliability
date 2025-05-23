@@ -140,19 +140,27 @@ class PilotController extends Controller
 
         // ~~~ PIREP ALERT STATUS ~~~
         $pirepAlertStatus = '';
+        // RED-3: 3 bulan berturut-turut melebihi alert level
         if ($pirepRate > $pirepAlertLevel && $pirep1Rate > $pirepAlertLevel && $pirep2Rate > $pirepAlertLevel) {
             $pirepAlertStatus = 'RED-3';
-        } elseif ($pirepRate > $pirepAlertLevel && $pirep1Rate > $pirepAlertLevel) {
+        }
+        // RED-2: 2 bulan terakhir berturut-turut melebihi alert level
+        elseif ($pirepRate > $pirepAlertLevel && $pirep1Rate > $pirepAlertLevel) {
             $pirepAlertStatus = 'RED-2';
-        } elseif ($pirepRate > $pirepAlertLevel) {
+        }
+        // RED-1: hanya bulan terakhir melebihi alert level
+        elseif ($pirepRate > $pirepAlertLevel) {
             $pirepAlertStatus = 'RED-1';
         }
+        
         // ~~~ PIREP TREND ~~~
         $pirepTrend = '';
-        if ($pirep1Rate > $pirep2Rate && $pirep1Rate < $pirepRate) {
-            $pirepTrend = 'UP';
-        } elseif ($pirep1Rate < $pirep2Rate && $pirep1Rate > $pirepRate) {
+        if ($pirepRate < $pirep1Rate && $pirep1Rate < $pirep2Rate) {
             $pirepTrend = 'DOWN';
+        } elseif ($pirepRate > $pirep1Rate && $pirep1Rate < $pirep2Rate) {
+            $pirepTrend = '';
+        } elseif ($pirepRate > $pirep1Rate && $pirep1Rate > $pirep2Rate) {
+            $pirepTrend = 'UP';
         }
 
         // ~~~~~ {{ Maintenance Report }} ~~~~~
@@ -242,8 +250,8 @@ class PilotController extends Controller
         if ($marepRate < $marep1Rate && $marep1Rate < $marep2Rate) {
             $marepTrend = 'DOWN';
         } elseif ($marepRate > $marep1Rate && $marep1Rate < $marep2Rate) {
-            $marepTrend = null;
-        }elseif ($marepRate > $marep1Rate && $marep1Rate > $marep2Rate) {
+            $marepTrend = '';
+        } elseif ($marepRate > $marep1Rate && $marep1Rate > $marep2Rate) {
             $marepTrend = 'UP';
         }
 
