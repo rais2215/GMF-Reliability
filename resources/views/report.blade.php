@@ -1,4 +1,12 @@
 <x-app-layout>
+    <!-- Page Loader -->
+    <div id="page-loader" class="fixed inset-0 bg-white/70 backdrop-blur-sm z-50 hidden items-center justify-center transition-opacity duration-300">
+        <div class="flex flex-col items-center">
+            <i data-lucide="loader" class="w-10 h-10 text-blue-600 animate-spin mb-3"></i>
+            <p class="text-sm text-gray-600">Loading...</p>
+        </div>
+    </div>
+
     <!-- Header dengan ikon -->
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight flex items-center gap-2">
@@ -12,10 +20,7 @@
             <div class="mb-4 space-y-2">
                 <!-- Tombol Back to Dashboard -->
                 <a href="/dashboard" class="flex items-center text-gray-800 hover:text-blue-700 font-semibold">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 12l2-2m0 0l7-7 7 7m-9 0v6m0 0H5m4 0h10" />
-                    </svg>
-                    🏠 Back to Dashboard
+                    <i data-lucide="home" class="w-5 h-5 mr-2"></i> Back to Dashboard
                 </a>
 
                 <!-- Label All Report -->
@@ -49,4 +54,30 @@
     </div>
 
     <script src="{{ asset('js/report.js') }}"></script>
+
+    <!-- Lucide Icons Script -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+
+            const loader = document.getElementById('page-loader');
+            const links = document.querySelectorAll('a[href]:not([target="_blank"])');
+
+            links.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    const href = this.getAttribute('href');
+                    if (!href || href.startsWith('#') || href === window.location.href) return;
+
+                    e.preventDefault();
+                    loader.classList.remove('hidden');
+                    loader.classList.add('flex');
+
+                    setTimeout(() => {
+                        window.location.href = href;
+                    }, 500);
+                });
+            });
+        });
+    </script>
 </x-app-layout>

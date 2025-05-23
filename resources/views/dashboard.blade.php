@@ -1,3 +1,12 @@
+<!-- Loading Spinner Overlay -->
+<div id="page-loader" class="fixed inset-0 bg-white/70 backdrop-blur-sm z-50 hidden items-center justify-center transition-opacity duration-300">
+    <div class="flex flex-col items-center">
+        <i data-lucide="loader" class="w-10 h-10 text-blue-600 animate-spin mb-3"></i>
+        <p class="text-sm text-gray-600">Loading...</p>
+    </div>
+</div>
+
+
 <x-app-layout>
     @if(session('error'))
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mx-6 my-4">
@@ -75,15 +84,15 @@
 
                     <!-- Log Out -->
                     <li>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="w-full flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-100">
-                                <div class="w-8 h-8 flex items-center justify-center mr-3 text-red-600">
-                                    <i data-lucide="log-out" class="w-5 h-5"></i>
-                                </div>
-                                <span>Log Out</span>
-                            </button>
-                        </form>
+                        <form id="logout-form" method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="w-full flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-100">
+                            <div class="w-8 h-8 flex items-center justify-center mr-3 text-red-600">
+                                <i data-lucide="log-out" class="w-5 h-5"></i>
+                            </div>
+                            <span>Log Out</span>
+                        </button>
+                    </form>
                     </li>
 
 
@@ -204,25 +213,36 @@
 
     <!-- Spinner Script -->
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
-            const loader = document.getElementById('page-loader');
-            const links = document.querySelectorAll('a[href]:not([target="_blank"])');
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+        const loader = document.getElementById('page-loader');
+        const links = document.querySelectorAll('a[href]:not([target="_blank"])');
 
-            links.forEach(link => {
-                link.addEventListener('click', function (e) {
-                    const href = this.getAttribute('href');
-                    if (!href || href.startsWith('#') || href === window.location.href) return;
+        // Handle link clicks
+        links.forEach(link => {
+            link.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (!href || href.startsWith('#') || href === window.location.href) return;
 
-                    e.preventDefault();
-                    loader.classList.remove('hidden');
-                    loader.classList.add('flex');
+                e.preventDefault();
+                loader.classList.remove('hidden');
+                loader.classList.add('flex');
 
-                    setTimeout(() => {
-                        window.location.href = href;
-                    }, 500);
-                });
+                setTimeout(() => {
+                    window.location.href = href;
+                }, 500);
             });
         });
+
+        // Handle logout form submission
+        const logoutForm = document.getElementById('logout-form');
+        if (logoutForm) {
+            logoutForm.addEventListener('submit', function () {
+                loader.classList.remove('hidden');
+                loader.classList.add('flex');
+            });
+        }
+    });
     </script>
+
 </x-app-layout>
