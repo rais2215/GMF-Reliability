@@ -64,24 +64,24 @@
                         <x-table.th>STATUS</x-table.th>
                     </tr>
                 </x-table.thead>
-                <x-table.tbody>
-                    @foreach ($tblAta as $item)
+               <x-table.tbody>
+                    @foreach ($reportPerAta as $row)
                     <tr>
-                        <x-table.th>{{ $item->ATA }}</x-table.th>
-                        <x-table.th>{{ $item->ATA_DESC }}</x-table.th>
-                        <x-table.td><a href="#">{{ $pirepCountTwoMonthsAgo }}</a></x-table.td>
-                        <x-table.td><a href="#">{{ $pirepCountBefore }}</a></x-table.td>
-                        <x-table.td><a href="#">{{ $pirepCount }}</a></x-table.td>
-                        <x-table.td>{{ $pirep3Month }}</x-table.td>
-                        <x-table.td>{{ $pirep12Month }}</x-table.td>
-                        <x-table.td>{{ number_format($pirep2Rate,2) }}</x-table.td>
-                        <x-table.td>{{ number_format($pirep1Rate,2) }}</x-table.td>
-                        <x-table.td>{{ number_format($pirepRate,2) }}</x-table.td>
-                        <x-table.td>{{ number_format($pirepRate3Month,2) }}</x-table.td>
-                        <x-table.td>{{ number_format($pirepRate12Month, 2) }}</x-table.td>
-                        <x-table.td>{{ number_format($pirepAlertLevel,2) }}</x-table.td>
-                        <x-table.td>{{ $pirepAlertStatus }}</x-table.td>
-                        <x-table.td>{{ $pirepTrend }}</x-table.td>
+                        <x-table.th>{{ $row['ata'] }}</x-table.th>
+                        <x-table.th>{{ $row['ata_name'] ?? '' }}</x-table.th>
+                        <x-table.td><a href="#">{{ $row['pirepCountTwoMonthsAgo'] }}</a></x-table.td>
+                        <x-table.td><a href="#">{{ $row['pirepCountBefore'] }}</a></x-table.td>
+                        <x-table.td><a href="#">{{ $row['pirepCount'] }}</a></x-table.td>
+                        <x-table.td>{{ $row['pirep3Month'] }}</x-table.td>
+                        <x-table.td>{{ $row['pirep12Month'] }}</x-table.td>
+                        <x-table.td>{{ number_format($row['pirep2Rate'],2) }}</x-table.td>
+                        <x-table.td>{{ number_format($row['pirep1Rate'],2) }}</x-table.td>
+                        <x-table.td>{{ number_format($row['pirepRate'],2) }}</x-table.td>
+                        <x-table.td>{{ number_format($row['pirepRate3Month'],2) }}</x-table.td>
+                        <x-table.td>{{ number_format($row['pirepRate12Month'],2) }}</x-table.td>
+                        <x-table.td>{{ number_format($row['pirepAlertLevel'],2) }}</x-table.td>
+                        <x-table.td>{{ $row['pirepAlertStatus'] }}</x-table.td>
+                        <x-table.td>{{ $row['pirepTrend'] }}</x-table.td>
                     </tr>  
                     @endforeach
                 </x-table.tbody>
