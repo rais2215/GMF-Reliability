@@ -140,16 +140,16 @@ class PilotController extends Controller
 
         // ~~~ PIREP ALERT STATUS ~~~
         $pirepAlertStatus = '';
-        // RED-3: 3 bulan berturut-turut melebihi alert level
-        if ($pirepRate > $pirepAlertLevel && $pirep1Rate > $pirepAlertLevel && $pirep2Rate > $pirepAlertLevel) {
+        $alertCount = 0;
+        if ($pirepRate > $pirepAlertLevel) $alertCount++;
+        if ($pirep1Rate > $pirepAlertLevel) $alertCount++;
+        if ($pirep2Rate > $pirepAlertLevel) $alertCount++;
+
+        if ($alertCount == 3) {
             $pirepAlertStatus = 'RED-3';
-        }
-        // RED-2: 2 bulan terakhir berturut-turut melebihi alert level
-        elseif ($pirepRate > $pirepAlertLevel && $pirep1Rate > $pirepAlertLevel) {
+        } elseif ($alertCount == 2) {
             $pirepAlertStatus = 'RED-2';
-        }
-        // RED-1: hanya bulan terakhir melebihi alert level
-        elseif ($pirepRate > $pirepAlertLevel) {
+        } elseif ($alertCount == 1) {
             $pirepAlertStatus = 'RED-1';
         }
         
