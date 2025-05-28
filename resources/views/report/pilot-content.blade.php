@@ -1,4 +1,4 @@
-<h1 class="text-3xl font-bold mb-8 text-center text-gray-800">Pilot Report And Technical Delay</h1>
+<h1 class="text-3xl font-bold mb-8 text-center text-white">Pilot Report And Technical Delay</h1>
 
 <div class="container mx-auto px-4">
     <form action="{{ url('/report/pilot') }}" method="POST" class="bg-white p-6 rounded-xl shadow-md">
@@ -42,7 +42,7 @@
 
         <!-- Tombol di Tengah -->
         <div class="flex justify-center mt-4">
-            <button type="submit" class="bg-green-500 hover:bg-green-800 text-white font-semibold py-2 px-6 rounded-lg shadow-md">
+            <button type="submit" class="bg-[#112955] hover:bg-blue-800 text-white font-semibold py-2 px-6 rounded-lg shadow-md">
                 Display Report
             </button>
         </div>
@@ -50,6 +50,30 @@
 </div>
 
 <!-- Display Report Placeholder -->
-<div class="mt-6 text-center text-gray-600" id="display-data">
+<div class="mt-6 text-center text-white" id="display-data">
     <p>Please select Periode, Operator, and Aircraft Type to display the report.</p>
 </div>
+
+<!-- JS untuk update aircraft type -->
+<script>
+    document.getElementById('operator-dropdown').addEventListener('change', function () {
+        const operator = this.value;
+        const aircraftTypeDropdown = document.getElementById('aircraft-type-dropdown');
+
+        aircraftTypeDropdown.innerHTML = '<option value="">Select Aircraft Type</option>';
+
+        if (operator) {
+            fetch(/get-aircraft-types?operator=${operator})
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(type => {
+                        const option = document.createElement('option');
+                        option.value = type.ACType;
+                        option.textContent = type.ACType;
+                        aircraftTypeDropdown.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching aircraft types:', error));
+        }
+    });
+</script>

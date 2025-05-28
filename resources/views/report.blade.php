@@ -47,9 +47,9 @@
         </div>
     
         <!-- Main Content Area -->
-        <div class="flex-1 p-6 bg-green-200" id="main-content">
-            <h1 class="text-3xl font-bold mb-4">Main Content Area</h1>
-            <p>This is where the main content will go. You can place your reports, data, or any other content here.</p>
+        <div class="flex-1 p-6" id="main-content" style="background-color: #7EBB1A;">
+            <h1 class="text-3xl text-white font-bold mb-4">Main Content Area</h1>
+            <p class="text-white">This is where the main content will go. You can place your reports, data, or any other content here.</p>
         </div>
     </div>
 

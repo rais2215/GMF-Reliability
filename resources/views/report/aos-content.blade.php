@@ -1,4 +1,4 @@
-<h1 class="text-3xl font-bold mb-8 text-center text-gray-800">Aircraft Operation Summary</h1>
+<h1 class="text-3xl font-bold mb-8 text-center text-white">Aircraft Operation Summary</h1>
 
 <div class="container mx-auto px-4">
     <form action="{{ url('/report/aos') }}" method="POST" class="bg-white p-6 rounded-xl shadow-md">
@@ -42,9 +42,9 @@
             </div>
         </div>
 
-        <!-- Tombol di tengah -->
+        <!-- Tombol di Tengah -->
         <div class="flex justify-center mt-4">
-            <button type="submit" class="bg-green-500 hover:bg-green-800 text-white font-semibold py-2 px-6 rounded-lg shadow-md">
+            <button type="submit" class="bg-[#112955] hover:bg-blue-800 text-white font-semibold py-2 px-6 rounded-lg shadow-md">
                 Display Report
             </button>
         </div>
@@ -52,7 +52,7 @@
 </div>
 
 <!-- Display Report Placeholder -->
-<div class="mt-6 text-center text-gray-600" id="display-data">
+<div class="mt-6 text-center text-white" id="display-data">
     <p>Please select Periode, Operator, and Aircraft Type to display the report.</p>
 </div>
 

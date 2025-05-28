@@ -48,16 +48,22 @@
         </div>
 
         <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
+            <x-primary-button 
+            style="background-color: #7EBB1A; border-color: #7EBB1A;"
+            onmouseover="this.style.backgroundColor='#8DC63F '; this.style.borderColor='#8DC63F ';"
+            onmouseout="this.style.backgroundColor='#7EBB1A'; this.style.borderColor='#7EBB1A';"
+            >
+            {{ __('Save') }}
+            </x-primary-button>
 
             @if (session('status') === 'profile-updated')
-                <p
-                    x-data="{ show: true }"
-                    x-show="show"
-                    x-transition
-                    x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600"
-                >{{ __('Saved.') }}</p>
+            <p
+            x-data="{ show: true }"
+            x-show="show"
+            x-transition
+            x-init="setTimeout(() => show = false, 2000)"
+            class="text-sm text-gray-600"
+            >{{ __('Saved.') }}</p>
             @endif
         </div>
     </form>
