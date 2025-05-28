@@ -50,11 +50,9 @@
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
-                                                this.closest('form').submit();" style="color: #112955;">
+                            <button type="submit" class="w-full text-left px-4 py-2 text-sm" style="color: #112955; background: none; border: none;">
                                 Log Out
-                            </x-dropdown-link>
+                            </button>
                         </form>
                     </x-slot>
                 </x-dropdown>
@@ -92,26 +90,17 @@
         </div>
 
         <!-- Responsive Settings Options -->
-        <div class="pt-4 pb-1 border-t" style="border-color: #112955;">
-            <div class="px-4">
-                <div class="font-medium text-base" style="color: #fff;">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm" style="color: #fff;">{{ Auth::user()->email }}</div>
-            </div>
-
-            <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')" style="color: #112955;">
-                    Profile
-                </x-responsive-nav-link>
-                <!-- Authentication -->
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
-                                        this.closest('form').submit();" style="color: #112955;">
-                        Log Out
-                    </x-responsive-nav-link>
-                </form>
-            </div>
+        <div class="mt-3 space-y-1">
+            <x-responsive-nav-link :href="route('profile.edit')" style="color: #112955;">
+                Profile
+            </x-responsive-nav-link>
+            <!-- Authentication -->
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="w-full text-left px-4 py-2 text-sm" style="color: #112955; background: none; border: none;">
+                    Log Out
+                </button>
+            </form>
         </div>
     </div>
 </nav>
