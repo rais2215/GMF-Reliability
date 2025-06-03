@@ -1,5 +1,67 @@
+<!-- filepath: c:\Users\Noval Rais\Documents\Github Repository\GMF-Reliability\resources\views\report\pilot-result.blade.php -->
 <x-app-layout>
-    <div class=" mx-auto py-4 px-4 sm:px-6 lg:px-8">
+    <!-- Loading Skeleton untuk Result Page -->
+    <div id="result-skeleton-loader" class="mx-auto py-4 px-4 sm:px-6 lg:px-8">
+        <!-- Header Skeleton -->
+        <div class="flex justify-between items-center mb-6">
+            <div class="h-6 bg-gray-300 rounded animate-pulse w-2/3"></div>
+            <div class="flex space-x-1">
+                <div class="h-10 bg-gray-300 rounded animate-pulse w-24"></div>
+                <div class="h-10 bg-gray-300 rounded animate-pulse w-28"></div>
+            </div>
+        </div>
+
+        <!-- Pilot Report Skeleton -->
+        <div class="flow-root px-4 bg-gray-200 rounded-lg mb-4">
+            <div class="h-8 bg-gray-300 rounded animate-pulse w-32 mx-auto my-4"></div>
+            <div class="space-y-3">
+                <div class="h-12 bg-gray-300 rounded animate-pulse"></div>
+                <div class="h-12 bg-gray-300 rounded animate-pulse"></div>
+                <div class="h-12 bg-gray-300 rounded animate-pulse"></div>
+                @for($i = 0; $i < 15; $i++)
+                    <div class="h-10 bg-gray-300 rounded animate-pulse"></div>
+                @endfor
+            </div>
+        </div>
+
+        <!-- Maintenance Report Skeleton -->
+        <div class="flow-root px-4 bg-gray-200 rounded-lg mb-4">
+            <div class="h-8 bg-gray-300 rounded animate-pulse w-40 mx-auto my-4"></div>
+            <div class="space-y-3">
+                <div class="h-12 bg-gray-300 rounded animate-pulse"></div>
+                <div class="h-12 bg-gray-300 rounded animate-pulse"></div>
+                <div class="h-12 bg-gray-300 rounded animate-pulse"></div>
+                @for($i = 0; $i < 15; $i++)
+                    <div class="h-10 bg-gray-300 rounded animate-pulse"></div>
+                @endfor
+            </div>
+        </div>
+
+        <!-- Delay Report Skeleton -->
+        <div class="flow-root px-4 bg-gray-200 rounded-lg">
+            <div class="h-8 bg-gray-300 rounded animate-pulse w-48 mx-auto my-4"></div>
+            <div class="space-y-3">
+                <div class="h-12 bg-gray-300 rounded animate-pulse"></div>
+                <div class="h-12 bg-gray-300 rounded animate-pulse"></div>
+                <div class="h-12 bg-gray-300 rounded animate-pulse"></div>
+                @for($i = 0; $i < 15; $i++)
+                    <div class="h-10 bg-gray-300 rounded animate-pulse"></div>
+                @endfor
+            </div>
+        </div>
+
+        <!-- Loading Animation -->
+        <div class="flex justify-center mt-6">
+            <div class="flex space-x-2">
+                <div class="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
+                <div class="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                <div class="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actual Content (Hidden Initially) -->
+    <div id="result-actual-content" class="hidden mx-auto py-4 px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center">
             <p class="y-2">Pilot Report AC Type {{ $aircraftType }}, bulan {{ \Carbon\Carbon::parse($period)->format('F Y') }}</p>
             <div class="flex space-x-1">
@@ -220,4 +282,92 @@
             </x-table.index>
         </div>
     </div>
+
+    <!-- JavaScript untuk result page -->
+    <script>
+        // Deteksi refresh sebelum DOM dimuat
+        (function() {
+            // Cek jika ini adalah refresh
+            const isRefresh = performance.navigation.type === performance.navigation.TYPE_RELOAD ||
+                             sessionStorage.getItem('pageRefreshed') === 'true';
+            
+            // Jika refresh, langsung tampilkan skeleton
+            if (isRefresh) {
+                document.documentElement.style.setProperty('--skeleton-display', 'block');
+                document.documentElement.style.setProperty('--content-display', 'none');
+                sessionStorage.setItem('showSkeletonOnLoad', 'true');
+            }
+        })();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const resultSkeletonLoader = document.getElementById('result-skeleton-loader');
+            const resultActualContent = document.getElementById('result-actual-content');
+
+            // Cek berbagai flag loading
+            const isLoadingFromForm = sessionStorage.getItem('pilotReportLoading');
+            const isRefresh = sessionStorage.getItem('pageRefreshed') === 'true';
+            const showSkeletonOnLoad = sessionStorage.getItem('showSkeletonOnLoad') === 'true';
+            
+            function showResultContent() {
+                if (resultSkeletonLoader) {
+                    resultSkeletonLoader.classList.add('hidden');
+                }
+                if (resultActualContent) {
+                    resultActualContent.classList.remove('hidden');
+                }
+                // Clear all loading flags
+                sessionStorage.removeItem('pilotReportLoading');
+                sessionStorage.removeItem('pageRefreshed');
+                sessionStorage.removeItem('showSkeletonOnLoad');
+            }
+
+            // Tentukan durasi skeleton berdasarkan sumber akses
+            let skeletonDuration = 0;
+            
+            if (isLoadingFromForm === 'true') {
+                skeletonDuration = 2000; // 2 detik dari form
+            } else if (isRefresh || showSkeletonOnLoad) {
+                skeletonDuration = 1500; // 1.5 detik untuk refresh
+                // Tampilkan skeleton immediately untuk refresh
+                if (resultSkeletonLoader) {
+                    resultSkeletonLoader.classList.remove('hidden');
+                }
+                if (resultActualContent) {
+                    resultActualContent.classList.add('hidden');
+                }
+            } else {
+                // Direct access, tampilkan content langsung
+                showResultContent();
+                return;
+            }
+
+            // Tampilkan content setelah durasi yang ditentukan
+            setTimeout(showResultContent, skeletonDuration);
+        });
+
+        // Deteksi refresh dengan berbagai metode
+        window.addEventListener('beforeunload', function() {
+            sessionStorage.setItem('pageRefreshed', 'true');
+        });
+
+        // Deteksi keyboard refresh (F5, Ctrl+R)
+        document.addEventListener('keydown', function(e) {
+            if ((e.key === 'F5') || (e.ctrlKey && e.key === 'r')) {
+                sessionStorage.setItem('pageRefreshed', 'true');
+            }
+        });
+
+        // Deteksi browser navigation (back/forward button)
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                sessionStorage.setItem('pageRefreshed', 'true');
+                location.reload();
+            }
+        });
+
+        // Deteksi refresh via performance API
+        if (performance.navigation.type === performance.navigation.TYPE_RELOAD) {
+            sessionStorage.setItem('pageRefreshed', 'true');
+        }
+    </script>
 </x-app-layout>
