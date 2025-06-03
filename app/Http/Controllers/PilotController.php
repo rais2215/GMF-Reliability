@@ -825,7 +825,8 @@ class PilotController extends Controller
         $pdf->setPaper('A4', 'landscape');
         
         // Download PDF dengan nama file yang sesuai
-        $filename = "Pilot_Report_{$aircraftType}_{$period}.pdf";
+        $periodOnlyDate = date('Y-m', strtotime($period));
+        $filename = "Pilot_Report_{$aircraftType}_{$periodOnlyDate}.pdf";
         
         return $pdf->download($filename);
     }
