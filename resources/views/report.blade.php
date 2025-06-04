@@ -1,28 +1,28 @@
 <x-app-layout>
     <!-- Page Loader -->
     <div id="page-loader" class="fixed inset-0 bg-white/70 backdrop-blur-sm z-50 hidden items-center justify-center transition-opacity duration-300">
-        <div class="flex flex-col items-center">
-            <i data-lucide="loader" class="w-10 h-10 text-blue-600 animate-spin mb-3"></i>
-            <p class="text-sm text-gray-600">Loading...</p>
-        </div>
+        <div class="w-40 h-6 bg-gray-300 animate-pulse rounded"></div>
     </div>
 
-    <!-- Header dengan ikon -->
+    <!-- Header -->
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight flex items-center gap-2">
-            Report
-        </h2>
+        <div class="flex items-center gap-4">
+            <!-- Back to Dashboard Icon only -->
+            <a href="{{ route('dashboard') }}" class="text-gray-800 hover:text-blue-600">
+                <i data-lucide="arrow-left" class="w-6 h-6"></i>
+            </a>
+
+            <!-- Title Report -->
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                Report
+            </h2>
+        </div>
     </x-slot>
 
     <div class="flex min-h-screen mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <!-- Sidebar -->
         <div class="w-[17%] bg-white p-4 border-r border-gray-300 ml-0">
             <div class="mb-4 space-y-2">
-                <!-- Tombol Back to Dashboard -->
-                <a href="/dashboard" class="flex items-center text-gray-800 hover:text-blue-700 font-semibold">
-                    <i data-lucide="home" class="w-5 h-5 mr-2"></i> Back to Dashboard
-                </a>
-
                 <!-- Label All Report -->
                 <a href="/report" class="font-bold border-b-2 border-black w-full py-2 block">All Report</a>
             </div>

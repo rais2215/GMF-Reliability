@@ -1,3 +1,10 @@
+<!-- Skeleton Loader -->
+<div id="loader" class="fixed inset-0 bg-white bg-opacity-90 flex flex-col gap-4 items-center justify-center z-50" style="display: none;">
+    <div class="w-1/2 h-6 bg-gray-300 rounded animate-pulse"></div>
+    <div class="w-1/3 h-6 bg-gray-300 rounded animate-pulse"></div>
+    <div class="w-1/4 h-6 bg-gray-300 rounded animate-pulse"></div>
+</div>
+
 <nav x-data="{ open: false }" style="background-color: #112955; border-bottom: 10px solid #112955;">
     <!-- Primary Navigation Menu -->
     <div class="mx-10 px-4 sm:px-6 lg:px-8">
@@ -5,27 +12,16 @@
             <div class="flex items-center">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center" style="padding-top: 8px;">
-                    <img class="h-14 w-auto"
-                        src="{{ asset('images/gmfwhite.png') }}"
-                        alt="logo">
+                    <img class="h-14 w-auto" src="{{ asset('images/gmfwhite.png') }}" alt="logo">
                 </div>
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" style="color: #fff;">
-                        Dashboard
-                    </x-nav-link>
-                    <x-nav-link :href="route('report')" :active="request()->routeIs('report')" style="color: #fff;">
-                        Report
-                    </x-nav-link>
                     @if(Auth::user()->Position === 'Admin')
                         <x-nav-link :href="route('user-setting')" :active="request()->routeIs('user-setting')" style="color: #fff;">
                             User Setting
                         </x-nav-link>
                     @endif
-                    <x-nav-link :href="'https://dashboard-reliability.gmf-aeroasia.co.id/'" target="_blank" style="color: #fff;">
-                        Techlog Delay
-                    </x-nav-link>
                 </div>
             </div>
 
@@ -44,13 +40,14 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')" style="color: #112955;">
+                        <x-dropdown-link href="{{ route('profile.edit') }}" onclick="event.preventDefault(); showLoaderAndGo('{{ route('profile.edit') }}');" style="color: #112955;">
                             Profile
                         </x-dropdown-link>
+
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="w-full text-left px-4 py-2 text-sm" style="color: #112955; background: none; border: none;">
+                            <button type="submit" onclick="showLoader()" class="w-full text-left px-4 py-2 text-sm" style="color: #112955;">
                                 Log Out
                             </button>
                         </form>
@@ -73,34 +70,47 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden" style="background-color: #112955;">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" style="color: #fff;">
-                Dashboard
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('report')" :active="request()->routeIs('report')" style="color: #fff;">
-                Report
-            </x-responsive-nav-link>
             @if(Auth::user()->Position === 'Admin')
                 <x-responsive-nav-link :href="route('user-setting')" :active="request()->routeIs('user-setting')" style="color: #fff;">
                     User Setting
                 </x-responsive-nav-link>
             @endif
-            <x-responsive-nav-link :href="'https://dashboard-reliability.gmf-aeroasia.co.id/'" target="_blank" style="color: #fff;">
-                Techlog Delay
-            </x-responsive-nav-link>
         </div>
 
         <!-- Responsive Settings Options -->
-        <div class="mt-3 space-y-1">
-            <x-responsive-nav-link :href="route('profile.edit')" style="color: #112955;">
-                Profile
-            </x-responsive-nav-link>
-            <!-- Authentication -->
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="w-full text-left px-4 py-2 text-sm" style="color: #112955; background: none; border: none;">
-                    Log Out
-                </button>
-            </form>
+        <div class="pt-4 pb-1 border-t" style="border-color: #112955;">
+            <div class="px-4">
+                <div class="font-medium text-base" style="color: #fff;">{{ Auth::user()->name }}</div>
+                <div class="font-medium text-sm" style="color: #fff;">{{ Auth::user()->email }}</div>
+            </div>
+
+            <div class="mt-3 space-y-1">
+                <x-responsive-nav-link href="{{ route('profile.edit') }}" onclick="event.preventDefault(); showLoaderAndGo('{{ route('profile.edit') }}');" style="color: #112955;">
+                    Profile
+                </x-responsive-nav-link>
+
+                <!-- Authentication -->
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" onclick="showLoader()" class="w-full text-left px-4 py-2 text-sm" style="color: #112955;">
+                        Log Out
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </nav>
+
+<!-- JavaScript -->
+<script>
+    function showLoader() {
+        document.getElementById('loader').style.display = 'flex';
+    }
+
+    function showLoaderAndGo(url) {
+        showLoader();
+        setTimeout(function () {
+            window.location.href = url;
+        }, 300); // bisa disesuaikan dengan kebutuhan UX
+    }
+</script>

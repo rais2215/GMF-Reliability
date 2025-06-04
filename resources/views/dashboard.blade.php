@@ -1,9 +1,13 @@
 <x-app-layout>
-    <!-- Loading Spinner Overlay -->
+    <!-- Loading Skeleton Overlay -->
     <div id="page-loader" class="fixed inset-0 bg-white/70 backdrop-blur-sm z-50 hidden items-center justify-center transition-opacity duration-300">
-        <div class="flex flex-col items-center">
-            <i data-lucide="loader" class="w-10 h-10 text-blue-600 animate-spin mb-3"></i>
-            <p class="text-sm text-gray-600">Loading...</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-8 w-full max-w-5xl">
+            @for ($i = 0; $i < 3; $i++)
+                <div class="bg-white p-6 rounded-xl shadow animate-pulse">
+                    <div class="h-4 bg-gray-300 rounded w-1/2 mb-4"></div>
+                    <div class="h-8 bg-gray-400 rounded w-3/4"></div>
+                </div>
+            @endfor
         </div>
     </div>
 
@@ -33,26 +37,21 @@
 
             <!-- Content Area -->
             <section class="flex-1 p-8 overflow-auto bg-gray-100">
-                <!-- KPI Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-xl shadow flex flex-col items-center">
-                        <h4 class="text-sm text-gray-500 mb-1">Total Penerbangan</h4>
-                        <p class="text-2xl font-semibold text-blue-600">
-                            {{ $totalFlights ?? '-' }}
-                        </p>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow flex flex-col items-center">
-                        <h4 class="text-sm text-gray-500 mb-1">Delay Hari Ini</h4>
-                        <p class="text-2xl font-semibold text-red-500">
-                            {{ $todayDelays ?? '-' }}
-                        </p>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow flex flex-col items-center">
-                        <h4 class="text-sm text-gray-500 mb-1">Dispatch Rate</h4>
-                        <p class="text-2xl font-semibold text-green-600">
-                            {{ $dispatchRate ?? '-' }}%
-                        </p>
-                    </div>
+                <!-- Fitur Navigasi Ganti KPI Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <a href="{{ url('/report') }}" 
+                                           class="flex bg-gradient-to-r from-[#0066B3] to-[#7EBB1A] text-white p-6 rounded-xl shadow hover:from-[#005799] hover:to-[#6ca00a] transition text-center flex-col items-center space-y-3">
+                        <i data-lucide="file-text" class="lucide lucide-file-text w-10 h-10"></i>
+                        <h4 class="text-xl font-semibold">Report</h4>
+                        <p class="text-sm opacity-90">Lihat detail report lengkap</p>
+                    </a>
+
+                    <a href="https://dashboard-reliability.gmf-aeroasia.co.id/" target="_blank" 
+                                           class="bg-gradient-to-r from-[#0066B3] to-[#7EBB1A] text-white p-6 rounded-xl shadow hover:from-[#005799] hover:to-[#6ca00a] transition text-center flex flex-col items-center space-y-3">
+                        <i data-lucide="clock" class="lucide lucide-clock w-10 h-10"></i>
+                        <h4 class="text-xl font-semibold">Techlog Delay</h4>
+                        <p class="text-sm opacity-90">Cek data delay techlog terbaru</p>
+                    </a>
                 </div>
 
                 <!-- Power BI Report Section -->
@@ -80,61 +79,56 @@
             const now = new Date();
             const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
             const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-            
+
             const day = days[now.getDay()];
             const date = now.getDate();
             const month = months[now.getMonth()];
             const year = now.getFullYear();
-            
-            // Format time with leading zeros
+
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const seconds = String(now.getSeconds()).padStart(2, '0');
-            
-            // Format in Indonesian style: Rabu, 22 Mei 2025, 12:00:00
-            const formattedDateTime = `${day}, ${date} ${month} ${year}, ${hours}:${minutes}:${seconds}`;
-            
+
+            const formattedDateTime = ${day}, ${date} ${month} ${year}, ${hours}:${minutes}:${seconds};
+
             document.getElementById('current-datetime').textContent = formattedDateTime;
         }
 
-        // Update immediately and then every second
         document.addEventListener('DOMContentLoaded', () => {
             updateDateTime();
             setInterval(updateDateTime, 1000);
         });
     </script>
 
-    <!-- Spinner Script -->
+    <!-- Loader Display Script -->
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        lucide.createIcons();
-        const loader = document.getElementById('page-loader');
-        const links = document.querySelectorAll('a[href]:not([target="_blank"])');
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            const loader = document.getElementById('page-loader');
+            const links = document.querySelectorAll('a[href]:not([target="_blank"])');
 
-        // Handle link clicks
-        links.forEach(link => {
-            link.addEventListener('click', function (e) {
-                const href = this.getAttribute('href');
-                if (!href || href.startsWith('#') || href === window.location.href) return;
+            links.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    const href = this.getAttribute('href');
+                    if (!href || href.startsWith('#') || href === window.location.href) return;
 
-                e.preventDefault();
-                loader.classList.remove('hidden');
-                loader.classList.add('flex');
+                    e.preventDefault();
+                    loader.classList.remove('hidden');
+                    loader.classList.add('flex');
 
-                setTimeout(() => {
-                    window.location.href = href;
-                }, 500);
+                    setTimeout(() => {
+                        window.location.href = href;
+                    }, 500);
+                });
             });
+
+            const logoutForm = document.getElementById('logout-form');
+            if (logoutForm) {
+                logoutForm.addEventListener('submit', function () {
+                    loader.classList.remove('hidden');
+                    loader.classList.add('flex');
+                });
+            }
         });
-
-        // Handle logout form submission
-        const logoutForm = document.getElementById('logout-form');
-        if (logoutForm) {
-            logoutForm.addEventListener('submit', function () {
-                loader.classList.remove('hidden');
-                loader.classList.add('flex');
-            });
-        }
-    });
     </script>
 </x-app-layout>
