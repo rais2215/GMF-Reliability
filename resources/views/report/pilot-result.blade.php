@@ -1,67 +1,102 @@
 <!-- filepath: c:\Users\Noval Rais\Documents\Github Repository\GMF-Reliability\resources\views\report\pilot-result.blade.php -->
 <x-app-layout>
-    <!-- Loading Skeleton untuk Result Page -->
-    <div id="result-skeleton-loader" class="mx-auto py-4 px-4 sm:px-6 lg:px-8">
-        <!-- Header Skeleton -->
-        <div class="flex justify-between items-center mb-6">
-            <div class="h-6 bg-gray-300 rounded animate-pulse w-2/3"></div>
-            <div class="flex space-x-1">
-                <div class="h-10 bg-gray-300 rounded animate-pulse w-24"></div>
-                <div class="h-10 bg-gray-300 rounded animate-pulse w-28"></div>
+    <div class="mx-auto py-4 px-4 sm:px-6 lg:px-8">
+        {{-- Back to Report Button --}}
+        <div class="mb-4">
+            <button id="backBtn" onclick="showLoadingAndGoBack()" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200">
+                <svg id="backIcon" class="w-4 h-4 mr-2 transition-all duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                <span id="backText">Back to Report</span>
+                {{-- Loading Spinner (hidden by default) --}}
+                <svg id="loadingSpinner" class="hidden animate-spin w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </button>
+        </div>
+
+        {{-- Loading Skeleton Overlay (hidden by default) --}}
+        <div id="loadingSkeleton" class="fixed inset-0 bg-white bg-opacity-90 z-50 items-center justify-center hidden">
+            <div class="max-w-6xl w-full mx-auto px-4 space-y-4">
+                {{-- Header Skeleton --}}
+                <div class="flex justify-between items-center mb-6">
+                    <div class="h-6 bg-gray-300 rounded animate-pulse w-96"></div>
+                    <div class="flex space-x-2">
+                        <div class="h-10 w-32 bg-gray-300 rounded animate-pulse"></div>
+                        <div class="h-10 w-32 bg-gray-300 rounded animate-pulse"></div>
+                    </div>
+                </div>
+                
+                {{-- Table Skeleton --}}
+                <div class="bg-white shadow rounded-lg overflow-hidden">
+                    {{-- Table Header --}}
+                    <div class="bg-gray-50 px-6 py-3 border-b border-gray-200">
+                        <div class="flex space-x-4">
+                            <div class="h-4 bg-gray-300 rounded animate-pulse w-24"></div>
+                            <div class="h-4 bg-gray-300 rounded animate-pulse w-16"></div>
+                            <div class="h-4 bg-gray-300 rounded animate-pulse w-16"></div>
+                            <div class="h-4 bg-gray-300 rounded animate-pulse w-16"></div>
+                            <div class="h-4 bg-gray-300 rounded animate-pulse w-16"></div>
+                            <div class="h-4 bg-gray-300 rounded animate-pulse w-16"></div>
+                        </div>
+                    </div>
+                    
+                    {{-- Table Rows --}}
+                    <div class="divide-y divide-gray-200">
+                        @for ($i = 0; $i < 8; $i++)
+                        <div class="px-6 py-4">
+                            <div class="flex space-x-4">
+                                <div class="h-4 bg-gray-200 rounded animate-pulse w-48"></div>
+                                <div class="h-4 bg-gray-200 rounded animate-pulse w-16"></div>
+                                <div class="h-4 bg-gray-200 rounded animate-pulse w-16"></div>
+                                <div class="h-4 bg-gray-200 rounded animate-pulse w-16"></div>
+                                <div class="h-4 bg-gray-200 rounded animate-pulse w-16"></div>
+                                <div class="h-4 bg-gray-200 rounded animate-pulse w-16"></div>
+                            </div>
+                        </div>
+                        @endfor
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Pilot Report Skeleton -->
-        <div class="flow-root px-4 bg-gray-200 rounded-lg mb-4">
-            <div class="h-8 bg-gray-300 rounded animate-pulse w-32 mx-auto my-4"></div>
-            <div class="space-y-3">
-                <div class="h-12 bg-gray-300 rounded animate-pulse"></div>
-                <div class="h-12 bg-gray-300 rounded animate-pulse"></div>
-                <div class="h-12 bg-gray-300 rounded animate-pulse"></div>
-                @for($i = 0; $i < 15; $i++)
-                    <div class="h-10 bg-gray-300 rounded animate-pulse"></div>
-                @endfor
-            </div>
-        </div>
+        {{-- JavaScript Function --}}
+        <script>
+        function showLoadingAndGoBack() {
+            const backBtn = document.getElementById('backBtn');
+            const backIcon = document.getElementById('backIcon');
+            const backText = document.getElementById('backText');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const loadingSkeleton = document.getElementById('loadingSkeleton');
+            
+            // Show loading state on button
+            backIcon.classList.add('hidden');
+            loadingSpinner.classList.remove('hidden');
+            backText.textContent = 'Loading...';
+            backBtn.disabled = true;
+            backBtn.classList.add('opacity-75', 'cursor-not-allowed');
+            
+            // Show skeleton overlay
+            loadingSkeleton.classList.remove('hidden');
+            
+            // Add slight delay for better UX, then go back
+            setTimeout(() => {
+                history.back();
+                // If history.back() doesn't work (no previous page), hide loading after 2 seconds
+                setTimeout(() => {
+                    // Reset button state
+                    backIcon.classList.remove('hidden');
+                    loadingSpinner.classList.add('hidden');
+                    backText.textContent = 'Back to Report';
+                    backBtn.disabled = false;
+                    backBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+                    loadingSkeleton.classList.add('hidden');
+                }, 2000);
+            }, 500);
+        }
+        </script>
 
-        <!-- Maintenance Report Skeleton -->
-        <div class="flow-root px-4 bg-gray-200 rounded-lg mb-4">
-            <div class="h-8 bg-gray-300 rounded animate-pulse w-40 mx-auto my-4"></div>
-            <div class="space-y-3">
-                <div class="h-12 bg-gray-300 rounded animate-pulse"></div>
-                <div class="h-12 bg-gray-300 rounded animate-pulse"></div>
-                <div class="h-12 bg-gray-300 rounded animate-pulse"></div>
-                @for($i = 0; $i < 15; $i++)
-                    <div class="h-10 bg-gray-300 rounded animate-pulse"></div>
-                @endfor
-            </div>
-        </div>
-
-        <!-- Delay Report Skeleton -->
-        <div class="flow-root px-4 bg-gray-200 rounded-lg">
-            <div class="h-8 bg-gray-300 rounded animate-pulse w-48 mx-auto my-4"></div>
-            <div class="space-y-3">
-                <div class="h-12 bg-gray-300 rounded animate-pulse"></div>
-                <div class="h-12 bg-gray-300 rounded animate-pulse"></div>
-                <div class="h-12 bg-gray-300 rounded animate-pulse"></div>
-                @for($i = 0; $i < 15; $i++)
-                    <div class="h-10 bg-gray-300 rounded animate-pulse"></div>
-                @endfor
-            </div>
-        </div>
-
-        <!-- Loading Animation -->
-        <div class="flex justify-center mt-6">
-            <div class="flex space-x-2">
-                <div class="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
-                <div class="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
-                <div class="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Actual Content (Hidden Initially) -->
-    <div id="result-actual-content" class="hidden mx-auto py-4 px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center">
             <p class="y-2">Pilot Report AC Type {{ $aircraftType }}, bulan {{ \Carbon\Carbon::parse($period)->format('F Y') }}</p>
             <div class="flex space-x-1">

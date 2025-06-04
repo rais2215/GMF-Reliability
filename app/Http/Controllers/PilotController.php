@@ -58,10 +58,9 @@ class PilotController extends Controller
             return TblMonthlyfhfc::where('Actype', $aircraftType)
                 ->where('MonthEval', $period)
                 ->selectRaw('SUM(RevFHHours + (RevFHMin / 60) + NoRevFHHours + (NoRevFHMin / 60)) as total')
-                ->first()->total ?? 0; // Menggunakan null coalescing operator
+                ->first()->total ?? 0;
         };
 
-        // Fungsi untuk menghitung total flight cycles (untuk DELAY)
         $getFlyingCycles = function($aircraftType, $period) {
             return TblMonthlyfhfc::where('Actype', $aircraftType)
                 ->where('MonthEval', $period)
@@ -72,37 +71,22 @@ class PilotController extends Controller
 
         // Hitung flying hours untuk periode sekarang dan sebelumnya
         $flyingHoursTotal = $getFlyingHours($aircraftType, $period);
-        $flyingHoursBefore = $getFlyingHours($aircraftType, \Carbon\Carbon::parse($period)->subMonth(1));
-        $flyingHours2Before = $getFlyingHours($aircraftType, \Carbon\Carbon::parse($period)->subMonth(2));
-        $flyingCyclesTotal = $getFlyingCycles($aircraftType, $period);
-        $flyingCyclesBefore = $getFlyingCycles($aircraftType, \Carbon\Carbon::parse($period)->subMonth(1));
-        $flyingCycles2Before = $getFlyingCycles($aircraftType, \Carbon\Carbon::parse($period)->subMonth(2));
-        $fh3Last = $flyingHoursTotal + $flyingHoursBefore + $flyingHours2Before;
-        $fh12Last = 0;
-        for ($i = 0; $i <= 11; $i++) {
-            $periodBefore = \Carbon\Carbon::parse($period)->subMonth($i);
-            $fh12Last += $getFlyingHours($aircraftType, $periodBefore);
-        }
-        // Calculate fc3Last and fc12Last for use in the PDF
-        $fc3Last = $flyingCyclesTotal + $flyingCyclesBefore + $flyingCycles2Before;
-        $fc12Last = 0;
-        for ($i = 0; $i <= 11; $i++) {
-            $periodBefore = \Carbon\Carbon::parse($period)->subMonth($i);
-            $fc12Last += $getFlyingCycles($aircraftType, $periodBefore);
-        }
+        $flyingHoursBefore = $getFlyingHours($aircraftType, \Carbon\Carbon::parse($period)->subMonth(1)->format('Y-m-d'));
+        $flyingHours2Before = $getFlyingHours($aircraftType, \Carbon\Carbon::parse($period)->subMonth(2)->format('Y-m-d'));
 
-        // Hitung flying cycles untuk DELAY
         $flyingCyclesTotal = $getFlyingCycles($aircraftType, $period);
         $flyingCyclesBefore = $getFlyingCycles($aircraftType, \Carbon\Carbon::parse($period)->subMonth(1)->format('Y-m-d'));
         $flyingCycles2Before = $getFlyingCycles($aircraftType, \Carbon\Carbon::parse($period)->subMonth(2)->format('Y-m-d'));
-
-        // Total flight cycles untuk 3 bulan terakhir
+        
+        //Hitung Totals
+        $fh3Last = $flyingHoursTotal + $flyingHoursBefore + $flyingHours2Before;
         $fc3Last = $flyingCyclesTotal + $flyingCyclesBefore + $flyingCycles2Before;
 
-        // Total flight cycles untuk 12 bulan terakhir
+        $fh12Last = 0;
         $fc12Last = 0;
         for ($i = 0; $i <= 11; $i++) {
             $periodBefore = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m-d');
+            $fh12Last += $getFlyingHours($aircraftType, $periodBefore);
             $fc12Last += $getFlyingCycles($aircraftType, $periodBefore);
         }
 
@@ -337,17 +321,14 @@ class PilotController extends Controller
             $delayAlertLevel = $alertLevels[$ata]['ALD'][0]->alertlevel ?? null;
 
             if (is_null($delayAlertLevel)) {
-                // Ambil array rate 12 bulan terakhir dari kolom Rate di pilot-result.blade.php
                 $delayRates = $request->input('rates', []);
-                // Pastikan hanya 12 data terakhir yang digunakan
                 if (count($delayRates) > 12) {
-                $delayRates = array_slice($delayRates, -12);
+                    $delayRates = array_slice($delayRates, -12);
                 }
-                // Jika data rates tidak valid, fallback ke perhitungan lama
                 if (empty($delayRates) || count($delayRates) < 12) {
-                $delaypRates = [$delayRate, $delay1Rate, $delay2Rate];
+                    $delayRates = [$delayRate, $delay1Rate, $delay2Rate]; // ✅ FIX: Nama variable yang benar
                     for ($i = 3; $i < 12; $i++) {
-                        $fc = $getFlyingCycles($aircraftType, \Carbon\Carbon::parse($period)->subMonths($i)->format('Y-m'));
+                        $fc = $getFlyingCycles($aircraftType, \Carbon\Carbon::parse($period)->subMonths($i)->format('Y-m-d'));
                         $count = $delayData[$i][$ata]->count ?? 0;
                         $rate = $count * 1000 / ($fc ?: 1);
                         $delayRates[] = $rate;
@@ -432,27 +413,6 @@ class PilotController extends Controller
             'flyingCyclesTotal' => $flyingCyclesTotal, 'flyingCyclesBefore' => $flyingCyclesBefore,
             'flyingCycles2Before' => $flyingCycles2Before, 'fc3Last' => $fc3Last, 'fc12Last' => $fc12Last,
             'aircraftType' => $aircraftType, 'tblAta' => $tblAta, 'month' => $month, 'period' => $period,
-            'pirepCount' => $pirepCount, // AWAL PILOT REPORT
-            'pirepCountBefore' => $pirepCountBefore, 'pirepCountTwoMonthsAgo' => $pirepCountTwoMonthsAgo,
-            'pirep3Month' => $pirep3Month, 'pirep12Month' => $pirep12Month,
-            'pirepRate' => $pirepRate, 'pirep1Rate' => $pirep1Rate,
-            'pirep2Rate' => $pirep2Rate, 'pirepRate3Month' => $pirepRate3Month,
-            'pirepRate12Month' => $pirepRate12Month, 'pirepAlertLevel' => $pirepAlertLevel,
-            'pirepAlertStatus' => $pirepAlertStatus, 'pirepTrend' => $pirepTrend,
-            'marepCount' => $marepCount, // AWAL MAINTENANCE REPORT
-            'marepCountBefore' => $marepCountBefore, 'marepCountTwoMonthsAgo' => $marepCountTwoMonthsAgo,
-            'marep3Month' => $marep3Month, 'marep12Month' => $marep12Month,
-            'marepRate' => $marepRate, 'marep1Rate' => $marep1Rate,
-            'marep2Rate' => $marep2Rate, 'marepRate3Month' => $marepRate3Month,
-            'marepRate12Month' => $marepRate12Month, 'marepAlertLevel' => $marepAlertLevel,
-            'marepAlertStatus' => $marepAlertStatus, 'marepTrend' => $marepTrend,
-            'delayCount' => $delayCount, // AWAL TECHNICAL DELAY
-            'delayCountBefore'=> $delayCountBefore, 'delayCountTwoMonthsAgo' => $delayCountTwoMonthsAgo,
-            'delay3Month' => $delay3Month, 'delay12Month' => $delay12Month,
-            'delayRate' => $delayRate, 'delay1Rate' => $delay1Rate,
-            'delay2Rate' => $delay2Rate, 'delayRate3Month' => $delayRate3Month,
-            'delayRate12Month' => $delayRate12Month, 'delayAlertLevel' => $delayAlertLevel,
-            'delayAlertStatus' => $delayAlertStatus, 'delayTrend' => $delayTrend
         ]);
     }
 
@@ -476,7 +436,6 @@ class PilotController extends Controller
                 ->first()->total ?? 0;
         };
 
-        // Fungsi untuk menghitung total flight cycles (untuk DELAY)
         $getFlyingCycles = function($aircraftType, $period) {
             return TblMonthlyfhfc::where('Actype', $aircraftType)
                 ->where('MonthEval', $period)
@@ -484,39 +443,24 @@ class PilotController extends Controller
                 ->first()->total ?? 0;
         };
 
-        // Hitung flying hours untuk periode sekarang dan sebelumnya
+         // Hitung flying hours untuk periode sekarang dan sebelumnya
         $flyingHoursTotal = $getFlyingHours($aircraftType, $period);
-        $flyingHoursBefore = $getFlyingHours($aircraftType, \Carbon\Carbon::parse($period)->subMonth(1));
-        $flyingHours2Before = $getFlyingHours($aircraftType, \Carbon\Carbon::parse($period)->subMonth(2));
-        $flyingCyclesTotal = $getFlyingCycles($aircraftType, $period);
-        $flyingCyclesBefore = $getFlyingCycles($aircraftType, \Carbon\Carbon::parse($period)->subMonth(1));
-        $flyingCycles2Before = $getFlyingCycles($aircraftType, \Carbon\Carbon::parse($period)->subMonth(2));
-        $fh3Last = $flyingHoursTotal + $flyingHoursBefore + $flyingHours2Before;
-        $fh12Last = 0;
-        for ($i = 0; $i <= 11; $i++) {
-            $periodBefore = \Carbon\Carbon::parse($period)->subMonth($i);
-            $fh12Last += $getFlyingHours($aircraftType, $periodBefore);
-        }
-        // Calculate fc3Last and fc12Last for use in the PDF
-        $fc3Last = $flyingCyclesTotal + $flyingCyclesBefore + $flyingCycles2Before;
-        $fc12Last = 0;
-        for ($i = 0; $i <= 11; $i++) {
-            $periodBefore = \Carbon\Carbon::parse($period)->subMonth($i);
-            $fc12Last += $getFlyingCycles($aircraftType, $periodBefore);
-        }
+        $flyingHoursBefore = $getFlyingHours($aircraftType, \Carbon\Carbon::parse($period)->subMonth(1)->format('Y-m-d'));
+        $flyingHours2Before = $getFlyingHours($aircraftType, \Carbon\Carbon::parse($period)->subMonth(2)->format('Y-m-d'));
 
-        // Hitung flying cycles untuk DELAY
         $flyingCyclesTotal = $getFlyingCycles($aircraftType, $period);
         $flyingCyclesBefore = $getFlyingCycles($aircraftType, \Carbon\Carbon::parse($period)->subMonth(1)->format('Y-m-d'));
         $flyingCycles2Before = $getFlyingCycles($aircraftType, \Carbon\Carbon::parse($period)->subMonth(2)->format('Y-m-d'));
-
-        // Total flight cycles untuk 3 bulan terakhir
+        
+        //Hitung Totals
+        $fh3Last = $flyingHoursTotal + $flyingHoursBefore + $flyingHours2Before;
         $fc3Last = $flyingCyclesTotal + $flyingCyclesBefore + $flyingCycles2Before;
 
-        // Total flight cycles untuk 12 bulan terakhir
+        $fh12Last = 0;
         $fc12Last = 0;
         for ($i = 0; $i <= 11; $i++) {
             $periodBefore = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m-d');
+            $fh12Last += $getFlyingHours($aircraftType, $periodBefore);
             $fc12Last += $getFlyingCycles($aircraftType, $periodBefore);
         }
 
