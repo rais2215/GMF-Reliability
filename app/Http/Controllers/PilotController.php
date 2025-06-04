@@ -689,22 +689,19 @@ class PilotController extends Controller
             $marepAlertLevel = $alertLevels[$ata]['ALM'][0]->alertlevel ?? null;
 
             if (is_null($marepAlertLevel)) {
-                // Ambil array rate 12 bulan terakhir dari kolom Rate di pilot-result.blade.php
                 $marepRates = $request->input('rates', []);
-                // Pastikan hanya 12 data terakhir yang digunakan
                 if (count($marepRates) > 12) {
-                $marepRates = array_slice($marepRates, -12);
+                    $marepRates = array_slice($marepRates, -12);
                 }
-                // Jika data rates tidak valid, fallback ke perhitungan lama
                 if (empty($marepRates) || count($marepRates) < 12) {
-                $marepRates = [$marepRate, $marep1Rate, $marep2Rate];
-                    for ($i = 0; $i < 12; $i++) {
-                        $marep12Month += $marepData[$i][$ata]->count ?? 0;
-                    } 
+                    $marepRates = [$marepRate, $marep1Rate, $marep2Rate];
                 }
-                $stddev = sqrt($marepRate12Month / count($marepRates));
-                // Alert level = rata-rata + 2 * standar deviasi
-                $marepAlertLevel = $marepRate12Month + 2 * $stddev;
+                $mean = array_sum($marepRates) / count($marepRates);
+                $variance = array_sum(array_map(function($rate) use ($mean) {
+                    return pow($rate - $mean, 2);
+                }, $marepRates)) / count($marepRates);
+                $stddev = sqrt($variance);
+                $marepAlertLevel = $mean + 2 * $stddev;
             }
 
            // ~~~ MAREP ALERT STATUS ~~~
@@ -737,18 +734,18 @@ class PilotController extends Controller
             $delayCountBefore = $delayData[1][$ata]->count ?? 0;
             $delayCountTwoMonthsAgo = $delayData[2][$ata]->count ?? 0;
             $delay3Month = $delayCount + $delayCountBefore + $delayCountTwoMonthsAgo;
-            
             $delay12Month = 0;
             for ($i = 0; $i < 12; $i++) {
                 $delay12Month += $delayData[$i][$ata]->count ?? 0;
             }
 
             // ~~~ TECHNICAL DELAY RATE ~~~
-            $delayRate = $delayCount * 1000 / ($flyingHoursTotal ?: 1);
-            $delay1Rate = $delayCountBefore * 1000 / ($flyingHoursBefore ?: 1);
-            $delay2Rate = $delayCountTwoMonthsAgo * 1000 / ($flyingHours2Before ?: 1);
+            $delayRate = $delayCount * 1000 / ($flyingCyclesTotal ?: 1);
+            $delay1Rate = $delayCountBefore * 1000 / ($flyingCyclesBefore ?: 1);
+            $delay2Rate = $delayCountTwoMonthsAgo * 1000 / ($flyingCycles2Before ?: 1);
             $delayRate3Month = ($delayRate + $delay1Rate + $delay2Rate) / 3;
-            $delayRate12Month = $delay12Month * 1000 / ($fh12Last ?: 1);
+            $delayRate12Month = $delay12Month * 1000 / ($fc12Last ?: 1);
+
 
             // ~~~ TECHNICAL DELAY ALERT LEVEL ~~~
             $delayAlertLevel = $alertLevels[$ata]['ALD'][0]->alertlevel ?? null;
@@ -763,13 +760,19 @@ class PilotController extends Controller
                 // Jika data rates tidak valid, fallback ke perhitungan lama
                 if (empty($delayRates) || count($delayRates) < 12) {
                 $delaypRates = [$delayRate, $delay1Rate, $delay2Rate];
-                    for ($i = 0; $i < 12; $i++) {
-                        $delay12Month += $delayData[$i][$ata]->count ?? 0;
-                    } 
+                    for ($i = 3; $i < 12; $i++) {
+                        $fc = $getFlyingCycles($aircraftType, \Carbon\Carbon::parse($period)->subMonths($i)->format('Y-m'));
+                        $count = $delayData[$i][$ata]->count ?? 0;
+                        $rate = $count * 1000 / ($fc ?: 1);
+                        $delayRates[] = $rate;
+                    }
                 }
-                $stddev = sqrt($delayRate12Month / count($delaypRates));
-                // Alert level = rata-rata + 2 * standar deviasi
-                $delayAlertLevel = $delayRate12Month + 2 * $stddev;
+                $mean = array_sum($delayRates) / count($delayRates);
+                $variance = array_sum(array_map(function($rate) use ($mean) {
+                    return pow($rate - $mean, 2);
+                }, $delayRates)) / count($delayRates);
+                $stddev = sqrt($variance);
+                $delayAlertLevel = $mean + 2 * $stddev;
             }
 
              // ~~~ TECHNICAL DELAY ALERT STATUS ~~~
