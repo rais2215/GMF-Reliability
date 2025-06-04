@@ -20,8 +20,8 @@
     <div class="min-h-screen bg-gray-100 flex flex-col">
         <!-- Main Content Area (No Sidebar) -->
         <main class="flex-1 flex flex-col">
-            <!-- Header Banner -->
-            <header class="bg-gradient-to-r from-[#0066B3] to-[#7EBB1A] p-8 text-white relative overflow-hidden">
+            <!-- Header Banner with Border -->
+            <header class="bg-gradient-to-r from-[#0066B3] to-[#7EBB1A] p-8 text-white relative overflow-hidden border border-white/50 rounded-xl shadow-md mx-6 mt-6">
                 <div class="relative z-10">
                     <h1 class="text-3xl font-bold mb-2">Hi, Welcome to!</h1>
                     <h2 class="text-4xl font-bold mb-4">Reliability Dashboard</h2>
@@ -39,18 +39,20 @@
             <section class="flex-1 p-8 overflow-auto bg-gray-100">
                 <!-- Fitur Navigasi Ganti KPI Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <!-- Report Button -->
                     <a href="{{ url('/report') }}" 
-                                           class="flex bg-gradient-to-r from-[#0066B3] to-[#7EBB1A] text-white p-6 rounded-xl shadow hover:from-[#005799] hover:to-[#6ca00a] transition text-center flex-col items-center space-y-3">
+                       class="bg-white border border-white text-blue-600 p-6 rounded-xl shadow hover:bg-blue-50 transition text-center flex flex-col items-center space-y-3">
                         <i data-lucide="file-text" class="lucide lucide-file-text w-10 h-10"></i>
                         <h4 class="text-xl font-semibold">Report</h4>
-                        <p class="text-sm opacity-90">Lihat detail report lengkap</p>
+                        <p class="text-sm">Lihat detail report lengkap</p>
                     </a>
 
+                    <!-- Techlog Delay Button -->
                     <a href="https://dashboard-reliability.gmf-aeroasia.co.id/" target="_blank" 
-                                           class="bg-gradient-to-r from-[#0066B3] to-[#7EBB1A] text-white p-6 rounded-xl shadow hover:from-[#005799] hover:to-[#6ca00a] transition text-center flex flex-col items-center space-y-3">
+                       class="bg-white border border-white text-blue-600 p-6 rounded-xl shadow hover:bg-blue-50 transition text-center flex flex-col items-center space-y-3">
                         <i data-lucide="clock" class="lucide lucide-clock w-10 h-10"></i>
                         <h4 class="text-xl font-semibold">Techlog Delay</h4>
-                        <p class="text-sm opacity-90">Cek data delay techlog terbaru</p>
+                        <p class="text-sm">Cek data delay techlog terbaru</p>
                     </a>
                 </div>
 

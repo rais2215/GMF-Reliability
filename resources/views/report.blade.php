@@ -6,10 +6,17 @@
 
     <!-- Header -->
     <x-slot name="header">
-        <div class="flex items-center gap-4">
-            <!-- Back to Dashboard Icon only -->
-            <a href="{{ route('dashboard') }}" class="text-gray-800 hover:text-blue-600">
-                <i data-lucide="arrow-left" class="w-6 h-6"></i>
+        <div class="flex items-center space-x-4">
+            <!-- Back to Dashboard Button (Disamakan) -->
+            <a href="{{ route('dashboard') }}"
+               class="text-gray-600 hover:text-blue-600 transition duration-150 ease-in-out"
+               title="Back to Dashboard">
+                <!-- Heroicon: Arrow Left -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
             </a>
 
             <!-- Title Report -->
@@ -23,7 +30,6 @@
         <!-- Sidebar -->
         <div class="w-[17%] bg-white p-4 border-r border-gray-300 ml-0">
             <div class="mb-4 space-y-2">
-                <!-- Label All Report -->
                 <a href="/report" class="font-bold border-b-2 border-black w-full py-2 block">All Report</a>
             </div>
 

@@ -5,11 +5,11 @@
             <a href="{{ route('dashboard') }}"
                class="text-gray-600 hover:text-blue-600 transition duration-150 ease-in-out"
                title="Back to Dashboard">
-                <!-- Heroicon: Arrow Left Circle -->
+                <!-- Heroicon: Arrow Left (tanpa lingkaran) -->
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                      stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
                     <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M11.25 15.75L7.5 12m0 0l3.75-3.75M7.5 12h9M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                 </svg>
             </a>
 
@@ -41,11 +41,14 @@
         </div>
     </div>
 
-    <!-- Loading Spinner Overlay -->
-    <div id="page-loader" class="fixed inset-0 bg-white/70 backdrop-blur-sm z-50 invisible pointer-events-none flex items-center justify-center transition-opacity duration-300">
-        <div class="flex flex-col items-center">
-            <i data-lucide="loader" class="w-10 h-10 text-blue-600 animate-spin mb-3"></i>
-            <p class="text-sm text-gray-600">Loading...</p>
+    <!-- Skeleton Loading Overlay -->
+    <div id="page-loader" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 opacity-0 pointer-events-none flex items-center justify-center transition-opacity duration-300">
+        <div class="w-full max-w-md px-6 space-y-4 animate-pulse">
+            <div class="h-4 bg-gray-300 rounded w-3/4"></div>
+            <div class="h-4 bg-gray-300 rounded w-full"></div>
+            <div class="h-4 bg-gray-300 rounded w-5/6"></div>
+            <div class="h-4 bg-gray-300 rounded w-1/2"></div>
+            <div class="h-10 bg-gray-300 rounded w-full mt-6"></div>
         </div>
     </div>
 
@@ -61,10 +64,11 @@
             if (backButton && loader) {
                 backButton.addEventListener('click', function (e) {
                     e.preventDefault(); // Hentikan navigasi default
-                    loader.classList.remove('hidden'); // Tampilkan loader
+                    loader.classList.remove('opacity-0', 'pointer-events-none');
+                    loader.classList.add('opacity-100');
                     setTimeout(() => {
                         window.location.href = backButton.href; // Redirect manual
-                    }, 300); // Delay biar animasi kelihatan
+                    }, 500); // Delay untuk menampilkan animasi
                 });
             }
         });
