@@ -215,12 +215,12 @@
                     <th colspan="15"></th>
                 </tr>
                 <tr>
-                    <th colspan="2">Total Flight Hours</th>
-                    <th>{{ round($flyingHours2Before) }}</th>
-                    <th>{{ round($flyingHoursBefore) }}</th>
-                    <th>{{ round($flyingHoursTotal) }}</th>
-                    <th>{{ round($fh3Last) }}</th>
-                    <th>{{ round($fh12Last) }}</th>
+                    <th colspan="2">Total Flight Cycles</th>              
+                    <th>{{ round($flyingCycles2Before) }}</th>           
+                    <th>{{ round($flyingCyclesBefore) }}</th>             
+                    <th>{{ round($flyingCyclesTotal) }}</th>              
+                    <th>{{ round($fc3Last) }}</th>                        
+                    <th>{{ round($fc12Last) }}</th>                       
                     <th colspan="8"></th>
                 </tr>
                 <tr>
