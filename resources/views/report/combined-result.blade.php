@@ -73,16 +73,6 @@
                         Export to PDF
                     </button>
                 </form>
-                {{-- <form action="{{ route('report.combined.export.excel') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="period" value="{{ $period }}">
-                    <input type="hidden" name="operator" value="{{ $operator }}">
-                    <input type="hidden" name="aircraft_type_aos" value="{{ $aircraftTypeAos }}">
-                    <input type="hidden" name="aircraft_type_pilot" value="{{ $aircraftTypePilot }}">
-                    <button type="submit" class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-green-500 border border-green-500 rounded-md shadow-sm hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200">
-                        Export to Excel
-                    </button>
-                </form>  --}}
             </div>
         </div>
 
@@ -112,23 +102,30 @@
                     <x-table.tbody>
                         @if(isset($aosData['reportData']))
                             @php
-                                $reportData = $aosData['reportData'];
-                                // Inisialisasi total untuk setiap metrik
-                                $totalAcInFleet = 0;
-                                $totalAcInService = 0;
-                                $totalDaysInService = 0;
-                                $totalFlyingHoursTotal = 0;
-                                $totalRevenueFlyingHours = 0;
-                                $totalTakeOffTotal = 0;
-                                $totalRevenueTakeOff = 0;
-                                $totalTechnicalDelayTotal = 0;
-                                $totalRatePer100TakeOff = 0;
-                                $totalTechnicalIncidentTotal = 0;
-                                $totalTechnicalIncidentRate = 0;
-                                $totalTechnicalCancellationTotal = 0;
-                                $totalDispatchReliability = 0;
-                            @endphp
-                            
+                            $reportData = $aosData['reportData'];
+                            // Inisialisasi total untuk setiap metrik
+                            $totalAcInFleet = 0;
+                            $totalAcInService = 0;
+                            $totalDaysInService = 0;
+                            $totalFlyingHoursTotal = 0;
+                            $totalRevenueFlyingHours = 0;
+                            $totalTakeOffTotal = 0;
+                            $totalRevenueTakeOff = 0;
+                            $totalFlightHoursPerTakeOffTotal = 0;
+                            $totalRevenueFlightHoursPerTakeOff = 0;
+                            $totalDailyUtilizationFlyingHoursTotal = 0;
+                            $totalRevenueDailyUtilizationFlyingHoursTotal = 0;
+                            $totalDailyUtilizationTakeOffTotal = 0;
+                            $totalRevenueDailyUtilizationTakeOffTotal = 0;
+                            $totalTechnicalDelayTotal = 0;
+                            $totalTotalDuration = 0;
+                            $totalAverageDuration = 0;
+                            $totalRatePer100TakeOff = 0;
+                            $totalTechnicalIncidentTotal= 0;
+                            $totalTechnicalIncidentRate=0;
+                            $totalTechnicalCancellationTotal=0;
+                            $totalDispatchReliability=0;
+                        @endphp
                             <tr>
                                 <x-table.th class="text-left">A/C In Fleet</x-table.th>
                                 @for ($i = 11; $i >= 0; $i--)
@@ -156,6 +153,19 @@
                             </tr>
                             
                             <tr>
+                                <x-table.th class="text-left">A/C Days In Service (Revenue)</x-table.th>
+                                @for ($i = 11; $i >= 0; $i--)
+                                    @php
+                                        $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
+                                        $daysInService = $aosData['reportData'][$monthKey]['daysInService'] ?? 0;
+                                        $totalDaysInService += $daysInService;
+                                    @endphp
+                                    <x-table.td>{{ $daysInService }}</x-table.td>
+                                @endfor
+                                <x-table.td>{{ round($totalDaysInService) }}</x-table.td>
+                            </tr>
+
+                            <tr>
                                 <x-table.th class="text-left">Flying Hours - Total</x-table.th>
                                 @for ($i = 11; $i >= 0; $i--)
                                     @php
@@ -168,6 +178,18 @@
                                 <x-table.td>{{ round($totalFlyingHoursTotal) }}</x-table.td>
                             </tr>
                             
+                            <tr>
+                                <x-table.th class="text-left">- Revenue</x-table.th>
+                                @for ($i = 11; $i >= 0; $i--)
+                                    @php
+                                        $revenueFlyingHours = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['revenueFlyingHours'];
+                                        $totalRevenueFlyingHours += $revenueFlyingHours;
+                                    @endphp
+                                    <x-table.td>{{ round($revenueFlyingHours) }}</x-table.td>
+                                @endfor
+                                <x-table.td>{{ round($totalRevenueFlyingHours) }}</x-table.td>
+                            </tr>
+
                             <tr>
                                 <x-table.th class="text-left">Take Off - Total</x-table.th>
                                 @for ($i = 11; $i >= 0; $i--)
@@ -182,24 +204,148 @@
                             </tr>
                             
                             <tr>
-                                <x-table.th class="text-left">Technical Delay - Total</x-table.th>
+                                <x-table.th class="text-left">- Revenue</x-table.th>
                                 @for ($i = 11; $i >= 0; $i--)
                                     @php
                                         $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
-                                        $technicalDelayTotal = $reportData[$monthKey]['technicalDelayTotal'] ?? 0;
-                                        $totalTechnicalDelayTotal += $technicalDelayTotal;
+                                        $revenueFlyingHours = $reportData[$monthKey]['revenueFlyingHours'] ?? 0;
+                                        $revenueFlyingHours = is_numeric($revenueFlyingHours) ? (float)$revenueFlyingHours : 0;
+                                        $totalRevenueFlyingHours += $revenueFlyingHours;
                                     @endphp
-                                    <x-table.td>{{ round($technicalDelayTotal) }}</x-table.td>
+                                    <x-table.td>{{ round($revenueFlyingHours) }}</x-table.td>
                                 @endfor
-                                <x-table.td>{{ round($totalTechnicalDelayTotal) }}</x-table.td>
+                                <x-table.td>{{ round($totalRevenueFlyingHours) }}</x-table.td>
                             </tr>
-                            
+
+                            <tr>
+                                <x-table.th class="text-left">- Revenue</x-table.th>
+                                @for ($i = 11; $i >= 0; $i--)
+                                    @php
+                                        $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
+                                        $revenueTakeOff = $reportData[$monthKey]['revenueTakeOff'] ?? 0;
+                                        $revenueTakeOff = is_numeric($revenueTakeOff) ? (float)$revenueTakeOff : 0;
+                                        $totalRevenueTakeOff += $revenueTakeOff;
+                                    @endphp
+                                    <x-table.td>{{ $revenueTakeOff }}</x-table.td>
+                                @endfor
+                                <x-table.td>{{ round($totalRevenueTakeOff) }}</x-table.td>
+                            </tr>
+
+                            <tr>
+                                <x-table.th class="text-left">Flight Hours per Take Off - Total</x-table.th>
+                                @for ($i = 11; $i >= 0; $i--)
+                                    @php
+                                        $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
+                                        $flightHoursPerTakeOffTotal = $reportData[$monthKey]['flightHoursPerTakeOffTotal'] ?? 0;
+                                        $flightHoursPerTakeOffTotal = is_numeric($flightHoursPerTakeOffTotal) ? (float)$flightHoursPerTakeOffTotal : 0;
+                                    @endphp
+                                    <x-table.td>{{ number_format($flightHoursPerTakeOffTotal, 2) }}</x-table.td>
+                                @endfor
+                                <x-table.td>{{ isset($aosData['avgFlightHoursPerTakeOffTotal']) && is_numeric($aosData['avgFlightHoursPerTakeOffTotal']) ? number_format((float)$aosData['avgFlightHoursPerTakeOffTotal'], 2) : '0.00' }}</x-table.td>
+                            </tr>
+
+                            <tr>
+                                <x-table.th class="text-left">- Revenue</x-table.th>
+                                @for ($i = 11; $i >= 0; $i--)
+                                    @php
+                                        $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
+                                        $revenueFlightHoursPerTakeOff = $reportData[$monthKey]['revenueFlightHoursPerTakeOff'] ?? 0;
+                                        $revenueFlightHoursPerTakeOff = is_numeric($revenueFlightHoursPerTakeOff) ? (float)$revenueFlightHoursPerTakeOff : 0;
+                                    @endphp
+                                    <x-table.td>{{ number_format($revenueFlightHoursPerTakeOff, 2) }}</x-table.td>
+                                @endfor
+                                <x-table.td>{{ isset($aosData['avgRevenueFlightHoursPerTakeOff']) && is_numeric($aosData['avgRevenueFlightHoursPerTakeOff']) ? number_format((float)$aosData['avgRevenueFlightHoursPerTakeOff'], 2) : '0.00' }}</x-table.td>
+                            </tr>
+
+                            <tr>
+                                <x-table.th class="text-left">Daily Utiliz - Total FH</x-table.th>
+                                @for ($i = 11; $i >= 0; $i--)
+                                    @php
+                                        $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
+                                        $dailyUtilizationFlyingHoursTotal = $reportData[$monthKey]['dailyUtilizationFlyingHoursTotal'] ?? 0;
+                                        $dailyUtilizationFlyingHoursTotal = is_numeric($dailyUtilizationFlyingHoursTotal) ? (float)$dailyUtilizationFlyingHoursTotal : 0;
+                                    @endphp
+                                    <x-table.td>{{ number_format($dailyUtilizationFlyingHoursTotal, 2) }}</x-table.td>
+                                @endfor
+                                <x-table.td>{{ isset($aosData['avgDailyUtilizationFlyingHoursTotal']) && is_numeric($aosData['avgDailyUtilizationFlyingHoursTotal']) ? number_format((float)$aosData['avgDailyUtilizationFlyingHoursTotal'], 2) : '0.00' }}</x-table.td>
+                            </tr>
+
+                            <tr>
+                                <x-table.th class="text-left">- Revenue FH</x-table.th>
+                                @for ($i = 11; $i >= 0; $i--)
+                                    @php
+                                        $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
+                                        $revenueDailyUtilizationFlyingHoursTotal = $reportData[$monthKey]['revenueDailyUtilizationFlyingHoursTotal'] ?? 0;
+                                        $revenueDailyUtilizationFlyingHoursTotal = is_numeric($revenueDailyUtilizationFlyingHoursTotal) ? (float)$revenueDailyUtilizationFlyingHoursTotal : 0;
+                                    @endphp
+                                    <x-table.td>{{ number_format($revenueDailyUtilizationFlyingHoursTotal, 2) }}</x-table.td>
+                                @endfor
+                                <x-table.td>{{ isset($aosData['avgRevenueDailyUtilizationFlyingHoursTotal']) && is_numeric($aosData['avgRevenueDailyUtilizationFlyingHoursTotal']) ? number_format((float)$aosData['avgRevenueDailyUtilizationFlyingHoursTotal'], 2) : '0.00' }}</x-table.td>
+                            </tr>
+
+                            <tr>
+                                <x-table.th class="text-left">- Rate/100 Take-Off</x-table.th>
+                                @for ($i = 11; $i >= 0; $i--)
+                                    @php
+                                        $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
+                                        $ratePer100TakeOff = $reportData[$monthKey]['ratePer100TakeOff'] ?? 0;
+                                        $ratePer100TakeOff = is_numeric($ratePer100TakeOff) ? (float)$ratePer100TakeOff : 0;
+                                        $totalRatePer100TakeOff += $ratePer100TakeOff;
+                                    @endphp
+                                    <x-table.td>{{ number_format($ratePer100TakeOff, 2) }}</x-table.td>
+                                @endfor
+                                <x-table.td>{{ number_format($totalRatePer100TakeOff / 12, 2) }}</x-table.td>
+                            </tr>
+
+                            <tr>
+                                <x-table.th class="text-left">Technical Incident - Total</x-table.th>
+                                @for ($i = 11; $i >= 0; $i--)
+                                    @php
+                                        $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
+                                        $technicalIncidentTotal = $reportData[$monthKey]['technicalIncidentTotal'] ?? 0;
+                                        $technicalIncidentTotal = is_numeric($technicalIncidentTotal) ? (float)$technicalIncidentTotal : 0;
+                                        $totalTechnicalIncidentTotal += $technicalIncidentTotal;
+                                    @endphp
+                                    <x-table.td>{{ round($technicalIncidentTotal) }}</x-table.td>
+                                @endfor
+                                <x-table.td>{{ round($totalTechnicalIncidentTotal) }}</x-table.td>
+                            </tr>
+
+                            <tr>
+                                <x-table.th class="text-left">- Rate / 100 FC</x-table.th>
+                                @for ($i = 11; $i >= 0; $i--)
+                                    @php
+                                        $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
+                                        $technicalIncidentRate = $reportData[$monthKey]['technicalIncidentRate'] ?? 0;
+                                        $technicalIncidentRate = is_numeric($technicalIncidentRate) ? (float)$technicalIncidentRate : 0;
+                                        $totalTechnicalIncidentRate += $technicalIncidentRate;
+                                    @endphp
+                                    <x-table.td>{{ $technicalIncidentRate == 0 ? '0' : number_format($technicalIncidentRate, 3) }}</x-table.td>
+                                @endfor
+                                <x-table.td>{{ number_format($totalTechnicalIncidentRate / 12, 2) }}</x-table.td>
+                            </tr>
+
+                            <tr>
+                                <x-table.th class="text-left">Technical Cancellation - Total</x-table.th>
+                                @for ($i = 11; $i >= 0; $i--)
+                                    @php
+                                        $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
+                                        $technicalCancellationTotal = $reportData[$monthKey]['technicalCancellationTotal'] ?? 0;
+                                        $technicalCancellationTotal = is_numeric($technicalCancellationTotal) ? (float)$technicalCancellationTotal : 0;
+                                        $totalTechnicalCancellationTotal += $technicalCancellationTotal;
+                                    @endphp
+                                    <x-table.td>{{ round($technicalCancellationTotal) }}</x-table.td>
+                                @endfor
+                                <x-table.td>{{ round($totalTechnicalCancellationTotal) }}</x-table.td>
+                            </tr>
+
                             <tr>
                                 <x-table.th class="text-left">Dispatch Reliability (%)</x-table.th>
                                 @for ($i = 11; $i >= 0; $i--)
                                     @php
                                         $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
                                         $dispatchReliability = $reportData[$monthKey]['dispatchReliability'] ?? 0;
+                                        $dispatchReliability = is_numeric($dispatchReliability) ? (float)$dispatchReliability : 0;
                                         $totalDispatchReliability += $dispatchReliability;
                                     @endphp
                                     <x-table.td>{{ number_format($dispatchReliability, 2) }}%</x-table.td>
