@@ -2,23 +2,8 @@
 
 <x-app-layout>
     <div class=" mx-auto py-4 px-4 sm:px-6 lg:px-8">
-        {{-- Back to Report Button --}}
-        <div class="mb-4">
-            <button id="backBtn" onclick="showLoadingAndGoBack()" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200">
-                <svg id="backIcon" class="w-4 h-4 mr-2 transition-all duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                </svg>
-                <span id="backText">Back to Report</span>
-                {{-- Loading Spinner (hidden by default) --}}
-                <svg id="loadingSpinner" class="hidden animate-spin w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-            </button>
-        </div>
-
         {{-- Loading Skeleton Overlay (hidden by default) --}}
-        <div id="loadingSkeleton" class="fixed inset-0 bg-white bg-opacity-90 z-50 flex items-center justify-center" style="display: none;">
+        <div id="loadingSkeleton" class="hidden fixed inset-0 bg-white bg-opacity-90 z-50 items-center justify-center">
             <div class="max-w-6xl w-full mx-auto px-4 space-y-4">
                 {{-- Header Skeleton --}}
                 <div class="flex justify-between items-center mb-6">
@@ -96,30 +81,47 @@
             }, 500);
         }
         </script>
-        
-        <div class="flex justify-between items-center">
-            <p class="py-2">Data Aircraft Operation Summary Type: {{ $aircraftType }} pada {{ $month }}-{{ $year }}</p>
-            <div class="flex space-x-1">
-                <form action="{{ route('report.aos.export.pdf') }}" method="POST">
+
+        {{-- Header dengan tombol yang sejajar --}}
+        <div class="flex justify-between items-center mb-4">
+            {{-- Back to Report Button --}}
+            <button id="backBtn" onclick="showLoadingAndGoBack()" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200">
+                <svg id="backIcon" class="w-4 h-4 mr-2 transition-all duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                <span id="backText">Back to Report</span>
+                {{-- Loading Spinner (hidden by default) --}}
+                <svg id="loadingSpinner" class="hidden animate-spin w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </button>
+
+            {{-- Export Buttons --}}
+            <div class="flex space-x-2">
+                <form action="{{ route('report.aos.export.pdf') }}" method="POST" class="inline">
                     @csrf
                     <input type="hidden" name="period" value="{{ $period }}">
                     <input type="hidden" name="aircraft_type" value="{{ $aircraftType }}">
-                    <button type="submit" class="block rounded-md bg-gray-800 px-3 py-2 text-center text-sm text-white shadow-sm hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600">
+                    <button type="submit" class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-red-500 border border-transparent rounded-md shadow-sm hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200">
                         Export to PDF
                     </button>
                 </form>
-                <form action="{{ route('report.aos.export.excel') }}" method="POST">
+                <form action="{{ route('report.aos.export.excel') }}" method="POST" class="inline">
                     @csrf
                     <input type="hidden" name="period" value="{{ $period }}">
                     <input type="hidden" name="aircraft_type" value="{{ $aircraftType }}">
-                    <button type="submit" class="block rounded-md bg-green-500 px-3 py-2 text-center text-sm text-white shadow-sm hover:bg-green-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600">
+                    <button type="submit" class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-green-500 border border-transparent rounded-md shadow-sm hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200">
                         Export to Excel
                     </button>
-                </form> 
+                </form>
             </div>
         </div>
 
-        
+        {{-- Title Section --}}
+        <div class="mb-4">
+            <p class="py-2">Data Aircraft Operation Summary Type: {{ $aircraftType }} pada {{ $month }}-{{ $year }}</p>
+        </div>
 
         <div class="mt-3 flow-root">
             <!-- Ganti pertahun -->

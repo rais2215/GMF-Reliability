@@ -7,11 +7,10 @@
     <!-- Header -->
     <x-slot name="header">
         <div class="flex items-center space-x-4">
-            <!-- Back to Dashboard Button (Disamakan) -->
+            <!-- Back to Dashboard Button -->
             <a href="{{ route('dashboard') }}"
                class="text-gray-600 hover:text-blue-600 transition duration-150 ease-in-out"
                title="Back to Dashboard">
-                <!-- Heroicon: Arrow Left -->
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                      stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -27,15 +26,27 @@
     </x-slot>
 
     <div class="flex min-h-screen mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <!-- Sidebar -->
+        <!-- Sidebar 1 -->
         <div class="w-[17%] bg-white p-4 border-r border-gray-300 ml-0">
             <div class="mb-4 space-y-2">
                 <a href="/report" class="font-bold border-b-2 border-black w-full py-2 block">All Report</a>
             </div>
 
             <ul class="space-y-2">
-                <li><a href="#" class="flex items-center text-blue-500 hover:text-blue-900 sidebar-item" data-url="{{ route('report.aos.index') }}"><span class="mr-2 text-xl">✈</span> Aircraft Operation Summary</a></li>
-                <li><a href="#" class="flex items-center text-blue-500 hover:text-blue-900 sidebar-item" data-url="{{ route('report.pilot.index') }}"><span class="mr-2 text-xl">✈</span> Pilot Report And Technical Delay</a></li>
+                <!-- Fitur Terpisah -->
+                <li>
+                    <a href="#" class="flex items-center text-blue-500 hover:text-blue-900 sidebar-item"
+                       data-url="{{ route('report.aos.index') }}">
+                        <span class="mr-2 text-xl">✈</span> Aircraft Operation Summary
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center text-blue-500 hover:text-blue-900 sidebar-item"
+                       data-url="{{ route('report.pilot.index') }}">
+                        <span class="mr-2 text-xl">✈</span> Pilot Report And Technical Delay
+                    </a>
+                </li>
+
                 <li><a href="#" class="flex items-center text-blue-500 hover:text-blue-900 sidebar-item" data-url="{{ route('report.cumulative') }}"><span class="mr-2 text-xl">✈</span> Cumulative Flight Hours and Take Off</a></li>
                 <li><a href="#" class="flex items-center text-blue-500 hover:text-blue-900 sidebar-item"><span class="mr-2 text-xl">✈</span> Etops Reliability Report</a></li>
                 <li><a href="#" class="flex items-center text-blue-500 hover:text-blue-900 sidebar-item"><span class="mr-2 text-xl">✈</span> Etops Event</a></li> 
@@ -48,10 +59,21 @@
                 <li><a href="#" class="flex items-center text-blue-500 hover:text-blue-900 sidebar-item"><span class="mr-2 text-xl">✈</span> Graph ATA Delay</a></li>
                 <li><a href="#" class="flex items-center text-blue-500 hover:text-blue-900 sidebar-item"><span class="mr-2 text-xl">✈</span> APU Operation Summary</a></li>
                 <li><a href="#" class="flex items-center text-blue-500 hover:text-blue-900 sidebar-item"><span class="mr-2 text-xl">✈</span> APU Removal</a></li>
-                <li><a href="#" class="flex items-center text-blue-500 hover:text-blue-900 sidebar-item"><span class="mr-2 text-xl">✈</span> Cabin Reliability Report</a></li> 
+                <li><a href="#" class="flex items-center text-blue-500 hover:text-blue-900 sidebar-item"><span class="mr-2 text-xl">✈</span> Cabin Reliability Report</a></li>
+
+                <!-- Divider -->
+                <li><hr class="border-t border-gray-300 my-2"></li>
+
+                <!-- Fitur Gabungan di Paling Bawah -->
+                <li>
+                     <a href="#" class="flex items-center text-blue-500 hover:text-blue-900 sidebar-item"
+                       data-url="{{ route('report.combined.index') }}">
+                        <i data-lucide="printer" class="mr-2 w-5 h-5"></i> Print AOS & Pilot Report (PDF)
+                    </a>
+                </li>
             </ul>
         </div>
-    
+
         <!-- Main Content Area -->
         <div class="flex-1 p-6" id="main-content" style="background-color: #7EBB1A;">
             <h1 class="text-3xl text-white font-bold mb-4">Main Content Area</h1>

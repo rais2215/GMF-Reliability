@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Reliability Dashboard'),
+    'name' => env('APP_NAME', 'GMF Reliability'),
 
     /*
     |--------------------------------------------------------------------------
