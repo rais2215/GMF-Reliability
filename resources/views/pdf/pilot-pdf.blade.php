@@ -215,12 +215,12 @@
                     <th colspan="15"></th>
                 </tr>
                 <tr>
-                    <th colspan="2">Total Flight Cycles</th>              
-                    <th>{{ round($flyingCycles2Before) }}</th>           
-                    <th>{{ round($flyingCyclesBefore) }}</th>             
-                    <th>{{ round($flyingCyclesTotal) }}</th>              
-                    <th>{{ round($fc3Last) }}</th>                        
-                    <th>{{ round($fc12Last) }}</th>                       
+                    <th colspan="2">Total Flight Cycles</th>  
+                    <th>{{ round($flyingCycles2Before) }}</th>    
+                    <th>{{ round($flyingCyclesBefore) }}</th>     
+                    <th>{{ round($flyingCyclesTotal) }}</th>      
+                    <th>{{ round($fc3Last) }}</th>                
+                    <th>{{ round($fc12Last) }}</th>               
                     <th colspan="8"></th>
                 </tr>
                 <tr>
@@ -252,29 +252,24 @@
                 </tr>
             </thead>
             <tbody>
-                {{-- ✅ FIXED: Gunakan data dari $reportPerAta untuk setiap ATA --}}
-                @foreach ($reportPerAta as $report)
+                @foreach ($reportPerAta as $row)
                 <tr>
-                    <th>{{ $report['ata'] }}</th>
-                    <th>{{ $report['ata_name'] }}</th>
-                    <td>{{ $report['delayCountTwoMonthsAgo'] }}</td>
-                    <td>{{ $report['delayCountBefore'] }}</td>
-                    <td>{{ $report['delayCount'] }}</td>
-                    <td>{{ $report['delay3Month'] }}</td>
-                    <td>{{ $report['delay12Month'] }}</td>
-                    <td>{{ number_format($report['delay2Rate'], 2) }}</td>
-                    <td>{{ number_format($report['delay1Rate'], 2) }}</td>
-                    <td>{{ number_format($report['delayRate'], 2) }}</td>
-                    <td>{{ number_format($report['delayRate3Month'], 2) }}</td>
-                    <td>{{ number_format($report['delayRate12Month'], 2) }}</td>
-                    <td>{{ number_format($report['delayAlertLevel'], 2) }}</td>
-                    <td class="{{ str_contains($report['delayAlertStatus'], 'RED') ? 'alert-red' : '' }}">
-                        {{ $report['delayAlertStatus'] }}
-                    </td>
-                    <td class="{{ $report['delayTrend'] == 'UP' ? 'trend-up' : ($report['delayTrend'] == 'DOWN' ? 'trend-down' : '') }}">
-                        {{ $report['delayTrend'] }}
-                    </td>
-                </tr>  
+                    <th>{{ $row['ata'] }}</th>
+                    <th>{{ $row['ata_name'] ?? '' }}</th>
+                    <td>{{ $row['delayCountTwoMonthsAgo'] }}</td>
+                    <td>{{ $row['delayCountBefore'] }}</td>
+                    <td>{{ $row['delayCount'] }}</td>
+                    <td>{{ $row['delay3Month'] }}</td>
+                    <td>{{ $row['delay12Month'] }}</td>
+                    <td>{{ number_format($row['delay2Rate'], 2) }}</td>
+                    <td>{{ number_format($row['delay1Rate'], 2) }}</td>
+                    <td>{{ number_format($row['delayRate'], 2) }}</td>
+                    <td>{{ number_format($row['delayRate3Month'], 2) }}</td>
+                    <td>{{ number_format($row['delayRate12Month'], 2) }}</td>
+                    <td>{{ number_format($row['delayAlertLevel'], 2) }}</td>
+                    <td>{{ $row['delayAlertStatus'] }}</td>
+                    <td>{{ $row['delayTrend'] }}</td>
+                </tr>
                 @endforeach
             </tbody>
         </table>
