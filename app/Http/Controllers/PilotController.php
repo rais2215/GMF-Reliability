@@ -214,16 +214,11 @@ class PilotController extends Controller
 
             // ~~~ PIREP ALERT STATUS ~~~
             $pirepAlertStatus = '';
-            $alertCount = 0;
-            if ($pirepRate > $pirepAlertLevel) $alertCount++;
-            if ($pirep1Rate > $pirepAlertLevel) $alertCount++;
-            if ($pirep2Rate > $pirepAlertLevel) $alertCount++;
-
-            if ($alertCount == 3) {
+            if ($pirepRate > $pirepAlertLevel && $pirep1Rate > $pirepAlertLevel && $pirep2Rate > $pirepAlertLevel){
                 $pirepAlertStatus = 'RED-3';
-            } elseif ($alertCount == 2) {
+            } elseif ($pirepRate > $pirepAlertLevel && $pirep1Rate > $pirepAlertLevel){
                 $pirepAlertStatus = 'RED-2';
-            } elseif ($alertCount == 1) {
+            } elseif ($pirepRate > $pirepAlertLevel){
                 $pirepAlertStatus = 'RED-1';
             }
             
@@ -588,16 +583,11 @@ class PilotController extends Controller
 
              // ~~~ PIREP ALERT STATUS ~~~
             $pirepAlertStatus = '';
-            $alertCount = 0;
-            if ($pirepRate > $pirepAlertLevel) $alertCount++;
-            if ($pirep1Rate > $pirepAlertLevel) $alertCount++;
-            if ($pirep2Rate > $pirepAlertLevel) $alertCount++;
-
-            if ($alertCount == 3) {
+            if ($pirepRate > $pirepAlertLevel && $pirep1Rate > $pirepAlertLevel && $pirep2Rate > $pirepAlertLevel){
                 $pirepAlertStatus = 'RED-3';
-            } elseif ($alertCount == 2) {
+            } elseif ($pirepRate > $pirepAlertLevel && $pirep1Rate > $pirepAlertLevel){
                 $pirepAlertStatus = 'RED-2';
-            } elseif ($alertCount == 1) {
+            } elseif ($pirepRate > $pirepAlertLevel){
                 $pirepAlertStatus = 'RED-1';
             }
             

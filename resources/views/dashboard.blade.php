@@ -91,14 +91,15 @@
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const seconds = String(now.getSeconds()).padStart(2, '0');
 
-            const formattedDateTime = ${day}, ${date} ${month} ${year}, ${hours}:${minutes}:${seconds};
+            // ✅ PERBAIKAN: Gunakan backticks untuk template literal
+            const formattedDateTime = `${day}, ${date} ${month} ${year}, ${hours}:${minutes}:${seconds}`;
 
             document.getElementById('current-datetime').textContent = formattedDateTime;
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             updateDateTime();
-            setInterval(updateDateTime, 1000);
+            setInterval(updateDateTime, 1000); // Update setiap detik
         });
     </script>
 
