@@ -253,6 +253,7 @@ class CombinedReportController extends Controller
                 'revenueFlyingHours' => $revenueFlyingHours,
                 'takeOffTotal' => $takeOffTotal,
                 'revenueTakeOff' => $revenueTakeOff,
+                // KONVERSI KE FORMAT HH:MM
                 'flightHoursPerTakeOffTotal' => $this->convertDecimalToHoursMinutes($flightHoursPerTakeOffTotal),
                 'revenueFlightHoursPerTakeOff' => $this->convertDecimalToHoursMinutes($revenueFlightHoursPerTakeOff),
                 'dailyUtilizationFlyingHoursTotal' => $this->convertDecimalToHoursMinutes($dailyUtilizationFlyingHoursTotal),
@@ -260,6 +261,7 @@ class CombinedReportController extends Controller
                 'dailyUtilizationTakeOffTotal' => $dailyUtilizationTakeOffTotal,
                 'revenueDailyUtilizationTakeOffTotal' => $revenueDailyUtilizationTakeOffTotal,
                 'technicalDelayTotal' => $technicalDelayTotal,
+                // UNTUK DURATION, SIMPAN YANG SUDAH DIKONVERSI KARENA INI DISPLAY SAJA
                 'totalDuration' => $this->convertDecimalToHoursMinutes($totalDuration),
                 'averageDuration' => $this->convertDecimalToHoursMinutes($averageDuration),
                 'ratePer100TakeOff' => $ratePer100TakeOff,
@@ -278,7 +280,7 @@ class CombinedReportController extends Controller
             $totalAverageDuration += $averageDuration;
         }
 
-        // Menghitung rata-rata 12 bulan and konversi ke format (HH:MM)
+        // Menghitung rata-rata 12 bulan dan konversi ke format (HH:MM)
         $averageFlightHoursPerTakeOffTotal = $totalFlightHoursPerTakeOffTotal / 12;
         $avgFlightHoursPerTakeOffTotal = $this->convertDecimalToHoursMinutes($averageFlightHoursPerTakeOffTotal);
 
