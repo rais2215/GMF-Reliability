@@ -1,3 +1,9 @@
+@php
+    function formatNumber($value, $decimals = 2) {
+        return rtrim(rtrim(number_format($value, $decimals), '0'), '.');
+    }
+@endphp
+
 <!-- filepath: c:\Users\Noval Rais\Documents\Github Repository\GMF-Reliability\resources\views\report\combined-result.blade.php -->
 <x-app-layout>
     <div class="mx-auto py-4 px-4 sm:px-6 lg:px-8">
@@ -134,9 +140,9 @@
                                         $acInFleet = $reportData[$monthKey]['acInFleet'] ?? 0;
                                         $totalAcInFleet += $acInFleet;
                                     @endphp
-                                    <x-table.td>{{ round($acInFleet) }}</x-table.td>
+                                    <x-table.td>{{ formatNumber($acInFleet, 0) }}</x-table.td>
                                 @endfor
-                                <x-table.td>{{ number_format($totalAcInFleet / 12, 2) }}</x-table.td>
+                                <x-table.td>{{ formatNumber($totalAcInFleet / 12) }}</x-table.td>
                             </tr>
                             
                             <tr>
@@ -147,9 +153,9 @@
                                         $acInService = $reportData[$monthKey]['acInService'] ?? 0;
                                         $totalAcInService += $acInService;
                                     @endphp
-                                    <x-table.td>{{ number_format($acInService, 2) }}</x-table.td>
+                                    <x-table.td>{{ formatNumber($acInService) }}</x-table.td>
                                 @endfor
-                                <x-table.td>{{ number_format($totalAcInService / 12, 2) }}</x-table.td>
+                                <x-table.td>{{ formatNumber($totalAcInService / 12) }}</x-table.td>
                             </tr>
                             
                             <tr>
@@ -160,9 +166,9 @@
                                         $daysInService = $aosData['reportData'][$monthKey]['daysInService'] ?? 0;
                                         $totalDaysInService += $daysInService;
                                     @endphp
-                                    <x-table.td>{{ $daysInService }}</x-table.td>
+                                    <x-table.td>{{ formatNumber($daysInService, 0) }}</x-table.td>
                                 @endfor
-                                <x-table.td>{{ round($totalDaysInService) }}</x-table.td>
+                                <x-table.td>{{ formatNumber($totalDaysInService, 0) }}</x-table.td>
                             </tr>
 
                             <tr>
@@ -173,9 +179,9 @@
                                         $flyingHoursTotal = $reportData[$monthKey]['flyingHoursTotal'] ?? 0;
                                         $totalFlyingHoursTotal += $flyingHoursTotal;
                                     @endphp
-                                    <x-table.td>{{ round($flyingHoursTotal) }}</x-table.td>
+                                    <x-table.td>{{ formatNumber($flyingHoursTotal, 0) }}</x-table.td>
                                 @endfor
-                                <x-table.td>{{ round($totalFlyingHoursTotal) }}</x-table.td>
+                                <x-table.td>{{ formatNumber($totalFlyingHoursTotal, 0) }}</x-table.td>
                             </tr>
                             
                             <tr>
@@ -185,9 +191,9 @@
                                         $revenueFlyingHours = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['revenueFlyingHours'];
                                         $totalRevenueFlyingHours += $revenueFlyingHours;
                                     @endphp
-                                    <x-table.td>{{ round($revenueFlyingHours) }}</x-table.td>
+                                    <x-table.td>{{ formatNumber($revenueFlyingHours, 0) }}</x-table.td>
                                 @endfor
-                                <x-table.td>{{ round($totalRevenueFlyingHours) }}</x-table.td>
+                                <x-table.td>{{ formatNumber($totalRevenueFlyingHours, 0) }}</x-table.td>
                             </tr>
 
                             <tr>
@@ -198,9 +204,9 @@
                                         $takeOffTotal = $reportData[$monthKey]['takeOffTotal'] ?? 0;
                                         $totalTakeOffTotal += $takeOffTotal;
                                     @endphp
-                                    <x-table.td>{{ $takeOffTotal }}</x-table.td>
+                                    <x-table.td>{{ formatNumber($takeOffTotal, 0) }}</x-table.td>
                                 @endfor
-                                <x-table.td>{{ round($totalTakeOffTotal) }}</x-table.td>
+                                <x-table.td>{{ formatNumber($totalTakeOffTotal, 0) }}</x-table.td>
                             </tr>
                             
                             <tr>
@@ -210,9 +216,9 @@
                                         $revenueTakeOff = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['revenueTakeOff'];
                                         $totalRevenueTakeOff += $revenueTakeOff;
                                     @endphp
-                                    <x-table.td>{{ $revenueTakeOff }}</x-table.td>
+                                    <x-table.td>{{ formatNumber($revenueTakeOff, 0) }}</x-table.td>
                                 @endfor
-                                <x-table.td>{{ round($totalRevenueTakeOff) }}</x-table.td>
+                                <x-table.td>{{ formatNumber($totalRevenueTakeOff, 0) }}</x-table.td>
                             </tr>
 
                             <tr>
@@ -270,9 +276,9 @@
                                         $dailyUtilizationTakeOffTotal = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['dailyUtilizationTakeOffTotal'];
                                         $totalDailyUtilizationTakeOffTotal += is_numeric($dailyUtilizationTakeOffTotal) ? $dailyUtilizationTakeOffTotal : 0;
                                     @endphp
-                                    <x-table.td>{{ number_format($dailyUtilizationTakeOffTotal, 2) }}</x-table.td>
+                                    <x-table.td>{{ formatNumber($dailyUtilizationTakeOffTotal) }}</x-table.td>
                                 @endfor
-                                <x-table.td>{{ number_format($totalDailyUtilizationTakeOffTotal / 12, 2) }}</x-table.td>
+                                <x-table.td>{{ formatNumber($totalDailyUtilizationTakeOffTotal / 12) }}</x-table.td>
                             </tr>
 
                             <tr>
@@ -282,9 +288,9 @@
                                         $revenueDailyUtilizationTakeOffTotal = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['revenueDailyUtilizationTakeOffTotal'];
                                         $totalRevenueDailyUtilizationTakeOffTotal += is_numeric($revenueDailyUtilizationTakeOffTotal) ? $revenueDailyUtilizationTakeOffTotal : 0;
                                     @endphp
-                                    <x-table.td>{{ number_format($revenueDailyUtilizationTakeOffTotal, 2)}}</x-table.td>
+                                    <x-table.td>{{ formatNumber($revenueDailyUtilizationTakeOffTotal) }}</x-table.td>
                                 @endfor
-                                <x-table.td>{{ number_format($totalRevenueDailyUtilizationTakeOffTotal / 12, 2) }}</x-table.td>
+                                <x-table.td>{{ formatNumber($totalRevenueDailyUtilizationTakeOffTotal / 12) }}</x-table.td>
                             </tr>
 
                              <tr>
@@ -294,9 +300,9 @@
                                         $technicalDelayTotal = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['technicalDelayTotal'];
                                         $totalTechnicalDelayTotal += is_numeric($technicalDelayTotal) ? $technicalDelayTotal:0;
                                     @endphp
-                                    <x-table.td>{{ round($technicalDelayTotal) }}</x-table.td>
+                                    <x-table.td>{{ formatNumber($technicalDelayTotal, 0) }}</x-table.td>
                                 @endfor
-                                <x-table.td>{{ round($totalTechnicalDelayTotal) }}</x-table.td>
+                                <x-table.td>{{ formatNumber($totalTechnicalDelayTotal, 0) }}</x-table.td>
                             </tr>
 
                             <tr>
@@ -332,9 +338,9 @@
                                         $ratePer100TakeOff = is_numeric($ratePer100TakeOff) ? (float)$ratePer100TakeOff : 0;
                                         $totalRatePer100TakeOff += $ratePer100TakeOff;
                                     @endphp
-                                    <x-table.td>{{ number_format($ratePer100TakeOff, 2) }}</x-table.td>
+                                    <x-table.td>{{ formatNumber($ratePer100TakeOff) }}</x-table.td>
                                 @endfor
-                                <x-table.td>{{ number_format($totalRatePer100TakeOff / 12, 2) }}</x-table.td>
+                                <x-table.td>{{ formatNumber($totalRatePer100TakeOff / 12) }}</x-table.td>
                             </tr>
 
                             <tr>
@@ -346,9 +352,9 @@
                                         $technicalIncidentTotal = is_numeric($technicalIncidentTotal) ? (float)$technicalIncidentTotal : 0;
                                         $totalTechnicalIncidentTotal += $technicalIncidentTotal;
                                     @endphp
-                                    <x-table.td>{{ round($technicalIncidentTotal) }}</x-table.td>
+                                    <x-table.td>{{ formatNumber($technicalIncidentTotal, 0) }}</x-table.td>
                                 @endfor
-                                <x-table.td>{{ round($totalTechnicalIncidentTotal) }}</x-table.td>
+                                <x-table.td>{{ formatNumber($totalTechnicalIncidentTotal, 0) }}</x-table.td>
                             </tr>
 
                             <tr>
@@ -360,9 +366,9 @@
                                         $technicalIncidentRate = is_numeric($technicalIncidentRate) ? (float)$technicalIncidentRate : 0;
                                         $totalTechnicalIncidentRate += $technicalIncidentRate;
                                     @endphp
-                                    <x-table.td>{{ $technicalIncidentRate == 0 ? '0' : number_format($technicalIncidentRate, 3) }}</x-table.td>
+                                    <x-table.td>{{ $technicalIncidentRate == 0 ? '0' : formatNumber($technicalIncidentRate, 3) }}</x-table.td>
                                 @endfor
-                                <x-table.td>{{ number_format($totalTechnicalIncidentRate / 12, 2) }}</x-table.td>
+                                <x-table.td>{{ formatNumber($totalTechnicalIncidentRate / 12) }}</x-table.td>
                             </tr>
 
                             <tr>
@@ -374,9 +380,9 @@
                                         $technicalCancellationTotal = is_numeric($technicalCancellationTotal) ? (float)$technicalCancellationTotal : 0;
                                         $totalTechnicalCancellationTotal += $technicalCancellationTotal;
                                     @endphp
-                                    <x-table.td>{{ round($technicalCancellationTotal) }}</x-table.td>
+                                    <x-table.td>{{ formatNumber($technicalCancellationTotal, 0) }}</x-table.td>
                                 @endfor
-                                <x-table.td>{{ round($totalTechnicalCancellationTotal) }}</x-table.td>
+                                <x-table.td>{{ formatNumber($totalTechnicalCancellationTotal, 0) }}</x-table.td>
                             </tr>
 
                             <tr>
@@ -388,9 +394,9 @@
                                         $dispatchReliability = is_numeric($dispatchReliability) ? (float)$dispatchReliability : 0;
                                         $totalDispatchReliability += $dispatchReliability;
                                     @endphp
-                                    <x-table.td>{{ number_format($dispatchReliability, 2) }}%</x-table.td>
+                                    <x-table.td>{{ formatNumber($dispatchReliability) }}%</x-table.td>
                                 @endfor
-                                <x-table.td>{{ number_format($totalDispatchReliability / 12, 2) }}%</x-table.td>
+                                <x-table.td>{{ formatNumber($totalDispatchReliability / 12) }}%</x-table.td>
                             </tr>
                         @else
                             <tr>
@@ -412,11 +418,11 @@
                 <x-table.thead>
                     <tr>
                         <x-table.th colspan="2">Total Flight Hours</x-table.th>
-                        <x-table.th>{{ round($pilotData['flyingHours2Before'] ?? 0) }}</x-table.th>
-                        <x-table.th>{{ round($pilotData['flyingHoursBefore'] ?? 0) }}</x-table.th>
-                        <x-table.th>{{ round($pilotData['flyingHoursTotal'] ?? 0) }}</x-table.th>
-                        <x-table.th>{{ round($pilotData['fh3Last'] ?? 0) }}</x-table.th>
-                        <x-table.th>{{ round($pilotData['fh12Last'] ?? 0) }}</x-table.th>
+                        <x-table.th>{{ formatNumber($pilotData['flyingHours2Before'] ?? 0, 0) }}</x-table.th>
+                        <x-table.th>{{ formatNumber($pilotData['flyingHoursBefore'] ?? 0, 0) }}</x-table.th>
+                        <x-table.th>{{ formatNumber($pilotData['flyingHoursTotal'] ?? 0, 0) }}</x-table.th>
+                        <x-table.th>{{ formatNumber($pilotData['fh3Last'] ?? 0, 0) }}</x-table.th>
+                        <x-table.th>{{ formatNumber($pilotData['fh12Last'] ?? 0, 0) }}</x-table.th>
                         <x-table.th colspan="8"></x-table.th>
                     </tr>
                     <tr>
@@ -457,12 +463,12 @@
                         <x-table.td><a href="#">{{ $row['pirepCount'] }}</a></x-table.td>
                         <x-table.td>{{ $row['pirep3Month'] }}</x-table.td>
                         <x-table.td>{{ $row['pirep12Month'] }}</x-table.td>
-                        <x-table.td>{{ number_format($row['pirep2Rate'],2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['pirep1Rate'],2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['pirepRate'],2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['pirepRate3Month'],2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['pirepRate12Month'],2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['pirepAlertLevel'],2) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['pirep2Rate']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['pirep1Rate']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['pirepRate']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['pirepRate3Month']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['pirepRate12Month']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['pirepAlertLevel']) }}</x-table.td>
                         <x-table.td>{{ $row['pirepAlertStatus'] }}</x-table.td>
                         <x-table.td>{{ $row['pirepTrend'] }}</x-table.td>
                     </tr>  
@@ -482,11 +488,11 @@
                 <x-table.thead>
                     <tr>
                         <x-table.th colspan="2">Total Flight Hours</x-table.th>
-                        <x-table.th>{{ round($pilotData['flyingHours2Before'] ?? 0) }}</x-table.th>
-                        <x-table.th>{{ round($pilotData['flyingHoursBefore'] ?? 0) }}</x-table.th>
-                        <x-table.th>{{ round($pilotData['flyingHoursTotal'] ?? 0) }}</x-table.th>
-                        <x-table.th>{{ round($pilotData['fh3Last'] ?? 0) }}</x-table.th>
-                        <x-table.th>{{ round($pilotData['fh12Last'] ?? 0) }}</x-table.th>
+                        <x-table.th>{{ formatNumber($pilotData['flyingHours2Before'] ?? 0, 0) }}</x-table.th>
+                        <x-table.th>{{ formatNumber($pilotData['flyingHoursBefore'] ?? 0, 0) }}</x-table.th>
+                        <x-table.th>{{ formatNumber($pilotData['flyingHoursTotal'] ?? 0, 0) }}</x-table.th>
+                        <x-table.th>{{ formatNumber($pilotData['fh3Last'] ?? 0, 0) }}</x-table.th>
+                        <x-table.th>{{ formatNumber($pilotData['fh12Last'] ?? 0, 0) }}</x-table.th>
                         <x-table.th colspan="8"></x-table.th>
                     </tr>
                     <tr>
@@ -527,12 +533,12 @@
                         <x-table.td><a href="#">{{ $row['marepCount'] }}</a></x-table.td>
                         <x-table.td>{{ $row['marep3Month'] }}</x-table.td>
                         <x-table.td>{{ $row['marep12Month'] }}</x-table.td>
-                        <x-table.td>{{ number_format($row['marep2Rate'], 2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['marep1Rate'], 2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['marepRate'], 2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['marepRate3Month'], 2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['marepRate12Month'], 2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['marepAlertLevel'], 2) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['marep2Rate']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['marep1Rate']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['marepRate']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['marepRate3Month']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['marepRate12Month']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['marepAlertLevel']) }}</x-table.td>
                         <x-table.td>{{ $row['marepAlertStatus'] }}</x-table.td>
                         <x-table.td>{{ $row['marepTrend'] }}</x-table.td>
                     </tr>  
@@ -552,11 +558,11 @@
                 <x-table.thead>
                     <tr>
                         <x-table.th colspan="2">Total Flight Cycles</x-table.th>  
-                        <x-table.th>{{ round($pilotData['flyingCycles2Before'] ?? 0) }}</x-table.th>    
-                        <x-table.th>{{ round($pilotData['flyingCyclesBefore'] ?? 0) }}</x-table.th>     
-                        <x-table.th>{{ round($pilotData['flyingCyclesTotal'] ?? 0) }}</x-table.th>      
-                        <x-table.th>{{ round($pilotData['fc3Last'] ?? 0) }}</x-table.th>                
-                        <x-table.th>{{ round($pilotData['fc12Last'] ?? 0) }}</x-table.th>               
+                        <x-table.th>{{ formatNumber($pilotData['flyingCycles2Before'] ?? 0, 0) }}</x-table.th>    
+                        <x-table.th>{{ formatNumber($pilotData['flyingCyclesBefore'] ?? 0, 0) }}</x-table.th>     
+                        <x-table.th>{{ formatNumber($pilotData['flyingCyclesTotal'] ?? 0, 0) }}</x-table.th>      
+                        <x-table.th>{{ formatNumber($pilotData['fc3Last'] ?? 0, 0) }}</x-table.th>                
+                        <x-table.th>{{ formatNumber($pilotData['fc12Last'] ?? 0, 0) }}</x-table.th>               
                         <x-table.th colspan="8"></x-table.th>
                     </tr>
                     <tr>
@@ -597,12 +603,12 @@
                         <x-table.td><a href="#">{{ $row['delayCount'] }}</a></x-table.td>
                         <x-table.td>{{ $row['delay3Month'] }}</x-table.td>
                         <x-table.td>{{ $row['delay12Month'] }}</x-table.td>
-                        <x-table.td>{{ number_format($row['delay2Rate'], 2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['delay1Rate'], 2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['delayRate'], 2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['delayRate3Month'], 2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['delayRate12Month'], 2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['delayAlertLevel'], 2) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['delay2Rate']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['delay1Rate']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['delayRate']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['delayRate3Month']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['delayRate12Month']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['delayAlertLevel']) }}</x-table.td>
                         <x-table.td>{{ $row['delayAlertStatus'] }}</x-table.td>
                         <x-table.td>{{ $row['delayTrend'] }}</x-table.td>
                     </tr>  

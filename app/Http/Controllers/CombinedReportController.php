@@ -125,6 +125,11 @@ class CombinedReportController extends Controller
 
     private function getAosData($aircraftType, $period)
     {
+        // Helper function untuk menghilangkan trailing zero
+        $formatRate = function($value) {
+            return (float) number_format($value, 10, '.', '');
+        };
+
         // Initialize an array to hold report data for each month
         $reportData = [];
         $totalFlightHoursPerTakeOffTotal = 0;
@@ -155,8 +160,8 @@ class CombinedReportController extends Controller
             // Calculate the number of days in the month
             $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
-            // A/C in Service
-            $acInService = $daysInMonth > 0 ? $daysInService / $daysInMonth : 0;
+            // A/C in Service (DENGAN FORMAT RATE)
+            $acInService = $daysInMonth > 0 ? $formatRate($daysInService / $daysInMonth) : 0;
 
             // 3. Flying Hours - Total
             $flyingHoursTotal = TblMonthlyfhfc::where('Actype', $aircraftType)
@@ -221,8 +226,8 @@ class CombinedReportController extends Controller
             // 15. Average Duration
             $averageDuration = $technicalDelayTotal > 0 ? $totalDuration / $technicalDelayTotal : 0;
 
-            // 16. Rate / 100 Take Off
-            $ratePer100TakeOff = $revenueTakeOff > 0 ? ($technicalDelayTotal * 100) / $revenueTakeOff : 0;
+            // 16. Rate / 100 Take Off (DENGAN FORMAT RATE)
+            $ratePer100TakeOff = $revenueTakeOff > 0 ? $formatRate(($technicalDelayTotal * 100) / $revenueTakeOff) : 0;
 
             // Technical Incident - Total
             $technicalIncidentTotal = TblSdr::where('ACType', $aircraftType)
@@ -230,8 +235,8 @@ class CombinedReportController extends Controller
                 ->whereYear('DateOccur', '=', $year)
                 ->count();
 
-            // Technical Incident Rate /100 FC
-            $technicalIncidentRate = $revenueTakeOff > 0 ? ($technicalIncidentTotal * 100) / $revenueTakeOff : 0;
+            // Technical Incident Rate /100 FC (DENGAN FORMAT RATE)
+            $technicalIncidentRate = $revenueTakeOff > 0 ? $formatRate(($technicalIncidentTotal * 100) / $revenueTakeOff) : 0;
 
             // 17. Technical Cancellation - Total
             $technicalCancellationTotal = Mcdrnew::where('ACType', $aircraftType)
@@ -240,9 +245,9 @@ class CombinedReportController extends Controller
                 ->where('DCP', 'LIKE', '%C%')
                 ->count();
 
-            // 18. Dispatch Reliability (%)
+            // 18. Dispatch Reliability (%) (DENGAN FORMAT RATE)
             $dispatchReliability = $revenueTakeOff > 0 ? 
-                (($revenueTakeOff - $technicalDelayTotal - $technicalCancellationTotal) / $revenueTakeOff) * 100 : 0;
+                $formatRate((($revenueTakeOff - $technicalDelayTotal - $technicalCancellationTotal) / $revenueTakeOff) * 100) : 0;
 
             // Store the metrics for the current month in the report data array
             $reportData[$currentPeriod] = [
@@ -258,8 +263,8 @@ class CombinedReportController extends Controller
                 'revenueFlightHoursPerTakeOff' => $this->convertDecimalToHoursMinutes($revenueFlightHoursPerTakeOff),
                 'dailyUtilizationFlyingHoursTotal' => $this->convertDecimalToHoursMinutes($dailyUtilizationFlyingHoursTotal),
                 'revenueDailyUtilizationFlyingHoursTotal' => $this->convertDecimalToHoursMinutes($revenueDailyUtilizationFlyingHoursTotal),
-                'dailyUtilizationTakeOffTotal' => $dailyUtilizationTakeOffTotal,
-                'revenueDailyUtilizationTakeOffTotal' => $revenueDailyUtilizationTakeOffTotal,
+                'dailyUtilizationTakeOffTotal' => $formatRate($dailyUtilizationTakeOffTotal),
+                'revenueDailyUtilizationTakeOffTotal' => $formatRate($revenueDailyUtilizationTakeOffTotal),
                 'technicalDelayTotal' => $technicalDelayTotal,
                 // UNTUK DURATION, SIMPAN YANG SUDAH DIKONVERSI KARENA INI DISPLAY SAJA
                 'totalDuration' => $this->convertDecimalToHoursMinutes($totalDuration),
@@ -312,6 +317,11 @@ class CombinedReportController extends Controller
 
     private function getPilotData($aircraftType, $period, $request = null)
     {
+        // Helper function untuk menghilangkan trailing zero
+        $formatRate = function($value) {
+            return (float) number_format($value, 10, '.', '');
+        };
+
         $month = date('m', strtotime($period));
         $year = date('Y', strtotime($period));
 
@@ -443,11 +453,11 @@ class CombinedReportController extends Controller
                 $pirep12Month += $pirepData[$i][$ata]->count ?? 0;
             }
 
-            $pirepRate = $pirepCount * 1000 / ($flyingHoursTotal ?: 1);
-            $pirep1Rate = $pirepCountBefore * 1000 / ($flyingHoursBefore ?: 1);
-            $pirep2Rate = $pirepCountTwoMonthsAgo * 1000 / ($flyingHours2Before ?: 1);
-            $pirepRate3Month = ($pirepRate + $pirep1Rate + $pirep2Rate) / 3;
-            $pirepRate12Month = $pirep12Month * 1000 / ($fh12Last ?: 1);
+            $pirepRate = $formatRate($pirepCount * 1000 / ($flyingHoursTotal ?: 1));
+            $pirep1Rate = $formatRate($pirepCountBefore * 1000 / ($flyingHoursBefore ?: 1));
+            $pirep2Rate = $formatRate($pirepCountTwoMonthsAgo * 1000 / ($flyingHours2Before ?: 1));
+            $pirepRate3Month = $formatRate(($pirepRate + $pirep1Rate + $pirep2Rate) / 3);
+            $pirepRate12Month = $formatRate($pirep12Month * 1000 / ($fh12Last ?: 1));
             
             // PIREP ALERT LEVEL
             $pirepAlertLevel = $alertLevels[$ata]['ALP'][0]->alertlevel ?? null;
@@ -470,7 +480,9 @@ class CombinedReportController extends Controller
                 }
                 $stddev = sqrt($pirepRate12Month / count($pirepRates));
                 // Alert level = rata-rata + 2 * standar deviasi
-                $pirepAlertLevel = $pirepRate12Month + 2 * $stddev;
+                $pirepAlertLevel = $formatRate($pirepRate12Month + 2 * $stddev);
+            } else {
+                $pirepAlertLevel = $formatRate($pirepAlertLevel);
             }
 
             // ~~~ PIREP ALERT STATUS ~~~
@@ -505,11 +517,11 @@ class CombinedReportController extends Controller
             }
 
             // ~~~ MAREP RATE PERIOD ~~~
-            $marepRate = $marepCount * 1000 / ($flyingHoursTotal ?: 1);
-            $marep1Rate = $marepCountBefore * 1000 / ($flyingHoursBefore ?: 1);
-            $marep2Rate = $marepCountTwoMonthsAgo * 1000 / ($flyingHours2Before ?: 1);
-            $marepRate3Month = ($marepRate + $marep1Rate + $marep2Rate) / 3;
-            $marepRate12Month = $marep12Month * 1000 / ($fh12Last ?: 1);
+            $marepRate = $formatRate($marepCount * 1000 / ($flyingHoursTotal ?: 1));
+            $marep1Rate = $formatRate($marepCountBefore * 1000 / ($flyingHoursBefore ?: 1));
+            $marep2Rate = $formatRate($marepCountTwoMonthsAgo * 1000 / ($flyingHours2Before ?: 1));
+            $marepRate3Month = $formatRate(($marepRate + $marep1Rate + $marep2Rate) / 3);
+            $marepRate12Month = $formatRate($marep12Month * 1000 / ($fh12Last ?: 1));
             
             // ~~~ MAREP ALERT LEVEL ~~~
             $marepAlertLevel = $alertLevels[$ata]['ALM'][0]->alertlevel ?? null;
@@ -527,7 +539,9 @@ class CombinedReportController extends Controller
                     return pow($rate - $mean, 2);
                 }, $marepRates)) / count($marepRates);
                 $stddev = sqrt($variance);
-                $marepAlertLevel = $mean + 2 * $stddev;
+                $marepAlertLevel = $formatRate($mean + 2 * $stddev);
+            } else {
+                $marepAlertLevel = $formatRate($marepAlertLevel);
             }
 
            // ~~~ MAREP ALERT STATUS ~~~
@@ -566,11 +580,11 @@ class CombinedReportController extends Controller
             }
 
             // ~~~ TECHNICAL DELAY RATE ~~~
-            $delayRate = $delayCount * 1000 / ($flyingCyclesTotal ?: 1);
-            $delay1Rate = $delayCountBefore * 1000 / ($flyingCyclesBefore ?: 1);
-            $delay2Rate = $delayCountTwoMonthsAgo * 1000 / ($flyingCycles2Before ?: 1);
-            $delayRate3Month = ($delayRate + $delay1Rate + $delay2Rate) / 3;
-            $delayRate12Month = $delay12Month * 1000 / ($fc12Last ?: 1);
+            $delayRate = $formatRate($delayCount * 1000 / ($flyingCyclesTotal ?: 1));
+            $delay1Rate = $formatRate($delayCountBefore * 1000 / ($flyingCyclesBefore ?: 1));
+            $delay2Rate = $formatRate($delayCountTwoMonthsAgo * 1000 / ($flyingCycles2Before ?: 1));
+            $delayRate3Month = $formatRate(($delayRate + $delay1Rate + $delay2Rate) / 3);
+            $delayRate12Month = $formatRate($delay12Month * 1000 / ($fc12Last ?: 1));
 
             // ~~~ TECHNICAL DELAY ALERT LEVEL ~~~
             $delayAlertLevel = $alertLevels[$ata]['ALD'][0]->alertlevel ?? null;
@@ -594,7 +608,9 @@ class CombinedReportController extends Controller
                     return pow($rate - $mean, 2);
                 }, $delayRates)) / count($delayRates);
                 $stddev = sqrt($variance);
-                $delayAlertLevel = $mean + 2 * $stddev;
+                $delayAlertLevel = $formatRate($mean + 2 * $stddev);
+            } else {
+                $delayAlertLevel = $formatRate($delayAlertLevel);
             }
 
              // ~~~ TECHNICAL DELAY ALERT STATUS ~~~
