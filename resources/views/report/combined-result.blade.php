@@ -69,7 +69,7 @@
 
             {{-- Export Buttons --}}
             <div class="flex space-x-2">
-                <form action="{{ route('report.combined.export.pdf') }}" method="POST">
+                <form action="{{ route('report.combined-report.export-pdf') }}" method="POST">
                     @csrf
                     <input type="hidden" name="period" value="{{ $period }}">
                     <input type="hidden" name="operator" value="{{ $operator }}">

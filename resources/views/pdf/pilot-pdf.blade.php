@@ -41,7 +41,7 @@
     }
     @endphp
 
-    {{-- Pilot Report --}}
+    {{-- PILOT REPORT SECTION --}}
     <div>
         <table>
             <thead>
@@ -63,9 +63,9 @@
                 </tr>
                 <tr>
                     <th colspan="2" rowspan="2">ATA CHAPTER</th>
-                    <th>{{ substr(\Carbon\Carbon::parse($period)->subMonths(2)->format('F'), 0, 3) }}</th>
-                    <th>{{ substr(\Carbon\Carbon::parse($period)->subMonth(1)->format('F'), 0, 3) }}</th>
-                    <th>{{ substr(\Carbon\Carbon::parse($period)->format('F'), 0, 3) }}</th>
+                    <th rowspan="2">{{ substr(\Carbon\Carbon::parse($period)->subMonths(2)->format('F'), 0, 3) }}</th>
+                    <th rowspan="2">{{ substr(\Carbon\Carbon::parse($period)->subMonth(1)->format('F'), 0, 3) }}</th>
+                    <th rowspan="2">{{ substr(\Carbon\Carbon::parse($period)->format('F'), 0, 3) }}</th>
                     <th>Last 3</th>
                     <th>Last 12</th>
                     <th>{{ substr(\Carbon\Carbon::parse($period)->subMonths(2)->format('F'), 0, 3) }}</th>
@@ -78,9 +78,6 @@
                     <th rowspan="2">TREND</th>
                 </tr>
                 <tr>
-                    <th></th>
-                    <th></th>
-                    <th></th>
                     <th>Months</th>
                     <th>Months</th>
                     <th>RATE</th>
@@ -93,7 +90,6 @@
                 </tr>
             </thead>
             <tbody>
-                {{-- PILOT REPORT DATA dengan formatNumber --}}
                 @foreach ($reportPerAta as $report)
                 <tr>
                     <th>{{ $report['ata'] }}</th>

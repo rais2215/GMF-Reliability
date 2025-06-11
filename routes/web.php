@@ -99,6 +99,7 @@ Route::middleware(['auth', 'verified'])->prefix('report')->name('report.')->grou
     Route::get('/cumulative', [ReportController::class, 'cumulativeContent'])->name('cumulative');
     Route::get('/aos-pilot', [ReportController::class, 'aosPilot'])->name('aos_pilot.index');
 
+    Route::post('/combined-report/export-pdf', [CombinedReportController::class, 'exportPdf'])->name('combined-report.export-pdf');
 });
 
 Route::get('/get-aircraft-types', [ReportController::class, 'getAircraftTypes'])->name('get.aircraft.types');

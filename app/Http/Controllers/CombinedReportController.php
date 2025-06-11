@@ -92,33 +92,47 @@ class CombinedReportController extends Controller
     {
         $request->validate([
             'period' => 'required',
-            'aircraft_type' => 'required',
+            'aircraft_type_aos' => 'required',
+            'aircraft_type_pilot' => 'required',
         ]);
 
-        $aircraftType = $request->aircraft_type;
         $period = $request->period;
         $operator = $request->operator;
+        $aircraftTypeAos = $request->aircraft_type_aos;     
+        $aircraftTypePilot = $request->aircraft_type_pilot;  
 
         // ===== GET AOS DATA =====
-        $aosData = $this->getAosData($aircraftType, $period);
+        $aosData = $this->getAosData($aircraftTypeAos, $period);
 
         // ===== GET PILOT DATA =====
-        $pilotData = $this->getPilotData($aircraftType, $period, $request);
+        $pilotData = $this->getPilotData($aircraftTypePilot, $period, $request);
+
+        // Helper function untuk format number
+        $formatNumber = function($value, $decimals = 2) {
+            return rtrim(rtrim(number_format($value, $decimals), '0'), '.');
+        };
 
         $data = [
             'aosData' => $aosData,
             'pilotData' => $pilotData,
-            'aircraftType' => $aircraftType,
+            'aircraftTypeAos' => $aircraftTypeAos,        
+            'aircraftTypePilot' => $aircraftTypePilot,    
             'period' => $period,
-            'operator' => $operator
+            'operator' => $operator,
+            'formatNumber' => $formatNumber
         ];
 
         // Generate PDF
         $pdf = Pdf::loadView('pdf.combined-pdf', $data);
         $pdf->setPaper('A4', 'landscape');
+        $pdf->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true,
+            'defaultFont' => 'sans-serif'
+        ]);
         
-        $periodOnlyDate = date('Y-m', strtotime($period));
-        $filename = "Combined_AOS_Pilot_Report_{$aircraftType}_{$periodOnlyDate}.pdf";
+        $periodFormatted = \Carbon\Carbon::parse($period)->format('Y-m');
+        $filename = "Combined_Report_AOS_{$aircraftTypeAos}_Pilot_{$aircraftTypePilot}_{$periodFormatted}.pdf";
         
         return $pdf->download($filename);
     }
