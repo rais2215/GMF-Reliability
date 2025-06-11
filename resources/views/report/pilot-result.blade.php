@@ -1,4 +1,10 @@
 <x-app-layout>
+    @php
+    function formatNumber($value, $decimals = 2) {
+        return rtrim(rtrim(number_format($value, $decimals), '0'), '.');
+    }
+    @endphp
+
     <div class="mx-auto py-4 px-4 sm:px-6 lg:px-8">
         {{-- Header dengan Back Button dan Export Buttons yang sejajar --}}
         <div class="flex justify-between items-center mb-4">
@@ -173,12 +179,12 @@
                         <x-table.td><a href="#">{{ $row['pirepCount'] }}</a></x-table.td>
                         <x-table.td>{{ $row['pirep3Month'] }}</x-table.td>
                         <x-table.td>{{ $row['pirep12Month'] }}</x-table.td>
-                        <x-table.td>{{ number_format($row['pirep2Rate'],2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['pirep1Rate'],2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['pirepRate'],2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['pirepRate3Month'],2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['pirepRate12Month'],2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['pirepAlertLevel'],2) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['pirep2Rate']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['pirep1Rate']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['pirepRate']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['pirepRate3Month']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['pirepRate12Month']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['pirepAlertLevel']) }}</x-table.td>
                         <x-table.td>{{ $row['pirepAlertStatus'] }}</x-table.td>
                         <x-table.td>{{ $row['pirepTrend'] }}</x-table.td>
                     </tr>  
@@ -239,12 +245,12 @@
                         <x-table.td><a href="#">{{ $row['marepCount'] }}</a></x-table.td>
                         <x-table.td>{{ $row['marep3Month'] }}</x-table.td>
                         <x-table.td>{{ $row['marep12Month'] }}</x-table.td>
-                        <x-table.td>{{ number_format($row['marep2Rate'], 2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['marep1Rate'], 2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['marepRate'], 2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['marepRate3Month'], 2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['marepRate12Month'], 2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['marepAlertLevel'], 2) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['marep2Rate']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['marep1Rate']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['marepRate']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['marepRate3Month']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['marepRate12Month']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['marepAlertLevel']) }}</x-table.td>
                         <x-table.td>{{ $row['marepAlertStatus'] }}</x-table.td>
                         <x-table.td>{{ $row['marepTrend'] }}</x-table.td>
                     </tr>  
@@ -305,12 +311,12 @@
                         <x-table.td><a href="#">{{ $row['delayCount'] }}</a></x-table.td>
                         <x-table.td>{{ $row['delay3Month'] }}</x-table.td>
                         <x-table.td>{{ $row['delay12Month'] }}</x-table.td>
-                        <x-table.td>{{ number_format($row['delay2Rate'], 2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['delay1Rate'], 2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['delayRate'], 2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['delayRate3Month'], 2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['delayRate12Month'], 2) }}</x-table.td>
-                        <x-table.td>{{ number_format($row['delayAlertLevel'], 2) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['delay2Rate']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['delay1Rate']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['delayRate']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['delayRate3Month']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['delayRate12Month']) }}</x-table.td>
+                        <x-table.td>{{ formatNumber($row['delayAlertLevel']) }}</x-table.td>
                         <x-table.td>{{ $row['delayAlertStatus'] }}</x-table.td>
                         <x-table.td>{{ $row['delayTrend'] }}</x-table.td>
                     </tr>  

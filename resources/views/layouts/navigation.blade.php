@@ -1,8 +1,15 @@
-<!-- Skeleton Loader -->
-<div id="loader" class="fixed inset-0 bg-white bg-opacity-90 flex flex-col gap-4 items-center justify-center z-50" style="display: none;">
-    <div class="w-1/2 h-6 bg-gray-300 rounded animate-pulse"></div>
-    <div class="w-1/3 h-6 bg-gray-300 rounded animate-pulse"></div>
-    <div class="w-1/4 h-6 bg-gray-300 rounded animate-pulse"></div>
+<!-- Loading Skeleton Overlay -->
+<div id="page-loader" class="fixed inset-0 bg-white/70 dark:bg-gray-900/70 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300">
+    <div class="flex items-center justify-center w-full h-full">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-8 w-full max-w-5xl">
+            @for ($i = 0; $i < 3; $i++)
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow animate-pulse">
+                    <div class="bg-gray-300 dark:bg-gray-700 rounded w-1/2 mb-4 h-4"></div>
+                    <div class="bg-gray-300 dark:bg-gray-700 rounded w-3/4 h-8"></div>
+                </div>
+            @endfor
+        </div>
+    </div>
 </div>
 
 <nav x-data="{ open: false }" style="background-color: #112955; border-bottom: 10px solid #112955;">
@@ -12,7 +19,9 @@
             <div class="flex items-center">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center" style="padding-top: 8px;">
-                    <img class="h-14 w-auto" src="{{ asset('images/gmfwhite.png') }}" alt="logo">
+                    <a href="{{ route('dashboard') }}" onclick="event.preventDefault(); showLoaderAndGo('{{ route('dashboard') }}');">
+                        <img class="h-14 w-auto" src="{{ asset('images/gmfwhite.png') }}" alt="logo">
+                    </a>
                 </div>
 
                 <!-- Navigation Links -->
@@ -44,10 +53,10 @@
                             Profile
                         </x-dropdown-link>
 
-                        <!-- Authentication -->
-                        <form method="POST" action="{{ route('logout') }}">
+                        <!-- Logout -->
+                        <form method="POST" action="{{ route('logout') }}" onsubmit="showLoader();">
                             @csrf
-                            <button type="submit" onclick="showLoader()" class="w-full text-left px-4 py-2 text-sm" style="color: #112955;">
+                            <button type="submit" class="w-full text-left px-4 py-2 text-sm" style="color: #112955;">
                                 Log Out
                             </button>
                         </form>
@@ -89,10 +98,10 @@
                     Profile
                 </x-responsive-nav-link>
 
-                <!-- Authentication -->
-                <form method="POST" action="{{ route('logout') }}">
+                <!-- Logout Responsive -->
+                <form method="POST" action="{{ route('logout') }}" onsubmit="showLoader();">
                     @csrf
-                    <button type="submit" onclick="showLoader()" class="w-full text-left px-4 py-2 text-sm" style="color: #112955;">
+                    <button type="submit" class="w-full text-left px-4 py-2 text-sm" style="color: #112955;">
                         Log Out
                     </button>
                 </form>
@@ -104,13 +113,17 @@
 <!-- JavaScript -->
 <script>
     function showLoader() {
-        document.getElementById('loader').style.display = 'flex';
+        const loader = document.getElementById('page-loader');
+        if (loader) {
+            loader.classList.remove('hidden', 'opacity-0');
+            loader.classList.add('opacity-100', 'flex', 'items-center', 'justify-center');
+        }
     }
 
     function showLoaderAndGo(url) {
         showLoader();
-        setTimeout(function () {
+        setTimeout(() => {
             window.location.href = url;
-        }, 300); // bisa disesuaikan dengan kebutuhan UX
+        }, 300);
     }
 </script>

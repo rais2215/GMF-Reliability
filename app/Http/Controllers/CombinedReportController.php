@@ -76,7 +76,7 @@ class CombinedReportController extends Controller
         $aosData = $this->getAosData($aircraftTypeAos, $period);
 
         // ===== GET PILOT DATA =====
-        $pilotData = $this->getPilotData($aircraftTypePilot, $period);
+        $pilotData = $this->getPilotData($aircraftTypePilot, $period, $request);
 
         return view('report.combined-result', [
             'aosData' => $aosData,
@@ -103,7 +103,7 @@ class CombinedReportController extends Controller
         $aosData = $this->getAosData($aircraftType, $period);
 
         // ===== GET PILOT DATA =====
-        $pilotData = $this->getPilotData($aircraftType, $period);
+        $pilotData = $this->getPilotData($aircraftType, $period, $request);
 
         $data = [
             'aosData' => $aosData,
@@ -310,7 +310,7 @@ class CombinedReportController extends Controller
         ];
     }
 
-    private function getPilotData($aircraftType, $period)
+    private function getPilotData($aircraftType, $period, $request = null)
     {
         $month = date('m', strtotime($period));
         $year = date('Y', strtotime($period));
@@ -450,7 +450,28 @@ class CombinedReportController extends Controller
             $pirepRate12Month = $pirep12Month * 1000 / ($fh12Last ?: 1);
             
             // PIREP ALERT LEVEL
-            $pirepAlertLevel = $alertLevels[$ata]['ALP'][0]->alertlevel ?? 0;
+            $pirepAlertLevel = $alertLevels[$ata]['ALP'][0]->alertlevel ?? null;
+
+            if (is_null($pirepAlertLevel)) {
+                // Ambil array rate 12 bulan terakhir dari kolom Rate di pilot-result.blade.php
+                $pirepRates = $request->input('rates', []);
+                // Pastikan hanya 12 data terakhir yang digunakan
+                if (count($pirepRates) > 12) {
+                $pirepRates = array_slice($pirepRates, -12);
+                }
+                // Jika data rates tidak valid, fallback ke perhitungan lama
+                if (empty($pirepRates) || count($pirepRates) < 12) {
+                $pirepRates = [$pirepRate, $pirep1Rate, $pirep2Rate];
+                    for ($i = 3; $i < 12; $i++) {
+                        $fh = $getFlyingHours($aircraftType, \Carbon\Carbon::parse($period)->subMonths($i)->format('Y-m'));
+                        $count = $pirepData[$i][$ata]->count ?? 0;
+                        $pirepRate12Month = $pirep12Month * 1000 / ($fh12Last ?: 1);
+                    }   
+                }
+                $stddev = sqrt($pirepRate12Month / count($pirepRates));
+                // Alert level = rata-rata + 2 * standar deviasi
+                $pirepAlertLevel = $pirepRate12Month + 2 * $stddev;
+            }
 
             // ~~~ PIREP ALERT STATUS ~~~
             $pirepAlertStatus = '';
@@ -491,15 +512,36 @@ class CombinedReportController extends Controller
             $marepRate12Month = $marep12Month * 1000 / ($fh12Last ?: 1);
             
             // ~~~ MAREP ALERT LEVEL ~~~
-            $marepAlertLevel = $alertLevels[$ata]['ALM'][0]->alertlevel ?? 0;
+            $marepAlertLevel = $alertLevels[$ata]['ALM'][0]->alertlevel ?? null;
+
+            if (is_null($marepAlertLevel)) {
+                $marepRates = $request->input('rates', []);
+                if (count($marepRates) > 12) {
+                    $marepRates = array_slice($marepRates, -12);
+                }
+                if (empty($marepRates) || count($marepRates) < 12) {
+                    $marepRates = [$marepRate, $marep1Rate, $marep2Rate];
+                }
+                $mean = array_sum($marepRates) / count($marepRates);
+                $variance = array_sum(array_map(function($rate) use ($mean) {
+                    return pow($rate - $mean, 2);
+                }, $marepRates)) / count($marepRates);
+                $stddev = sqrt($variance);
+                $marepAlertLevel = $mean + 2 * $stddev;
+            }
 
            // ~~~ MAREP ALERT STATUS ~~~
             $marepAlertStatus = '';
+            // RED-3: 3 bulan berturut-turut melebihi alert level
             if ($marepRate > $marepAlertLevel && $marep1Rate > $marepAlertLevel && $marep2Rate > $marepAlertLevel) {
                 $marepAlertStatus = 'RED-3';
-            } elseif ($marepRate > $marepAlertLevel && $marep1Rate > $marepAlertLevel) {
+            }
+            // RED-2: 2 bulan terakhir berturut-turut melebihi alert level
+            elseif ($marepRate > $marepAlertLevel && $marep1Rate > $marepAlertLevel) {
                 $marepAlertStatus = 'RED-2';
-            } elseif ($marepRate > $marepAlertLevel) {
+            }
+            // RED-1: hanya bulan terakhir melebihi alert level
+            elseif ($marepRate > $marepAlertLevel) {
                 $marepAlertStatus = 'RED-1';
             }
             
@@ -531,7 +573,29 @@ class CombinedReportController extends Controller
             $delayRate12Month = $delay12Month * 1000 / ($fc12Last ?: 1);
 
             // ~~~ TECHNICAL DELAY ALERT LEVEL ~~~
-            $delayAlertLevel = $alertLevels[$ata]['ALD'][0]->alertlevel ?? 0;
+            $delayAlertLevel = $alertLevels[$ata]['ALD'][0]->alertlevel ?? null;
+
+            if (is_null($delayAlertLevel)) {
+                $delayRates = $request->input('rates', []);
+                if (count($delayRates) > 12) {
+                    $delayRates = array_slice($delayRates, -12);
+                }
+                if (empty($delayRates) || count($delayRates) < 12) {
+                    $delayRates = [$delayRate, $delay1Rate, $delay2Rate];
+                    for ($i = 3; $i < 12; $i++) {
+                        $fc = $getFlyingCycles($aircraftType, \Carbon\Carbon::parse($period)->subMonths($i)->format('Y-m-d'));
+                        $count = $delayData[$i][$ata]->count ?? 0;
+                        $rate = $count * 1000 / ($fc ?: 1);
+                        $delayRates[] = $rate;
+                    }
+                }
+                $mean = array_sum($delayRates) / count($delayRates);
+                $variance = array_sum(array_map(function($rate) use ($mean) {
+                    return pow($rate - $mean, 2);
+                }, $delayRates)) / count($delayRates);
+                $stddev = sqrt($variance);
+                $delayAlertLevel = $mean + 2 * $stddev;
+            }
 
              // ~~~ TECHNICAL DELAY ALERT STATUS ~~~
             $delayAlertStatus = '';
@@ -545,10 +609,12 @@ class CombinedReportController extends Controller
             
             // ~~~ TECHNICAL DELAY TREND ~~~
             $delayTrend = '';
-            if ($delay1Rate > $delay2Rate && $delay1Rate < $delayRate) {
-                $delayTrend = 'UP';
-            } elseif ($delay1Rate < $delay2Rate && $delay1Rate > $delayRate) {
+            if ($delayRate < $delay1Rate && $delay1Rate < $delay2Rate) {
                 $delayTrend = 'DOWN';
+            } elseif ($delayRate > $delay1Rate && $delay1Rate < $delay2Rate) {
+                $delayTrend = '';
+            } elseif ($delayRate > $delay1Rate && $delay1Rate > $delay2Rate) {
+                $delayTrend = 'UP';
             }
 
             // Simpan hasil per ATA

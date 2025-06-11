@@ -65,6 +65,11 @@ class ReportController extends Controller
         $aircraftType = $request->aircraft_type;
         $period = $request->period; // Format: YYYY-MM
 
+        // Helper function untuk menghilangkan trailing zero
+        $formatRate = function($value) {
+            return (float) number_format($value, 10, '.', '');
+        };
+
         // Initialize an array to hold report data for each month
         $reportData = [];
         $totalFlightHoursPerTakeOffTotal = 0;
@@ -95,8 +100,8 @@ class ReportController extends Controller
             // Calculate the number of days in the month
             $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
-            // A/C in Service
-            $acInService = $daysInMonth > 0 ? $daysInService / $daysInMonth : 0;
+            // A/C in Service (DENGAN FORMAT RATE)
+            $acInService = $daysInMonth > 0 ? $formatRate($daysInService / $daysInMonth) : 0;
 
             // 3. Flying Hours - Total
             $flyingHoursTotal = TblMonthlyfhfc::where('Actype', $aircraftType)
@@ -161,8 +166,8 @@ class ReportController extends Controller
             // 15. Average Duration
             $averageDuration = $technicalDelayTotal > 0 ? $totalDuration / $technicalDelayTotal : 0;
 
-            // 16. Rate / 100 Take Off
-            $ratePer100TakeOff = $revenueTakeOff > 0 ? ($technicalDelayTotal * 100) / $revenueTakeOff : 0;
+            // 16. Rate / 100 Take Off (DENGAN FORMAT RATE)
+            $ratePer100TakeOff = $revenueTakeOff > 0 ? $formatRate(($technicalDelayTotal * 100) / $revenueTakeOff) : 0;
 
             // Technical Incident - Total
             $technicalIncidentTotal = TblSdr::where('ACType', $aircraftType)
@@ -170,8 +175,8 @@ class ReportController extends Controller
                 ->whereYear('DateOccur', '=', $year)
                 ->count();
 
-            // Technical Incident Rate /100 FC
-            $technicalIncidentRate = $revenueTakeOff > 0 ? ($technicalIncidentTotal * 100) / $revenueTakeOff : 0;
+            // Technical Incident Rate /100 FC (DENGAN FORMAT RATE)
+            $technicalIncidentRate = $revenueTakeOff > 0 ? $formatRate(($technicalIncidentTotal * 100) / $revenueTakeOff) : 0;
 
             // 17. Technical Cancellation - Total
             $technicalCancellationTotal = Mcdrnew::where('ACType', $aircraftType)
@@ -180,9 +185,9 @@ class ReportController extends Controller
                 ->where('DCP', 'LIKE', '%C%')
                 ->count();
 
-            // 18. Dispatch Reliability (%)
+            // 18. Dispatch Reliability (%) (DENGAN FORMAT RATE)
             $dispatchReliability = $revenueTakeOff > 0 ? 
-                (($revenueTakeOff - $technicalDelayTotal - $technicalCancellationTotal) / $revenueTakeOff) * 100 : 0;
+                $formatRate((($revenueTakeOff - $technicalDelayTotal - $technicalCancellationTotal) / $revenueTakeOff) * 100) : 0;
 
             // Store the metrics for the current month in the report data array
             $reportData[$currentPeriod] = [
@@ -263,6 +268,11 @@ class ReportController extends Controller
         $aircraftType = $request->aircraft_type;
         $period = $request->period;
 
+        // Helper function untuk menghilangkan trailing zero
+        $formatRate = function($value) {
+            return (float) number_format($value, 10, '.', '');
+        };
+
         // ... (logika untuk menghitung reportData)
         // Initialize an array to hold report data for each month
         $reportData = [];
@@ -294,8 +304,8 @@ class ReportController extends Controller
             // Calculate the number of days in the month
             $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 
-            // A/C in Service
-            $acInService = $daysInMonth > 0 ? $daysInService / $daysInMonth : 0;
+            // A/C in Service (DENGAN FORMAT RATE)
+            $acInService = $daysInMonth > 0 ? $formatRate($daysInService / $daysInMonth) : 0;
 
             // 3. Flying Hours - Total
             $flyingHoursTotal = TblMonthlyfhfc::where('Actype', $aircraftType)
@@ -361,8 +371,8 @@ class ReportController extends Controller
             // 15. Average Duration
             $averageDuration = $technicalDelayTotal > 0 ? $totalDuration / $technicalDelayTotal : 0;
 
-            // 16. Rate / 100 Take Off
-            $ratePer100TakeOff = $revenueTakeOff > 0 ? ($technicalDelayTotal * 100) / $revenueTakeOff : 0;
+            // 16. Rate / 100 Take Off (DENGAN FORMAT RATE)
+            $ratePer100TakeOff = $revenueTakeOff > 0 ? $formatRate(($technicalDelayTotal * 100) / $revenueTakeOff) : 0;
 
             // Technical Incident - Total
             $technicalIncidentTotal = TblSdr::where('ACType', $aircraftType)
@@ -370,8 +380,8 @@ class ReportController extends Controller
                 ->whereYear('DateOccur', '=', $year)
                 ->count();
 
-            // Technical Incident Rate /100 FC
-            $technicalIncidentRate = $revenueTakeOff > 0 ? ($technicalIncidentTotal * 100) / $revenueTakeOff : 0;
+            // Technical Incident Rate /100 FC (DENGAN FORMAT RATE)
+            $technicalIncidentRate = $revenueTakeOff > 0 ? $formatRate(($technicalIncidentTotal * 100) / $revenueTakeOff) : 0;
 
             // 17. Technical Cancellation - Total
             $technicalCancellationTotal = Mcdrnew::where('ACType', $aircraftType)
@@ -380,9 +390,9 @@ class ReportController extends Controller
                 ->where('DCP', 'LIKE', '%C%')
                 ->count();
 
-            // 18. Dispatch Reliability (%)
+            // 18. Dispatch Reliability (%) (DENGAN FORMAT RATE)
             $dispatchReliability = $revenueTakeOff > 0 ? 
-                (($revenueTakeOff - $technicalDelayTotal - $technicalCancellationTotal) / $revenueTakeOff) * 100 : 0;
+                $formatRate((($revenueTakeOff - $technicalDelayTotal - $technicalCancellationTotal) / $revenueTakeOff) * 100) : 0;
 
             // Store the metrics for the current month in the report data array
             $reportData[$currentPeriod] = [

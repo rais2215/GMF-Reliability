@@ -42,6 +42,11 @@
             </thead>
             <tbody>
                 @php
+                    // Helper function untuk menghilangkan trailing zero
+                    function formatNumber($value, $decimals = 2) {
+                        return rtrim(rtrim(number_format($value, $decimals), '0'), '.');
+                    }
+
                     // Inisialisasi total untuk setiap metrik
                     $totalAcInFleet = 0;
                     $totalAcInService = 0;
@@ -79,9 +84,9 @@
                         $acInFleet = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['acInFleet'];
                             $totalAcInFleet += $acInFleet;
                         @endphp
-                        <td class="style1">{{ number_format($acInFleet, decimals: 2) }}</td>
+                        <td class="style1">{{ formatNumber($acInFleet) }}</td>
                     @endfor
-                    <td class="style1">{{ number_format($totalAcInFleet / 12, decimals: 2) }}</td>
+                    <td class="style1">{{ formatNumber($totalAcInFleet / 12) }}</td>
                 </tr>
                 <tr>
                     <td>A/C in Service</td>
@@ -90,9 +95,9 @@
                             $acInService = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['acInService'];
                             $totalAcInService += $acInService;
                         @endphp
-                        <td class="style1">{{ number_format($acInService, 2) }}</td>
+                        <td class="style1">{{ formatNumber($acInService) }}</td>
                     @endfor
-                    <td class="style1">{{ number_format($totalAcInService / 12, 2) }}</td>
+                    <td class="style1">{{ formatNumber($totalAcInService / 12) }}</td>
                 </tr>
                 <tr>
                     <td>A/C Days in Service</td>
@@ -196,9 +201,9 @@
                                 $dailyUtilizationTakeOffTotal = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['dailyUtilizationTakeOffTotal'];
                                 $totalDailyUtilizationTakeOffTotal += is_numeric($dailyUtilizationTakeOffTotal) ? $dailyUtilizationTakeOffTotal : 0;
                             @endphp
-                            <td class="style1">{{ number_format($dailyUtilizationTakeOffTotal, 2) }}</td>
+                            <td class="style1">{{ formatNumber($dailyUtilizationTakeOffTotal) }}</td>
                         @endfor
-                        <td class="style1">{{ number_format($totalDailyUtilizationTakeOffTotal / 12, 2) }}</td>
+                        <td class="style1">{{ formatNumber($totalDailyUtilizationTakeOffTotal / 12) }}</td>
                 </tr>
                 <tr>
                     <td>- Revenue FC</td>
@@ -207,9 +212,9 @@
                                 $revenueDailyUtilizationTakeOffTotal = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['revenueDailyUtilizationTakeOffTotal'];
                                 $totalRevenueDailyUtilizationTakeOffTotal += is_numeric($revenueDailyUtilizationTakeOffTotal) ? $revenueDailyUtilizationTakeOffTotal : 0;
                             @endphp
-                            <td class="style1">{{ number_format($revenueDailyUtilizationTakeOffTotal, 2)}}</td>
+                            <td class="style1">{{ formatNumber($revenueDailyUtilizationTakeOffTotal) }}</td>
                         @endfor
-                        <td class="style1">{{ number_format($totalRevenueDailyUtilizationTakeOffTotal / 12, 2) }}</td>
+                        <td class="style1">{{ formatNumber($totalRevenueDailyUtilizationTakeOffTotal / 12) }}</td>
                 </tr>
                 <tr>
                     <td>Technical Delay - Total</td>
@@ -249,9 +254,9 @@
                                 $ratePer100TakeOff = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['ratePer100TakeOff'];
                                 $totalRatePer100TakeOff += is_numeric($ratePer100TakeOff) ? $ratePer100TakeOff:0;
                             @endphp
-                            <td class="style1">{{ number_format($ratePer100TakeOff, 2) }}</td>
+                            <td class="style1">{{ formatNumber($ratePer100TakeOff) }}</td>
                         @endfor
-                        <td class="style1">{{ number_format($totalRatePer100TakeOff / 12, 2) }}</td>
+                        <td class="style1">{{ formatNumber($totalRatePer100TakeOff / 12) }}</td>
                 </tr>
                 <tr>
                     <td>Technical Incident - Total</td>
@@ -268,21 +273,21 @@
                     <td>- Rate/100 FC</td>
                     @for ($i = 11; $i >= 0; $i--)
                             @php
-                                $technicalIncidentRate = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['technicalIncidentRate'] ?? 0; // Use null coalescing operator
-                                $totalTechnicalIncidentRate += is_numeric($technicalIncidentRate) ? $technicalIncidentRate : 0; // Ensure the value is numeric
+                                $technicalIncidentRate = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['technicalIncidentRate'] ?? 0;
+                                $totalTechnicalIncidentRate += is_numeric($technicalIncidentRate) ? $technicalIncidentRate : 0;
                             @endphp
-                            <td class="style1">{{ $technicalIncidentRate == 0 ? '0' : number_format($technicalIncidentRate, 3) }}</td>
+                            <td class="style1">{{ formatNumber($technicalIncidentRate, 3) }}</td>
                         @endfor
-                        <td class="style1">{{ number_format($totalTechnicalIncidentRate / 12, 2) }}</td>
+                        <td class="style1">{{ formatNumber($totalTechnicalIncidentRate / 12) }}</td>
                 </tr>
                 <tr>
                     <td>Technical Cancellation - Total</td>
                     @for ($i = 11; $i >= 0; $i--)
                             @php
-                                $technicalCancellationTotal = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['technicalCancellationTotal'] ?? 0; // Use null coalescing operator
-                                $totalTechnicalCancellationTotal += is_numeric($technicalCancellationTotal) ? $technicalCancellationTotal : 0; // Ensure the value is numeric
+                                $technicalCancellationTotal = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['technicalCancellationTotal'] ?? 0;
+                                $totalTechnicalCancellationTotal += is_numeric($technicalCancellationTotal) ? $technicalCancellationTotal : 0;
                             @endphp
-                            <td class="style1">{{ round($technicalCancellationTotal) }}</td> <!-- Display rounded total for the month -->
+                            <td class="style1">{{ round($technicalCancellationTotal) }}</td>
                         @endfor
                         <td class="style1">{{ round($totalTechnicalCancellationTotal) }}</td>
                 </tr>
@@ -290,12 +295,12 @@
                     <td>Dispatch Reliability (%)</td>
                     @for ($i = 11; $i >= 0; $i--)
                             @php
-                                $dispatchReliability = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['dispatchReliability'] ?? 0; // Use null coalescing operator
-                                $totalDispatchReliability += is_numeric($dispatchReliability) ? $dispatchReliability : 0; // Ensure the value is numeric
+                                $dispatchReliability = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['dispatchReliability'] ?? 0;
+                                $totalDispatchReliability += is_numeric($dispatchReliability) ? $dispatchReliability : 0;
                             @endphp
-                            <td class="style1">{{ number_format($dispatchReliability, 2) }}%</td> <!-- Display formatted reliability for the month -->
+                            <td class="style1">{{ formatNumber($dispatchReliability) }}%</td>
                         @endfor
-                        <td class="style1">{{ number_format($totalDispatchReliability / 12, 2) }}%</td>
+                        <td class="style1">{{ formatNumber($totalDispatchReliability / 12) }}%</td>
                 </tr>
             </tbody>
         </table>

@@ -34,6 +34,13 @@
     </style>
 </head>
 <body>
+    @php
+    // Helper function untuk menghilangkan trailing zero
+    function formatNumber($value, $decimals = 2) {
+        return rtrim(rtrim(number_format($value, $decimals), '0'), '.');
+    }
+    @endphp
+
     {{-- Pilot Report --}}
     <div>
         <table>
@@ -86,7 +93,7 @@
                 </tr>
             </thead>
             <tbody>
-                {{-- ✅ FIXED: Gunakan data dari $reportPerAta untuk setiap ATA --}}
+                {{-- PILOT REPORT DATA dengan formatNumber --}}
                 @foreach ($reportPerAta as $report)
                 <tr>
                     <th>{{ $report['ata'] }}</th>
@@ -96,18 +103,14 @@
                     <td>{{ $report['pirepCount'] }}</td>
                     <td>{{ $report['pirep3Month'] }}</td>
                     <td>{{ $report['pirep12Month'] }}</td>
-                    <td>{{ number_format($report['pirep2Rate'], 2) }}</td>
-                    <td>{{ number_format($report['pirep1Rate'], 2) }}</td>
-                    <td>{{ number_format($report['pirepRate'], 2) }}</td>
-                    <td>{{ number_format($report['pirepRate3Month'], 2) }}</td>
-                    <td>{{ number_format($report['pirepRate12Month'], 2) }}</td>
-                    <td>{{ number_format($report['pirepAlertLevel'], 2) }}</td>
-                    <td class="{{ str_contains($report['pirepAlertStatus'], 'RED') ? 'alert-red' : '' }}">
-                        {{ $report['pirepAlertStatus'] }}
-                    </td>
-                    <td class="{{ $report['pirepTrend'] == 'UP' ? 'trend-up' : ($report['pirepTrend'] == 'DOWN' ? 'trend-down' : '') }}">
-                        {{ $report['pirepTrend'] }}
-                    </td>
+                    <td>{{ formatNumber($report['pirep2Rate']) }}</td>
+                    <td>{{ formatNumber($report['pirep1Rate']) }}</td>
+                    <td>{{ formatNumber($report['pirepRate']) }}</td>
+                    <td>{{ formatNumber($report['pirepRate3Month']) }}</td>
+                    <td>{{ formatNumber($report['pirepRate12Month']) }}</td>
+                    <td>{{ formatNumber($report['pirepAlertLevel']) }}</td>
+                    <td>{{ $report['pirepAlertStatus'] }}</td>
+                    <td>{{ $report['pirepTrend'] }}</td>
                 </tr>  
                 @endforeach
             </tbody>
@@ -169,7 +172,7 @@
                 </tr>
             </thead>
             <tbody>
-                {{-- ✅ FIXED: Gunakan data dari $reportPerAta untuk setiap ATA --}}
+                {{-- MAINTENANCE REPORT DATA dengan formatNumber --}}
                 @foreach ($reportPerAta as $report)
                 <tr>
                     <th>{{ $report['ata'] }}</th>
@@ -179,18 +182,14 @@
                     <td>{{ $report['marepCount'] }}</td>
                     <td>{{ $report['marep3Month'] }}</td>
                     <td>{{ $report['marep12Month'] }}</td>
-                    <td>{{ number_format($report['marep2Rate'], 2) }}</td>
-                    <td>{{ number_format($report['marep1Rate'], 2) }}</td>
-                    <td>{{ number_format($report['marepRate'], 2) }}</td>
-                    <td>{{ number_format($report['marepRate3Month'], 2) }}</td>
-                    <td>{{ number_format($report['marepRate12Month'], 2) }}</td>
-                    <td>{{ number_format($report['marepAlertLevel'], 2) }}</td>
-                    <td class="{{ str_contains($report['marepAlertStatus'], 'RED') ? 'alert-red' : '' }}">
-                        {{ $report['marepAlertStatus'] }}
-                    </td>
-                    <td class="{{ $report['marepTrend'] == 'UP' ? 'trend-up' : ($report['marepTrend'] == 'DOWN' ? 'trend-down' : '') }}">
-                        {{ $report['marepTrend'] }}
-                    </td>
+                    <td>{{ formatNumber($report['marep2Rate']) }}</td>
+                    <td>{{ formatNumber($report['marep1Rate']) }}</td>
+                    <td>{{ formatNumber($report['marepRate']) }}</td>
+                    <td>{{ formatNumber($report['marepRate3Month']) }}</td>
+                    <td>{{ formatNumber($report['marepRate12Month']) }}</td>
+                    <td>{{ formatNumber($report['marepAlertLevel']) }}</td>
+                    <td>{{ $report['marepAlertStatus'] }}</td>
+                    <td>{{ $report['marepTrend'] }}</td>
                 </tr>  
                 @endforeach
             </tbody>
@@ -252,6 +251,7 @@
                 </tr>
             </thead>
             <tbody>
+                {{-- DELAY REPORT DATA dengan formatNumber --}}
                 @foreach ($reportPerAta as $row)
                 <tr>
                     <th>{{ $row['ata'] }}</th>
@@ -261,12 +261,12 @@
                     <td>{{ $row['delayCount'] }}</td>
                     <td>{{ $row['delay3Month'] }}</td>
                     <td>{{ $row['delay12Month'] }}</td>
-                    <td>{{ number_format($row['delay2Rate'], 2) }}</td>
-                    <td>{{ number_format($row['delay1Rate'], 2) }}</td>
-                    <td>{{ number_format($row['delayRate'], 2) }}</td>
-                    <td>{{ number_format($row['delayRate3Month'], 2) }}</td>
-                    <td>{{ number_format($row['delayRate12Month'], 2) }}</td>
-                    <td>{{ number_format($row['delayAlertLevel'], 2) }}</td>
+                    <td>{{ formatNumber($row['delay2Rate']) }}</td>
+                    <td>{{ formatNumber($row['delay1Rate']) }}</td>
+                    <td>{{ formatNumber($row['delayRate']) }}</td>
+                    <td>{{ formatNumber($row['delayRate3Month']) }}</td>
+                    <td>{{ formatNumber($row['delayRate12Month']) }}</td>
+                    <td>{{ formatNumber($row['delayAlertLevel']) }}</td>
                     <td>{{ $row['delayAlertStatus'] }}</td>
                     <td>{{ $row['delayTrend'] }}</td>
                 </tr>
