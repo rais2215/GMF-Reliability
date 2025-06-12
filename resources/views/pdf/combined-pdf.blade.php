@@ -6,32 +6,49 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Combined Report - AOS & Pilot Report</title>
     <style>
+        @page {
+            size: A4 portrait;
+            margin: 10mm; /* Dikurangi margin untuk lebih banyak ruang */
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10px; /* Diperbesar dari 8px */
+            margin: 0;
+            padding: 0;
+        }
+        
         table {
             border-collapse: collapse;
             width: 100%;
             font-family: Arial, sans-serif;
-            font-size: 10px;
+            font-size: 10px; /* Diperbesar dari 8px */
         }
         th, td {
             border: 1px solid #000;
-            padding: 5px;
+            padding: 4px; /* Diperbesar dari 3px */
             text-align: center;
+            font-size: 9px; /* Diperbesar dari 7px */
+            word-wrap: break-word;
+            line-height: 1.2; /* Tambahkan line-height */
         }
         .style1 {
             text-align: center;
         }
         .style2 {
-            font-size: 20px;
+            font-size: 18px; /* Diperbesar dari 16px */
             text-align: center;
+            font-weight: bold;
         }
         h6 {
-            font-size: 12px; 
+            font-size: 11px; /* Diperbesar dari 10px */
             text-align: left;
-            margin: 5px;
+            margin: 4px; /* Diperbesar dari 3px */
+            line-height: 1.3;
         }
         .issued {
             text-align: right;
-            margin: 6px;
+            margin: 5px; /* Diperbesar dari 4px */
         }
         .alert-red {
             background-color: red;
@@ -45,62 +62,108 @@
         .aos-label {
             text-align: left;
             font-weight: bold;
+            font-size: 9px; /* Diperbesar dari 7px */
+            width: 130px; /* Diperbesar dari 120px */
         }
         .ata-name {
             text-align: left;
             font-weight: bold;
+            font-size: 8px; /* Diperbesar dari 7px */
+            max-width: 110px; /* Diperbesar dari 100px */
         }
-        /* ✅ Style untuk halaman cover */
+        
         .cover-page {
             text-align: center;
-            padding: 50px 20px;
-            min-height: 80vh;
+            padding: 30px 15px;
+            min-height: 90vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
         }
         .logo {
-            max-width: 400px;
+            max-width: 300px; 
             width: 100%;
             height: auto;
-            margin-bottom: 50px;
+            margin-bottom: 30px;
         }
         .cover-title {
-            font-size: 32px;
+            font-size: 48px; 
             font-weight: bold;
-            color: #1e3a8a;
-            margin-bottom: 20px;
-            font-family: Arial, sans-serif;
-        }
-        .cover-subtitle {
-            font-size: 24px;
-            font-weight: bold;
-            color: #374151;
+            color: #000000;
             margin-bottom: 15px;
             font-family: Arial, sans-serif;
+            line-height: 1.2;
         }
-        .cover-info {
-            font-size: 18px;
-            color: #6b7280;
+        .cover-subtitle {
+            font-size: 18px; 
+            font-weight: bold;
+            color: #374151;
             margin-bottom: 10px;
             font-family: Arial, sans-serif;
         }
+        .cover-info {
+            font-size: 40px;
+            font-weight: bold;
+            color: #000000;
+            margin-bottom: 8px;
+            font-family: Arial, sans-serif;
+        }
         .cover-period {
-            font-size: 20px;
+            font-size: 40px; 
             font-weight: bold;
             color: #1e3a8a;
-            margin-top: 30px;
+            margin-top: 20px;
             font-family: Arial, sans-serif;
         }
         .cover-footer {
             position: absolute;
-            bottom: 50px;
+            bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 14px;
+            font-size: 12px;
             color: #9ca3af;
             font-family: Arial, sans-serif;
+        }
+        
+        /* Update table-responsive untuk font yang lebih besar */
+        .table-responsive {
+            overflow-x: auto;
+            font-size: 9px; /* Diperbesar dari 6px */
+        }
+        
+        .table-responsive table {
+            min-width: 100%;
+            font-size: 9px; /* Diperbesar dari 6px */
+        }
+        
+        .table-responsive th,
+        .table-responsive td {
+            padding: 3px; /* Diperbesar dari 2px */
+            font-size: 8px; /* Diperbesar dari 6px */
+        }
+        
+        /* Tambahan untuk mengoptimalkan ruang tabel */
+        .compact-table {
+            margin-bottom: 15px;
+        }
+        
+        .compact-table th,
+        .compact-table td {
+            padding: 3px 2px;
+            font-size: 8px;
+            line-height: 1.1;
+        }
+        
+        .notes-section {
+            margin-top: 15px;
+            font-size: 11px;
+        }
+        
+        .notes-section h6 {
+            font-size: 11px;
+            margin: 2px 0;
+            line-height: 1.2;
         }
     </style>
 </head>
@@ -112,27 +175,67 @@
     }
     @endphp
 
-    {{-- ✅ COVER PAGE --}}
-    <div class="cover-page">
-        <!-- Logo GMF AeroAsia -->
-        <img src="{{ public_path('images/gmfblue.png') }}" alt="GMF AeroAsia Logo" class="logo">
+    {{-- Cover Page --}}
+    <div class="cover-page" style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; text-align: center; padding: 0;">
+
+        <div class="cover-title" style="margin-bottom: 30px;">Fleet Reliability Report</div>
         
-        <div class="cover-title">AIRCRAFT OPERATION SUMMARY & PILOT REPORT</div>
+        <!-- Logo GMF AeroAsia - berada di tengah kertas -->
+        @php
+            $logoPath = public_path('images/coverPDF.jpg');
+            $logoExists = file_exists($logoPath);
+        @endphp
         
-        <div class="cover-info">Aircraft Type: {{ $aircraftTypeAos ?? $aircraftTypePilot }}</div>
+        @if($logoExists)
+            @php
+            try {
+                $imageData = file_get_contents($logoPath);
+                $imageBase64 = base64_encode($imageData);
+                $imageSrc = 'data:image/jpg;base64,' . $imageBase64;
+            } catch (Exception $e) {
+                $imageSrc = null;
+            }
+            @endphp
+            
+            @if(isset($imageSrc))
+            <div style="display: flex; justify-content: center; align-items: center; margin: 60px auto; width: 100%; text-align: center;">
+                <img src="{{ $imageSrc }}" alt="GMF AeroAsia Logo" style="max-width: 600px; width: 600px; height: auto; display: block; margin: 0 auto;">
+            </div>
+            @else
+            {{-- Fallback Logo - di tengah kertas --}}
+            <div style="display: flex; justify-content: center; align-items: center; margin: 60px auto; width: 100%; text-align: center;">
+                <div style="width: 600px; height: 180px; border: 3px solid #1e40af; display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); border-radius: 15px; margin: 0 auto;">
+                    <div style="font-size: 48px; font-weight: bold; color: white; margin-bottom: 12px;">GMF AeroAsia</div>
+                    <div style="font-size: 18px; color: #e2e8f0; letter-spacing: 2px;">GARUDA INDONESIA GROUP</div>
+                </div>
+            </div>
+            @endif
+        @else
+            {{-- Fallback Logo jika file tidak ada - di tengah kertas --}}
+            <div style="display: flex; justify-content: center; align-items: center; margin: 60px auto; width: 100%; text-align: center;">
+                <div style="width: 600px; height: 180px; border: 3px solid #1e40af; display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); border-radius: 15px; margin: 0 auto;">
+                    <div style="font-size: 48px; font-weight: bold; color: white; margin-bottom: 12px;">GMF AeroAsia</div>
+                    <div style="font-size: 18px; color: #e2e8f0; letter-spacing: 2px;">GARUDA INDONESIA GROUP</div>
+                </div>
+            </div>
+        @endif
         
-        <div class="cover-period">
-            Period: {{ \Carbon\Carbon::parse($period)->format('F Y') }}
+        <div style="position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); text-align: center;">
+            <div class="cover-info">Garuda Indonesia</div>
+            
+            <div class="cover-period" style="margin-bottom: 15px;">
+            {{ isset($period) ? \Carbon\Carbon::parse($period)->format('F Y') : 'N/A' }}
+            </div>
         </div>
         
-        <div class="cover-footer">
+        <div style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); font-size: 12px; color: #9ca3af; font-family: Arial, sans-serif;">
             Generated by GMF Reliability Engineering & Services
         </div>
     </div>
 
     {{-- AOS REPORT SECTION --}}
-    <div style="page-break-before: always;">
-        <table>
+    <div style="page-break-before: always;" class="table-responsive">
+        <table class="compact-table">
             <thead>
                 <tr>
                     <th colspan="14" class="style2">AIRCRAFT OPERATION SUMMARY</th>
@@ -173,7 +276,6 @@
                     <td><b>LAST 12 MTHS</b></td>
                 </tr>
                 
-                {{-- ...existing code untuk semua baris AOS... --}}
                 <tr>
                     <td class="aos-label">A/C in Fleet</td>
                     @for ($i = 11; $i >= 0; $i--)
@@ -453,9 +555,6 @@
                     <th colspan="13">PILOT REPORT</th>
                 </tr>
                 <tr>
-                    <th colspan="15"></th>
-                </tr>
-                <tr>
                     <th colspan="2">Total Flight Hours</th>
                     <th>{{ round($pilotData['flyingHours2Before']) }}</th>
                     <th>{{ round($pilotData['flyingHoursBefore']) }}</th>
@@ -514,12 +613,14 @@
                 @endforeach
             </tbody>
         </table>
-        <h6>NOTE :</h6>
+        <div class="notes-section">
+            <h6>NOTE :</h6>
+        </div>
         <h6>The Alert Level (AL) is based on monthly Technical Pilot Report / Maintenance Finding Report / Delay Rate of last Four Quarters (Average + 2 *STD)</h6>
         <h6>The Alert Status colomn will show "RED-1" if the last month Delay Rate exceed the AL, "RED-2" if this is true for the last two consecutive months,</h6>
         <h6>and "RED-3" if this is true for the last three consecutive months.</h6>
         <h6>The TREND colomn show an "UP" or "DOWN" when the rate has increased or decreased for 3 months</h6>
-        <h6 class="issued">Issued by Citilink Engineering & Maintenance and Compiled by GMF Reliability Engineering & Services</h6>
+        <h6 class="issued">Issued by JKTMQGA and Compiled by GMF Reliability Engineering & Services</h6>
     </div>
 
     {{-- MAINTENANCE REPORT SECTION --}}
@@ -529,9 +630,6 @@
                 <tr>
                     <th colspan="2">{{ $aircraftTypePilot }}</th>
                     <th colspan="13">MAINTENANCE FINDING REPORT</th>
-                </tr>
-                <tr>
-                    <th colspan="15"></th>
                 </tr>
                 <tr>
                     <th colspan="2">Total Flight Hours</th>
@@ -592,12 +690,14 @@
                 @endforeach
             </tbody>
         </table>
-        <h6>NOTE :</h6>
+        <div class="notes-section">
+            <h6>NOTE :</h6>
+        </div>
         <h6>The Alert Level (AL) is based on monthly Technical Pilot Report / Maintenance Finding Report / Delay Rate of last Four Quarters (Average + 2 *STD)</h6>
         <h6>The Alert Status colomn will show "RED-1" if the last month Delay Rate exceed the AL, "RED-2" if this is true for the last two consecutive months,</h6>
         <h6>and "RED-3" if this is true for the last three consecutive months.</h6>
         <h6>The TREND colomn show an "UP" or "DOWN" when the rate has increased or decreased for 3 months</h6>
-        <h6 class="issued">Issued by Citilink Engineering & Maintenance and Compiled by GMF Reliability Engineering & Services</h6>
+        <h6 class="issued">Issued by JKTMQGA and Compiled by GMF Reliability Engineering & Services</h6>
     </div>
 
     {{-- TECHNICAL DELAY REPORT SECTION --}}
@@ -607,9 +707,6 @@
                 <tr>
                     <th colspan="2">{{ $aircraftTypePilot }}</th>
                     <th colspan="13">TECHNICAL DELAY > 15 MINUTES AND CANCELLATION</th>
-                </tr>
-                <tr>
-                    <th colspan="15"></th>
                 </tr>
                 <tr>
                     <th colspan="2">Total Flight Cycles</th>
@@ -670,12 +767,14 @@
                 @endforeach
             </tbody>
         </table>
-        <h6>NOTE :</h6>
+        <div class="notes-section">
+            <h6>NOTE :</h6>
+        </div>
         <h6>The Alert Level (AL) is based on monthly Technical Pilot Report / Maintenance Finding Report / Delay Rate of last Four Quarters (Average + 2 *STD)</h6>
         <h6>The Alert Status colomn will show "RED-1" if the last month Delay Rate exceed the AL, "RED-2" if this is true for the last two consecutive months,</h6>
         <h6>and "RED-3" if this is true for the last three consecutive months.</h6>
         <h6>The TREND colomn show an "UP" or "DOWN" when the rate has increased or decreased for 3 months</h6>
-        <h6 class="issued">Issued by Citilink Engineering & Maintenance and Compiled by GMF Reliability Engineering & Services</h6>
+        <h6 class="issued">Issued by JKTMQGA and Compiled by GMF Reliability Engineering & Services</h6>
     </div>
 </body>
 </html>

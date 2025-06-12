@@ -116,7 +116,7 @@
         <h6>The Alert Status colomn will show "RED-1" if the last month Delay Rate exceed the AL, "RED-2" if this is true for the last two consecutive months,</h6>
         <h6>and "RED-3" if this is true for the last three consecutive months.</h6>
         <h6>The TREND colomn show an "UP" or "DOWN" when the rate has increased or decreased for 3 months</h6>
-        <h6 class="issued">Issued by Citilink Engineering & Maintenance and Compiled by GMF Reliability Engineering & Services</h6>
+        <h6 class="issued">Issued by JKTMQGA and Compiled by GMF Reliability Engineering & Services</h6>
     </div>
 
     {{-- Maintenance Report --}}
@@ -195,7 +195,7 @@
         <h6>The Alert Status colomn will show "RED-1" if the last month Delay Rate exceed the AL, "RED-2" if this is true for the last two consecutive months,</h6>
         <h6>and "RED-3" if this is true for the last three consecutive months.</h6>
         <h6>The TREND colomn show an "UP" or "DOWN" when the rate has increased or decreased for 3 months</h6>
-        <h6 class="issued">Issued by Citilink Engineering & Maintenance and Compiled by GMF Reliability Engineering & Services</h6>
+        <h6 class="issued">Issued by JKTMQGA and Compiled by GMF Reliability Engineering & Services</h6>
     </div>
 
     {{-- Delay Report --}}
@@ -274,7 +274,7 @@
         <h6>The Alert Status colomn will show "RED-1" if the last month Delay Rate exceed the AL, "RED-2" if this is true for the last two consecutive months,</h6>
         <h6>and "RED-3" if this is true for the last three consecutive months.</h6>
         <h6>The TREND colomn show an "UP" or "DOWN" when the rate has increased or decreased for 3 months</h6>
-        <h6 class="issued">Issued by Citilink Engineering & Maintenance and Compiled by GMF Reliability Engineering & Services</h6>
+        <h6 class="issued">Issued by JKTMQGA and Compiled by GMF Reliability Engineering & Services</h6>
     </div>
 </body>
 </html>
