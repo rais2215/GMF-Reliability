@@ -233,6 +233,132 @@
         </div>
     </div>
 
+    {{-- Engineering Reliability Report Page --}}
+    <div style="page-break-before: always;" class="engineering-report-page">
+        <div style="min-height: 100vh; display: flex; flex-direction: column; padding: 10mm;">
+
+        {{-- Container dengan border kotak yang lebih sesuai --}}
+        <div style="min-height: calc(100vh - 30mm); border: 2px solid #000000; margin: 0; padding: 10mm; position: relative; display: flex; flex-direction: column; box-sizing: border-box;">
+            
+            {{-- Header dengan Logo Garuda Indonesia --}}
+            <div style="text-align: center; margin-bottom: 10px; margin-top: -5px;">
+                @php
+                    $garudaLogoPath = public_path('images/GarudaIndonesia.jpg');
+                    $garudaLogoExists = file_exists($garudaLogoPath);
+                @endphp
+                
+                @if($garudaLogoExists)
+                    @php
+                    try {
+                        $garudaImageData = file_get_contents($garudaLogoPath);
+                        $garudaImageBase64 = base64_encode($garudaImageData);
+                        $garudaImageSrc = 'data:image/png;base64,' . $garudaImageBase64;
+                    } catch (Exception $e) {
+                        $garudaImageSrc = null;
+                    }
+                    @endphp
+                    
+                    @if(isset($garudaImageSrc))
+                    <img src="{{ $garudaImageSrc }}" alt="Garuda Indonesia Logo" style="max-width: 200px; height: auto; margin: 0 auto;">
+                    @else
+                    {{-- Fallback Logo Garuda Indonesia --}}
+                    <div style="width: 200px; height: 120px; margin: 0 auto; display: flex; align-items: center; justify-content: center; border: 2px solid #1e40af; background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); border-radius: 8px;">
+                        <div style="color: white; font-weight: bold; font-size: 24px; text-align: center; line-height: 1.4;">
+                            <div>GARUDA</div>
+                            <div>INDONESIA</div>
+                        </div>
+                    </div>
+                    @endif
+                @else
+                    {{-- Fallback Logo jika file tidak ada --}}
+                    <div style="width: 200px; height: 120px; margin: 0 auto; display: flex; align-items: center; justify-content: center; border: 2px solid #1e40af; background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); border-radius: 8px;">
+                        <div style="color: white; font-weight: bold; font-size: 24px; text-align: center; line-height: 1.4;">
+                            <div>GARUDA</div>
+                            <div>INDONESIA</div>
+                        </div>
+                    </div>
+                @endif
+            </div>
+
+            {{-- Main Content - ditengah halaman --}}
+            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; margin: 250px 0;">
+                <div style="font-size: 25px; font-weight: bold; color: #000000; font-family: Arial, sans-serif; line-height: 1.2;">
+                    ENGINEERING
+                </div>
+                <div style="font-size: 25px; font-weight: bold; color: #000000; font-family: Arial, sans-serif; line-height: 1.2;">
+                    RELIABILITY REPORT
+                </div>
+                <div style="font-size: 25px; font-weight: bold; color: #000000; font-family: Arial, sans-serif; line-height: 1.2;">
+                    PERIODE: {{ strtoupper(\Carbon\Carbon::parse($period)->format('F Y')) }}
+                </div>
+            </div>
+
+            {{-- Footer section - di bagian bawah --}}
+            <div style="margin-top: auto;">
+                {{-- Header Information --}}
+                <div style="text-align: right; margin-bottom: 20px;">
+                    <div style="font-size: 14px; color: #000000; margin-bottom: 5px; font-family: Arial, sans-serif; line-height: 1.2;">
+                        Issued by JKTMQGA
+                    </div>
+                    <div style="font-size: 14px; color: #000000; font-family: Arial, sans-serif; line-height: 1.2;">
+                        Compiled by GMF Reliability & Engineering Services
+                    </div>
+                </div>
+                
+                {{-- GMF AeroAsia Footer --}}
+                <div style="margin-bottom: 0;">
+                    {{-- Logo dan Banner --}}
+                    <div style="display: flex; align-items: center; margin: 0 -10mm 10px -10mm; width: calc(100% + 20mm);">
+                        @php
+                            $gmfLogoPath = public_path('images/banner.png');
+                            $gmfLogoExists = file_exists($gmfLogoPath);
+                        @endphp
+
+                        @if($gmfLogoExists)
+                            @php
+                            try {
+                                $gmfImageData = file_get_contents($gmfLogoPath);
+                                $gmfImageBase64 = base64_encode($gmfImageData);
+                                // Pastikan format yang benar
+                                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                                $mimeType = finfo_buffer($finfo, $gmfImageData);
+                                finfo_close($finfo);
+                                $gmfImageSrc = 'data:' . $mimeType . ';base64,' . $gmfImageBase64;
+                            } catch (Exception $e) {
+                                $gmfImageSrc = null;
+                            }
+                            @endphp
+                            
+                            @if(isset($gmfImageSrc))
+                            <img src="{{ $gmfImageSrc }}" alt="GMF Logo" style="width: 100%; height: 40px; object-fit: contain; object-position: center; image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges;">
+                            @else
+                            {{-- Fallback Logo GMF --}}
+                            <div style="width: 100%; height: 50px; background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: white; font-weight: bold; letter-spacing: 1px;">
+                                GMF AeroAsia - GARUDA INDONESIA GROUP
+                            </div>
+                            @endif
+                        @else
+                            {{-- Fallback Logo jika file tidak ada --}}
+                            <div style="width: 100%; height: 50px; background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: white; font-weight: bold; letter-spacing: 1px;">
+                                GMF AeroAsia - GARUDA INDONESIA GROUP
+                            </div>
+                        @endif
+                    </div>
+                    
+                    {{-- Informasi Alamat --}}
+                    <div style="text-align: right; font-size: 14px; line-height: 1.2; color: #000000; margin-top: 3px; margin-bottom: 0; margin-right: 0;">
+                        <div style="margin-bottom: 1px;">Hangar 3 Room 231</div>
+                        <div style="margin-bottom: 1px;">Soekarno-Hatta International Airport</div>
+                        <div style="margin-bottom: 1px;">P.O.Box 1303, BLSH 19130</div>
+                        <div style="margin-bottom: 1px;">Cengkareng - Indonesia</div>
+                        <div style="margin-top: 2px;">Phone: +62-21-5508199 Fax: +62-21-5501578</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
     {{-- AOS REPORT SECTION --}}
     <div style="page-break-before: always;" class="table-responsive">
         <table class="compact-table">
