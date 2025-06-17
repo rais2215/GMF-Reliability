@@ -112,6 +112,7 @@
             </tbody>
         </table>
         <h6>NOTE :</h6>
+        </div>
         <h6>The Alert Level (AL) is based on monthly Technical Pilot Report / Maintenance Finding Report / Delay Rate of last Four Quarters (Average + 2 *STD)</h6>
         <h6>The Alert Status colomn will show "RED-1" if the last month Delay Rate exceed the AL, "RED-2" if this is true for the last two consecutive months,</h6>
         <h6>and "RED-3" if this is true for the last three consecutive months.</h6>
@@ -191,6 +192,7 @@
             </tbody>
         </table>
         <h6>NOTE :</h6>
+        </div>
         <h6>The Alert Level (AL) is based on monthly Technical Pilot Report / Maintenance Finding Report / Delay Rate of last Four Quarters (Average + 2 *STD)</h6>
         <h6>The Alert Status colomn will show "RED-1" if the last month Delay Rate exceed the AL, "RED-2" if this is true for the last two consecutive months,</h6>
         <h6>and "RED-3" if this is true for the last three consecutive months.</h6>
@@ -270,6 +272,7 @@
             </tbody>
         </table>
         <h6>NOTE :</h6>
+        </div>
         <h6>The Alert Level (AL) is based on monthly Technical Pilot Report / Maintenance Finding Report / Delay Rate of last Four Quarters (Average + 2 *STD)</h6>
         <h6>The Alert Status colomn will show "RED-1" if the last month Delay Rate exceed the AL, "RED-2" if this is true for the last two consecutive months,</h6>
         <h6>and "RED-3" if this is true for the last three consecutive months.</h6>
