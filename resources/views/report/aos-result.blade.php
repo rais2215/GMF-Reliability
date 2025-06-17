@@ -1,51 +1,34 @@
-{{-- aos-result.blade.php Hasil Display AOS --}}
-
 <x-app-layout>
     <div class=" mx-auto py-4 px-4 sm:px-6 lg:px-8">
-        {{-- Loading Skeleton Overlay (hidden by default) --}}
-        <div id="loadingSkeleton" class="hidden fixed inset-0 bg-white bg-opacity-90 z-50 items-center justify-center">
-            <div class="max-w-6xl w-full mx-auto px-4 space-y-4">
-                {{-- Header Skeleton --}}
-                <div class="flex justify-between items-center mb-6">
-                    <div class="h-6 bg-gray-300 rounded animate-pulse w-96"></div>
-                    <div class="flex space-x-2">
-                        <div class="h-10 w-32 bg-gray-300 rounded animate-pulse"></div>
-                        <div class="h-10 w-32 bg-gray-300 rounded animate-pulse"></div>
-                    </div>
-                </div>
-                
-                {{-- Table Skeleton --}}
-                <div class="bg-white shadow rounded-lg overflow-hidden">
-                    {{-- Table Header --}}
-                    <div class="bg-gray-50 px-6 py-3 border-b border-gray-200">
-                        <div class="flex space-x-4">
-                            <div class="h-4 bg-gray-300 rounded animate-pulse w-24"></div>
-                            <div class="h-4 bg-gray-300 rounded animate-pulse w-16"></div>
-                            <div class="h-4 bg-gray-300 rounded animate-pulse w-16"></div>
-                            <div class="h-4 bg-gray-300 rounded animate-pulse w-16"></div>
-                            <div class="h-4 bg-gray-300 rounded animate-pulse w-16"></div>
-                            <div class="h-4 bg-gray-300 rounded animate-pulse w-16"></div>
-                        </div>
-                    </div>
-                    
-                    {{-- Table Rows --}}
-                    <div class="divide-y divide-gray-200">
-                        @for ($i = 0; $i < 8; $i++)
-                        <div class="px-6 py-4">
-                            <div class="flex space-x-4">
-                                <div class="h-4 bg-gray-200 rounded animate-pulse w-48"></div>
-                                <div class="h-4 bg-gray-200 rounded animate-pulse w-16"></div>
-                                <div class="h-4 bg-gray-200 rounded animate-pulse w-16"></div>
-                                <div class="h-4 bg-gray-200 rounded animate-pulse w-16"></div>
-                                <div class="h-4 bg-gray-200 rounded animate-pulse w-16"></div>
-                                <div class="h-4 bg-gray-200 rounded animate-pulse w-16"></div>
-                            </div>
-                        </div>
-                        @endfor
-                    </div>
-                </div>
+        {{-- Loading 3 Bar Loader Overlay (hidden by default) --}}
+        <div id="loadingSkeleton" class="fixed inset-0 z-50 flex-col items-center justify-center bg-white bg-opacity-90 hidden transition-opacity duration-300">
+            <div class="flex space-x-2 mb-4">
+                <div class="w-3 h-12 bg-blue-600 rounded animate-loader-bar"></div>
+                <div class="w-3 h-12 bg-blue-600 rounded animate-loader-bar delay-150"></div>
+                <div class="w-3 h-12 bg-blue-600 rounded animate-loader-bar delay-300"></div>
             </div>
+            <span id="loader-text" class="text-sm font-medium text-gray-800">Loading data...</span>
         </div>
+
+        {{-- Loading Animation Style --}}
+        <style>
+            @keyframes bar-bounce {
+                0%, 100% { transform: scaleY(0.5); opacity: 0.5; }
+                50% { transform: scaleY(1.2); opacity: 1; }
+            }
+
+            .animate-loader-bar {
+                animation: bar-bounce 1s infinite ease-in-out;
+            }
+
+            .delay-150 {
+                animation-delay: 0.15s;
+            }
+
+            .delay-300 {
+                animation-delay: 0.3s;
+            }
+        </style>
 
         @php
         function formatNumber($value, $decimals = 2) {
@@ -60,6 +43,7 @@
             const backText = document.getElementById('backText');
             const loadingSpinner = document.getElementById('loadingSpinner');
             const loadingSkeleton = document.getElementById('loadingSkeleton');
+            const loaderText = document.getElementById('loader-text');
             
             // Show loading state on button
             backIcon.classList.add('hidden');
@@ -68,8 +52,10 @@
             backBtn.disabled = true;
             backBtn.classList.add('opacity-75', 'cursor-not-allowed');
             
-            // Show skeleton overlay
+            // Show 3 bar loader overlay with updated text
             loadingSkeleton.classList.remove('hidden');
+            loadingSkeleton.classList.add('flex');
+            loaderText.textContent = 'Navigating back...';
             
             // Add slight delay for better UX, then go back
             setTimeout(() => {
@@ -83,8 +69,27 @@
                     backBtn.disabled = false;
                     backBtn.classList.remove('opacity-75', 'cursor-not-allowed');
                     loadingSkeleton.classList.add('hidden');
+                    loadingSkeleton.classList.remove('flex');
+                    loaderText.textContent = 'Loading data...';
                 }, 2000);
             }, 500);
+        }
+
+        // Function untuk show loading saat export
+        function showExportLoading(type) {
+            const loadingSkeleton = document.getElementById('loadingSkeleton');
+            const loaderText = document.getElementById('loader-text');
+            
+            loadingSkeleton.classList.remove('hidden');
+            loadingSkeleton.classList.add('flex');
+            loaderText.textContent = `Exporting to ${type}...`;
+            
+            // Hide loading setelah 3 detik (asumsi export selesai)
+            setTimeout(() => {
+                loadingSkeleton.classList.add('hidden');
+                loadingSkeleton.classList.remove('flex');
+                loaderText.textContent = 'Loading data...';
+            }, 3000);
         }
         </script>
 
@@ -105,7 +110,7 @@
 
             {{-- Export Buttons --}}
             <div class="flex space-x-2">
-                <form action="{{ route('report.aos.export.pdf') }}" method="POST" class="inline">
+                <form action="{{ route('report.aos.export.pdf') }}" method="POST" class="inline" onsubmit="showExportLoading('PDF')">
                     @csrf
                     <input type="hidden" name="period" value="{{ $period }}">
                     <input type="hidden" name="aircraft_type" value="{{ $aircraftType }}">
@@ -113,7 +118,7 @@
                         Export to PDF
                     </button>
                 </form>
-                <form action="{{ route('report.aos.export.excel') }}" method="POST" class="inline">
+                <form action="{{ route('report.aos.export.excel') }}" method="POST" class="inline" onsubmit="showExportLoading('Excel')">
                     @csrf
                     <input type="hidden" name="period" value="{{ $period }}">
                     <input type="hidden" name="aircraft_type" value="{{ $aircraftType }}">

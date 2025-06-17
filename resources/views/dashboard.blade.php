@@ -1,136 +1,222 @@
 <x-app-layout>
-    <!-- Loading Skeleton Overlay -->
-    <div id="page-loader" class="fixed inset-0 bg-white/70 backdrop-blur-sm z-50 hidden items-center justify-center transition-opacity duration-300">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-8 w-full max-w-5xl">
-            @for ($i = 0; $i < 3; $i++)
-                <div class="bg-white p-6 rounded-xl shadow animate-pulse">
-                    <div class="h-4 bg-gray-300 rounded w-1/2 mb-4"></div>
-                    <div class="h-8 bg-gray-400 rounded w-3/4"></div>
+    {{-- LOADER OVERLAY --}}
+    <div id="page-loader" class="fixed inset-0 z-50 items-center justify-center bg-white bg-opacity-80 hidden transition-opacity duration-300">
+        <div class="flex space-x-2 mb-4">
+            <div class="w-3 h-12 bg-blue-600 rounded animate-loader-bar"></div>
+            <div class="w-3 h-12 bg-blue-600 rounded animate-loader-bar delay-150"></div>
+            <div class="w-3 h-12 bg-blue-600 rounded animate-loader-bar delay-300"></div>
+        </div>
+        <span id="loader-text" class="text-sm font-medium text-gray-800">Redirecting page...</span>
+    </div>
+
+    {{-- SIDEBAR --}}
+    <aside class="fixed top-0 left-0 h-full w-64 bg-white shadow-xl z-40 flex flex-col justify-between transition-all duration-300" id="sidebar">
+        <div>
+            <div class="px-6 pt-6 pb-4 text-center">
+                <img src="{{ asset('images/gmfblue.png') }}" alt="GMF Logo" class="w-40 mx-auto mb-6 object-contain">
+                <hr class="border-t border-gray-200 my-4">
+                @php $initial = strtoupper(substr(Auth::user()->name, 0, 1)); @endphp
+                <div class="w-20 h-20 rounded-full bg-[#0F265C] text-white flex items-center justify-center text-3xl font-bold mx-auto shadow-md">
+                    {{ $initial }}
                 </div>
-            @endfor
+                <p class="mt-2 font-semibold text-gray-800 text-sm">{{ Auth::user()->name }}</p>
+                <div class="mt-2">
+                    <a href="javascript:void(0)" onclick="fadeNavigate('{{ route('profile.edit') }}')" class="flex items-center justify-center space-x-2 text-gray-700 hover:text-blue-500 transition">
+                        <i data-lucide="user" class="w-5 h-5"></i>
+                        <span>Edit Profile</span>
+                    </a>
+                </div>
+                <hr class="border-t border-gray-200 my-6">
+                <div class="text-xs uppercase text-gray-500 font-semibold text-left pl-2 mb-2">Menu</div>
+                <nav class="space-y-4 text-left px-2">
+                    <a href="javascript:void(0)" onclick="fadeNavigate('{{ route('dashboard') }}')" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:text-white hover:bg-blue-500 transition duration-300 group">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5 group-hover:text-white transition duration-300"></i>
+                        <span class="font-medium">Dashboard</span>
+                    </a>
+                    
+                    {{-- Perbaiki route report --}}
+                    @if(Route::has('report.index'))
+                        <a href="javascript:void(0)" onclick="fadeNavigate('{{ route('report.index') }}')" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:text-white hover:bg-blue-500 transition duration-300 group">
+                            <i data-lucide="file-text" class="w-5 h-5 group-hover:text-white transition duration-300"></i>
+                            <span class="font-medium">Report</span>
+                        </a>
+                    @else
+                        <a href="javascript:void(0)" onclick="fadeNavigate('/report')" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:text-white hover:bg-blue-500 transition duration-300 group">
+                            <i data-lucide="file-text" class="w-5 h-5 group-hover:text-white transition duration-300"></i>
+                            <span class="font-medium">Report</span>
+                        </a>
+                    @endif
+                    
+                    <a href="javascript:void(0)" onclick="fadeNavigate('https://dashboard-reliability.gmf-aeroasia.co.id/', true)" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:text-white hover:bg-blue-500 transition duration-300 group">
+                        <i data-lucide="clock" class="w-5 h-5 group-hover:text-white transition duration-300"></i>
+                        <span class="font-medium">Techlog Delay</span>
+                    </a>
+                </nav>
+                <hr class="border-t border-gray-200 my-6">
+            </div>
+        </div>
+        <div class="px-6 mb-6">
+            <form method="POST" action="{{ route('logout') }}" onsubmit="showLoader('Logging out...')">
+                @csrf
+                <button type="submit" class="w-full flex items-center space-x-3 text-red-500 hover:text-red-300 transition">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                    <span>Log Out</span>
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    {{-- MAIN CONTENT --}}
+    <div id="main-content" class="min-h-screen bg-gray-50 pl-64 pt-10 pb-20 opacity-0 transition-opacity duration-500">
+        <div class="mb-6 px-6">
+            <h1 class="text-3xl font-bold text-gray-800">Reliability Dashboard</h1>
+        </div>
+
+        {{-- Welcome Card --}}
+        <div class="px-6 mb-10">
+            <div class="relative rounded-2xl overflow-hidden shadow bg-cover bg-center text-white w-full h-44 md:h-52 xl:h-60"
+                style="background-image: url('{{ asset('images/bgwelcome.jpg') }}');">
+                <div class="absolute inset-0 bg-black/40 backdrop-blur-sm p-6 flex items-start md:items-center">
+                    <div class="text-left">
+                        <h2 class="text-2xl md:text-3xl font-semibold">Selamat Datang,</h2>
+                        <h1 class="text-3xl md:text-5xl font-bold">{{ Auth::user()->name }}</h1>
+                        <p class="text-base md:text-lg mt-2">Butuh bantuan? Hubungi:
+                            <a href="mailto:spoc-ict@gmf-aeroasia.co.id" class="underline font-semibold">spoc-ict@gmf-aeroasia.co.id</a>
+                        </p>
+                    </div>
+                </div>
+                <div id="clock" class="absolute top-4 right-6 text-sm md:text-base font-semibold whitespace-nowrap"></div>
+            </div>
+        </div>
+
+        {{-- Power BI Card --}}
+        <div class="px-6">
+            <div class="bg-white p-6 shadow-lg rounded-xl">
+                <div class="mb-4">
+                    <h4 class="text-2xl font-semibold text-gray-800">Dispatch Reliability Report</h4>
+                </div>
+                <div class="w-full h-[75vh] overflow-hidden">
+                    <iframe class="w-full h-full border-none"
+                        src="https://app.powerbi.com/view?r=eyJrIjoiNWYxNjYxZGItZTVjZS00YmQxLWIxMTctNjU3NDU0YmM0ODI5IiwidCI6ImIxNTAxOTBhLTE2ZjMtNGZiYS04YmY2LTNhNjIwYWI3NjA3OSIsImMiOjEwfQ%3D%3D"
+                        allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
         </div>
     </div>
 
-    @if(session('error'))
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mx-6 my-4">
-            {{ session('error') }}
-        </div>
-    @endif
-
-    <div class="min-h-screen bg-gray-100 flex flex-col">
-        <!-- Main Content Area (No Sidebar) -->
-        <main class="flex-1 flex flex-col">
-            <!-- Header Banner with Border -->
-            <header class="bg-gradient-to-r from-[#0066B3] to-[#7EBB1A] p-8 text-white relative overflow-hidden border border-white/50 rounded-xl shadow-md mx-6 mt-6">
-                <div class="relative z-10">
-                    <h1 class="text-3xl font-bold mb-2">Hi, Welcome to!</h1>
-                    <h2 class="text-4xl font-bold mb-4">Reliability Dashboard</h2>
-                    <p class="opacity-90">
-                        If you have any trouble, please contact to<br>
-                        <span class="font-bold">spoc-ict@gmf-aeroasia.co.id</span>
-                    </p>
-                </div>
-                <div class="absolute right-8 top-8 text-white/100">
-                    <span id="current-datetime" class="text-lg font-semibold">{{ now()->format('l, d M Y, H:i:s') }}</span>
-                </div>
-            </header>
-
-            <!-- Content Area -->
-            <section class="flex-1 p-8 overflow-auto bg-gray-100">
-                <!-- Fitur Navigasi Ganti KPI Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <!-- Report Button -->
-                    <a href="{{ url('/report') }}" 
-                       class="bg-white border border-white text-blue-600 p-6 rounded-xl shadow hover:bg-blue-50 transition text-center flex flex-col items-center space-y-3">
-                        <i data-lucide="file-text" class="lucide lucide-file-text w-10 h-10"></i>
-                        <h4 class="text-xl font-semibold">Report</h4>
-                        <p class="text-sm">Lihat detail report lengkap</p>
-                    </a>
-
-                    <!-- Techlog Delay Button -->
-                    <a href="https://dashboard-reliability.gmf-aeroasia.co.id/" target="_blank" 
-                       class="bg-white border border-white text-blue-600 p-6 rounded-xl shadow hover:bg-blue-50 transition text-center flex flex-col items-center space-y-3">
-                        <i data-lucide="clock" class="lucide lucide-clock w-10 h-10"></i>
-                        <h4 class="text-xl font-semibold">Techlog Delay</h4>
-                        <p class="text-sm">Cek data delay techlog terbaru</p>
-                    </a>
-                </div>
-
-                <!-- Power BI Report Section -->
-                <div class="bg-white p-6 rounded-xl shadow mb-8">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-semibold text-gray-800">Dispatch Reliability Report</h3>
-                    </div>
-                    <div class="w-full h-96 relative">
-                        <iframe id="reportContainer"
-                                src="https://app.powerbi.com/view?r=eyJrIjoiNWYxNjYxZGItZTVjZS00YmQxLWIxMTctNjU3NDU0YmM0ODI5IiwidCI6ImIxNTAxOTBhLTE2ZjMtNGZiYS04YmY2LTNhNjIwYWI3NjA3OSIsImMiOjEwfQ%3D%3D"
-                                class="w-full h-full border-none"
-                                allowfullscreen></iframe>
-                    </div>
-                </div>
-            </section>
-        </main>
-    </div>
-
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-
-    <!-- Date Time Script -->
-    <script>
-        function updateDateTime() {
-            const now = new Date();
-            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-
-            const day = days[now.getDay()];
-            const date = now.getDate();
-            const month = months[now.getMonth()];
-            const year = now.getFullYear();
-
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-
-            // ✅ PERBAIKAN: Gunakan backticks untuk template literal
-            const formattedDateTime = `${day}, ${date} ${month} ${year}, ${hours}:${minutes}:${seconds}`;
-
-            document.getElementById('current-datetime').textContent = formattedDateTime;
+    {{-- STYLE --}}
+    <style>
+        @keyframes bar-bounce {
+            0%, 100% { transform: scaleY(0.5); opacity: 0.5; }
+            50% { transform: scaleY(1.2); opacity: 1; }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            updateDateTime();
-            setInterval(updateDateTime, 1000); // Update setiap detik
-        });
-    </script>
+        .animate-loader-bar {
+            animation: bar-bounce 1s infinite ease-in-out;
+        }
 
-    <!-- Loader Display Script -->
+        .delay-150 {
+            animation-delay: 0.15s;
+        }
+
+        .delay-300 {
+            animation-delay: 0.3s;
+        }
+    </style>
+
+    {{-- JS --}}
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
-            const loader = document.getElementById('page-loader');
-            const links = document.querySelectorAll('a[href]:not([target="_blank"])');
+            try {
+                lucide.createIcons();
+                document.getElementById('main-content').classList.remove('opacity-0');
+                document.getElementById('main-content').classList.add('opacity-100');
+            } catch (error) {
+                console.error('Error initializing icons:', error);
+                // Tetap tampilkan content meskipun icon gagal load
+                document.getElementById('main-content').classList.remove('opacity-0');
+                document.getElementById('main-content').classList.add('opacity-100');
+            }
+        });
 
-            links.forEach(link => {
-                link.addEventListener('click', function (e) {
-                    const href = this.getAttribute('href');
-                    if (!href || href.startsWith('#') || href === window.location.href) return;
+        function updateClock() {
+            try {
+                const now = new Date();
+                const hari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+                const bulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+                
+                // Perbaiki template string
+                const fullTime = `${hari[now.getDay()]}, ${now.getDate()} ${bulan[now.getMonth()]} ${now.getFullYear()}, ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+                
+                const clockElement = document.getElementById("clock");
+                if (clockElement) {
+                    clockElement.textContent = fullTime;
+                }
+            } catch (error) {
+                console.error('Error updating clock:', error);
+            }
+        }
+        
+        // Initialize clock
+        setInterval(updateClock, 1000);
+        updateClock();
 
-                    e.preventDefault();
-                    loader.classList.remove('hidden');
-                    loader.classList.add('flex');
+        function showLoader(message = 'Redirecting page...') {
+            try {
+                const loaderText = document.getElementById('loader-text');
+                const pageLoader = document.getElementById('page-loader');
+                
+                if (loaderText) loaderText.textContent = message;
+                if (pageLoader) {
+                    pageLoader.classList.remove('hidden');
+                    pageLoader.classList.add('flex', 'flex-col');
+                }
+            } catch (error) {
+                console.error('Error showing loader:', error);
+            }
+        }
 
-                    setTimeout(() => {
-                        window.location.href = href;
-                    }, 500);
-                });
-            });
+        function fadeNavigate(url, isExternal = false) {
+            try {
+                showLoader();
+                const mainContent = document.getElementById('main-content');
+                
+                if (mainContent) {
+                    mainContent.classList.add('opacity-0');
+                }
+                
+                setTimeout(() => {
+                    if (isExternal) {
+                        window.open(url, '_blank');
+                        // Hide loader setelah membuka tab baru
+                        const pageLoader = document.getElementById('page-loader');
+                        if (pageLoader) pageLoader.classList.add('hidden');
+                        if (mainContent) mainContent.classList.remove('opacity-0');
+                    } else {
+                        window.location.href = url;
+                    }
+                }, 500);
+            } catch (error) {
+                console.error('Error in fadeNavigate:', error);
+                // Fallback navigation jika ada error
+                if (isExternal) {
+                    window.open(url, '_blank');
+                } else {
+                    window.location.href = url;
+                }
+            }
+        }
 
-            const logoutForm = document.getElementById('logout-form');
-            if (logoutForm) {
-                logoutForm.addEventListener('submit', function () {
-                    loader.classList.remove('hidden');
-                    loader.classList.add('flex');
-                });
+        // Error handling untuk mendeteksi JavaScript errors
+        window.addEventListener('error', function(e) {
+            console.error('JavaScript Error:', e.error);
+            // Pastikan content tetap visible meskipun ada error
+            const mainContent = document.getElementById('main-content');
+            if (mainContent && mainContent.classList.contains('opacity-0')) {
+                mainContent.classList.remove('opacity-0');
+                mainContent.classList.add('opacity-100');
             }
         });
     </script>

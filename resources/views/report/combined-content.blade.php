@@ -1,8 +1,8 @@
 <!-- filepath: c:\Users\Noval Rais\Documents\Github Repository\GMF-Reliability\resources\views\report\combined-content.blade.php -->
-<h1 class="text-3xl font-bold mb-8 text-center text-white">Combined AOS & Pilot Report and Technical Delay</h1>
+<h1 class="text-3xl font-bold mb-8 text-center text-white">Export AOS & Pilot Report and Technical Delay</h1>
 
 <div class="container mx-auto px-4">
-    <form action="{{ route('report.combined.store') }}" method="POST" class="bg-white p-6 rounded-xl shadow-md">
+    <form action="{{ route('report.combined.export.pdf') }}" method="POST" class="bg-white p-6 rounded-xl shadow-md">
         @csrf
 
         <!-- Baris Dropdown -->
@@ -70,8 +70,8 @@
 
         <!-- Tombol di Tengah -->
         <div class="flex justify-center mt-4">
-            <button type="submit" class="bg-[#112955] hover:bg-blue-800 text-white font-semibold py-2 px-6 rounded-lg shadow-md">
-                Display Combined Report
+            <button type="submit" class="bg-red-600 hover:bg-red-800 text-white font-semibold py-2 px-6 rounded-lg shadow-md">
+                Export to PDF
             </button>
         </div>
     </form>

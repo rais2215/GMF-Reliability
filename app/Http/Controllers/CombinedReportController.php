@@ -132,7 +132,7 @@ class CombinedReportController extends Controller
         ]);
         
         $periodFormatted = \Carbon\Carbon::parse($period)->format('Y-m');
-        $filename = "Combined_Report_AOS_{$aircraftTypeAos}_Pilot_{$aircraftTypePilot}_{$periodFormatted}.pdf";
+        $filename = "Fleet Reliability Report_{$aircraftTypeAos}_{$periodFormatted}.pdf";
         
         return $pdf->download($filename);
     }

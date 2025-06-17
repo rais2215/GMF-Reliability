@@ -1,4 +1,4 @@
-<!-- Loading Skeleton Overlay -->
+{{-- <!-- Loading Skeleton Overlay -->
 <div id="page-loader" class="fixed inset-0 bg-white/70 dark:bg-gray-900/70 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300">
     <div class="flex items-center justify-center w-full h-full">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-8 w-full max-w-5xl">
@@ -126,4 +126,4 @@
             window.location.href = url;
         }, 300);
     }
-</script>
+</script> --}}
