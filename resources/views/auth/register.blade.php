@@ -65,20 +65,19 @@
             75% { transform: translateY(20px) rotate(-5deg) scale(0.95); }
         }
 
-        /* New Fade and Slide Up Animation */
-        @keyframes fadeSlideUp {
-            0% {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        /* Loader Animation Style */
+        @keyframes bar-bounce {
+            0%, 100% { transform: scaleY(0.5); opacity: 0.5; }
+            50% { transform: scaleY(1.2); opacity: 1; }
         }
-
-        .fade-in-up {
-            animation: fadeSlideUp 1s ease-out forwards;
+        .animate-loader-bar {
+            animation: bar-bounce 1s infinite ease-in-out;
+        }
+        .delay-150 {
+            animation-delay: 0.15s;
+        }
+        .delay-300 {
+            animation-delay: 0.3s;
         }
     </style>
 </head>
@@ -92,10 +91,10 @@
     </div>
 
     <!-- Register Form -->
-    <div class="w-full max-w-md bg-blur/10 backdrop-blur-lg rounded-xl p-8 z-10 opacity-0 fade-in-up">
+    <div class="w-full max-w-md bg-blur/10 backdrop-blur-lg rounded-xl p-8 z-10">
         <h2 class="text-3xl font-semibold text-center mb-6 text-green-400">Sign up your account</h2>
 
-        <form method="POST" action="{{ route('register') }}" class="space-y-4">
+        <form id="register-form" method="POST" action="{{ route('register') }}" class="space-y-4">
             @csrf
 
             <!-- Name -->
@@ -136,13 +135,32 @@
             <!-- Actions -->
             <div class="flex items-center justify-between mt-6">
                 <a class="text-sm text-white hover:underline" href="/">
-                    Already registered?
+                     Sudah punya akun? Login
                 </a>
-                <x-primary-button class="bg-green-500 hover:bg-green-600 text-white">
-                    Register
+                <x-primary-button id="register-btn" class="bg-green-500 hover:bg-green-600 text-white">
+                    Create Account
                 </x-primary-button>
             </div>
         </form>
     </div>
+
+    <!-- Page Loader: 3 Bar Loader -->
+    <div id="page-loader" class="fixed inset-0 z-50 flex-col items-center justify-center bg-white bg-opacity-80 hidden transition-opacity duration-300">
+        <div class="flex space-x-2 mb-4">
+            <div class="w-3 h-12 bg-blue-600 rounded animate-loader-bar"></div>
+            <div class="w-3 h-12 bg-blue-600 rounded animate-loader-bar delay-150"></div>
+            <div class="w-3 h-12 bg-blue-600 rounded animate-loader-bar delay-300"></div>
+        </div>
+        <span id="loader-text" class="text-sm font-medium text-gray-800">Creating account...</span>
+    </div>
+
+    <script>
+        // Pastikan loader muncul saat tombol Register diklik
+        document.getElementById('register-form').addEventListener('submit', function(e) {
+            const loader = document.getElementById('page-loader');
+            loader.classList.remove('hidden');
+            loader.classList.add('flex');
+        });
+    </script>
 </body>
 </html>
