@@ -54,13 +54,168 @@ class ReportController extends Controller
         return response()->json($aircraftTypes);
     }
 
+    // ✅ ADDED: Helper function untuk format number - FIXED ERROR
+    private function formatNumber($value, $decimals = 2)
+    {
+        if (!is_numeric($value)) {
+            return '0';
+        }
+        return rtrim(rtrim(number_format($value, $decimals, '.', ''), '0'), '.');
+    }
+
+    // ✅ ADDED: Helper function untuk format rate dengan precision tinggi
+    private function formatRate($value, $decimals = 10)
+    {
+        if (!is_numeric($value)) {
+            return 0;
+        }
+        return (float) number_format($value, $decimals, '.', '');
+    }
+
+    // ✅ ADDED: Global helper function untuk digunakan di view
+    public static function formatNumberGlobal($value, $decimals = 2)
+    {
+        if (!is_numeric($value)) {
+            return '0';
+        }
+        return rtrim(rtrim(number_format($value, $decimals, '.', ''), '0'), '.');
+    }
+
+    // NEW METHOD: Get Metrics Configuration
+    private function getMetricsConfiguration()
+    {
+        return [
+            'acInFleet' => [
+                'label' => 'A/C in Fleet',
+                'format' => 'round',
+                'average_type' => 'valid_only',
+                'use_enhanced_calc' => true
+            ],
+            'acInService' => [
+                'label' => 'A/C in Service (Revenue)',
+                'format' => 'number',
+                'average_type' => 'all_months',
+                'use_enhanced_calc' => false
+            ],
+            'daysInService' => [
+                'label' => 'A/C Days in Service (Revenue)',
+                'format' => 'round',
+                'average_type' => 'sum',
+                'use_enhanced_calc' => false
+            ],
+            'flyingHoursTotal' => [
+                'label' => 'Flying Hours - Total',
+                'format' => 'round',
+                'average_type' => 'sum',
+                'use_enhanced_calc' => false
+            ],
+            'revenueFlyingHours' => [
+                'label' => '- Revenue',
+                'format' => 'round',
+                'average_type' => 'sum',
+                'use_enhanced_calc' => false
+            ],
+            'takeOffTotal' => [
+                'label' => 'Take-off - Total',
+                'format' => 'round',
+                'average_type' => 'sum',
+                'use_enhanced_calc' => false
+            ],
+            'revenueTakeOff' => [
+                'label' => '- Revenue',
+                'format' => 'round',
+                'average_type' => 'sum',
+                'use_enhanced_calc' => false
+            ],
+            'dailyUtilizationTakeOffTotal' => [
+                'label' => 'Daily Utilization Take-off - Total',
+                'format' => 'number',
+                'average_type' => 'all_months',
+                'use_enhanced_calc' => false
+            ],
+            'revenueDailyUtilizationTakeOffTotal' => [
+                'label' => '- Revenue',
+                'format' => 'number',
+                'average_type' => 'all_months',
+                'use_enhanced_calc' => false
+            ],
+            'technicalDelayTotal' => [
+                'label' => 'Technical Delay - Total',
+                'format' => 'round',
+                'average_type' => 'sum',
+                'use_enhanced_calc' => false
+            ],
+            'ratePer100TakeOff' => [
+                'label' => '- Rate/100 Take-Off',
+                'format' => 'number',
+                'average_type' => 'all_months',
+                'use_enhanced_calc' => false
+            ],
+            'technicalIncidentTotal' => [
+                'label' => 'Technical Incident - Total',
+                'format' => 'round',
+                'average_type' => 'sum',
+                'use_enhanced_calc' => false
+            ],
+            'technicalIncidentRate' => [
+                'label' => '- Rate / 100 FC',
+                'format' => 'number',
+                'average_type' => 'all_months',
+                'use_enhanced_calc' => false
+            ],
+            'technicalCancellationTotal' => [
+                'label' => 'Technical Cancellation - Total',
+                'format' => 'round',
+                'average_type' => 'sum',
+                'use_enhanced_calc' => false
+            ],
+            'dispatchReliability' => [
+                'label' => 'Dispatch Reliability (%)',
+                'format' => 'number',
+                'average_type' => 'all_months',
+                'use_enhanced_calc' => false
+            ]
+        ];
+    }
+
+    // NEW METHOD: Get Hour Metrics Configuration
+    private function getHourMetricsConfiguration()
+    {
+        return [
+            'flightHoursPerTakeOffTotal' => [
+                'label' => 'Flight Hours/Take-off - Total',
+                'average_var' => 'avgFlightHoursPerTakeOffTotal'
+            ],
+            'revenueFlightHoursPerTakeOff' => [
+                'label' => '- Revenue',
+                'average_var' => 'avgRevenueFlightHoursPerTakeOff'
+            ],
+            'dailyUtilizationFlyingHoursTotal' => [
+                'label' => 'Daily Utilization Flying Hours - Total',
+                'average_var' => 'avgDailyUtilizationFlyingHoursTotal'
+            ],
+            'revenueDailyUtilizationFlyingHoursTotal' => [
+                'label' => '- Revenue',
+                'average_var' => 'avgRevenueDailyUtilizationFlyingHoursTotal'
+            ],
+            'totalDuration' => [
+                'label' => '- Total Duration',
+                'average_var' => 'avgTotalDuration'
+            ],
+            'averageDuration' => [
+                'label' => '- Avg Duration',
+                'average_var' => 'avgAverageDuration'
+            ]
+        ];
+    }
+
     // Private method untuk mengambil semua data dengan single queries
     private function getAosReportData($aircraftType, $period)
     {
         $endDate = Carbon::parse($period)->endOfMonth();
         $startDate = Carbon::parse($period)->subMonths(11)->startOfMonth();
         
-        // Single query untuk semua data TblMonthlyfhfc
+        // ✅ FIXED: Single query untuk semua data TblMonthlyfhfc dengan proper GROUP BY
         $monthlyData = TblMonthlyfhfc::where('Actype', $aircraftType)
             ->whereBetween('MonthEval', [$startDate, $endDate])
             ->selectRaw('
@@ -73,13 +228,13 @@ class ReportController extends Controller
                 SUM(RevFC + NoRevFC) as take_off_total,
                 SUM(RevFC) as revenue_take_off
             ')
-            ->groupBy('year', 'month')
+            ->groupBy(DB::raw('YEAR(MonthEval)'), DB::raw('MONTH(MonthEval)'))
             ->get()
             ->keyBy(function($item) {
                 return $item->year . '-' . sprintf('%02d', $item->month);
             });
 
-        // Single query untuk data technical delay
+        // ✅ FIXED: Single query untuk data technical delay dengan proper GROUP BY
         $technicalDelayData = Mcdrnew::where('ACType', $aircraftType)
             ->whereBetween('DateEvent', [$startDate, $endDate])
             ->where('DCP', 'LIKE', '%D%')
@@ -89,13 +244,13 @@ class ReportController extends Controller
                 COUNT(*) as technical_delay_total,
                 SUM(HoursTek + (MinTek / 60)) as total_duration
             ')
-            ->groupBy('year', 'month')
+            ->groupBy(DB::raw('YEAR(DateEvent)'), DB::raw('MONTH(DateEvent)'))
             ->get()
             ->keyBy(function($item) {
                 return $item->year . '-' . sprintf('%02d', $item->month);
             });
 
-        // Single query untuk data technical incident
+        // ✅ FIXED: Single query untuk data technical incident dengan proper GROUP BY
         $technicalIncidentData = TblSdr::where('ACType', $aircraftType)
             ->whereBetween('DateOccur', [$startDate, $endDate])
             ->selectRaw('
@@ -103,13 +258,13 @@ class ReportController extends Controller
                 MONTH(DateOccur) as month,
                 COUNT(*) as technical_incident_total
             ')
-            ->groupBy('year', 'month')
+            ->groupBy(DB::raw('YEAR(DateOccur)'), DB::raw('MONTH(DateOccur)'))
             ->get()
             ->keyBy(function($item) {
                 return $item->year . '-' . sprintf('%02d', $item->month);
             });
 
-        // Single query untuk data technical cancellation
+        // ✅ FIXED: Single query untuk data technical cancellation dengan proper GROUP BY
         $technicalCancellationData = Mcdrnew::where('ACType', $aircraftType)
             ->whereBetween('DateEvent', [$startDate, $endDate])
             ->where('DCP', 'LIKE', '%C%')
@@ -118,7 +273,7 @@ class ReportController extends Controller
                 MONTH(DateEvent) as month,
                 COUNT(*) as technical_cancellation_total
             ')
-            ->groupBy('year', 'month')
+            ->groupBy(DB::raw('YEAR(DateEvent)'), DB::raw('MONTH(DateEvent)'))
             ->get()
             ->keyBy(function($item) {
                 return $item->year . '-' . sprintf('%02d', $item->month);
@@ -155,16 +310,117 @@ class ReportController extends Controller
         ];
     }
 
-    // Private method untuk memproses data report
+    // Calculate flexible averages untuk mengatasi masalah perhitungan
+    private function calculateAverages($reportData, $period)
+    {
+        $averages = [];
+        $metrics = [
+            'acInFleet' => ['type' => 'average_valid', 'format' => 'number'],
+            'acInService' => ['type' => 'average_all', 'format' => 'number'],
+            'daysInService' => ['type' => 'sum', 'format' => 'round'],
+            'flyingHoursTotal' => ['type' => 'sum', 'format' => 'round'],
+            'revenueFlyingHours' => ['type' => 'sum', 'format' => 'round'],
+            'takeOffTotal' => ['type' => 'sum', 'format' => 'round'],
+            'revenueTakeOff' => ['type' => 'sum', 'format' => 'round'],
+            'technicalDelayTotal' => ['type' => 'sum', 'format' => 'round'],
+            'technicalIncidentTotal' => ['type' => 'sum', 'format' => 'round'],
+            'technicalCancellationTotal' => ['type' => 'sum', 'format' => 'round'],
+            'dailyUtilizationTakeOffTotal' => ['type' => 'average_all', 'format' => 'number'],
+            'revenueDailyUtilizationTakeOffTotal' => ['type' => 'average_all', 'format' => 'number'],
+            'ratePer100TakeOff' => ['type' => 'average_all', 'format' => 'number'],
+            'technicalIncidentRate' => ['type' => 'average_all', 'format' => 'number'],
+            'dispatchReliability' => ['type' => 'average_all', 'format' => 'number']
+        ];
+
+        foreach ($metrics as $metric => $config) {
+            $total = 0;
+            $validCount = 0;
+            $monthlyValues = [];
+            
+            for ($i = 11; $i >= 0; $i--) {
+                $monthKey = Carbon::parse($period)->subMonth($i)->format('Y-m');
+                $value = $reportData[$monthKey][$metric] ?? 0;
+                
+                $monthlyValues[] = $value;
+                $total += $value;
+                
+                if ($value > 0) {
+                    $validCount++;
+                }
+            }
+            
+            // Calculate based on metric type
+            switch ($config['type']) {
+                case 'average_valid':
+                    $result = $validCount > 0 ? $total / $validCount : 0;
+                    break;
+                case 'sum':
+                    $result = $total;
+                    break;
+                default: // 'average_all'
+                    $result = $total / 12;
+                    break;
+            }
+            
+            $averages[$metric] = [
+                'value' => $result,
+                'total' => $total,
+                'valid_months' => $validCount,
+                'monthly_values' => $monthlyValues,
+                'format' => $config['format']
+            ];
+        }
+
+        return $averages;
+    }
+
+    // Get monthly data safely dengan null handling
+    private function getMonthlyData($reportData, $period, $metric, $monthsBack = 12)
+    {
+        $data = [];
+        for ($i = $monthsBack - 1; $i >= 0; $i--) {
+            $monthKey = Carbon::parse($period)->subMonth($i)->format('Y-m');
+            $value = $reportData[$monthKey][$metric] ?? 0;
+            $data[] = $value;
+        }
+        return $data;
+    }
+
+    // Calculate safe average dengan berbagai opsi
+    private function calculateSafeAverage($values, $type = 'all')
+    {
+        if (empty($values)) return 0;
+        
+        switch ($type) {
+            case 'valid_only':
+                $validValues = array_filter($values, function($v) { return $v > 0; });
+                return count($validValues) > 0 ? array_sum($validValues) / count($validValues) : 0;
+            case 'sum':
+                return array_sum($values);
+            default: // 'all'
+                return array_sum($values) / count($values);
+        }
+    }
+
+    // Format nilai berdasarkan tipe
+    private function formatValue($value, $format = 'number', $decimals = 2)
+    {
+        switch ($format) {
+            case 'round':
+                return round($value);
+            case 'hours':
+                return $this->convertDecimalToHoursMinutes($value);
+            default: // 'number'
+                return $this->formatNumber($value, $decimals);
+        }
+    }
+
+    // Process report data dengan enhanced calculations
     private function processReportData($aircraftType, $period)
     {
         // Ambil semua data dengan single queries
         $data = $this->getAosReportData($aircraftType, $period);
         
-        $formatRate = function($value) {
-            return (float) number_format($value, 10, '.', '');
-        };
-
         $reportData = [];
         $totalFlightHoursPerTakeOffTotal = 0;
         $totalRevenueFlightHoursPerTakeOff = 0;
@@ -193,7 +449,7 @@ class ReportController extends Controller
 
             // Hitung metrics berdasarkan data yang sudah diambil
             $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
-            $acInService = $daysInMonth > 0 ? $formatRate($monthly->days_in_service / $daysInMonth) : 0;
+            $acInService = $daysInMonth > 0 ? $this->formatRate($monthly->days_in_service / $daysInMonth) : 0;
 
             // Calculations based on existing data
             $flightHoursPerTakeOffTotal = $monthly->take_off_total > 0 ? 
@@ -219,15 +475,15 @@ class ReportController extends Controller
             $totalDuration = $techDelay->total_duration ?? 0;
             $averageDuration = $technicalDelayTotal > 0 ? $totalDuration / $technicalDelayTotal : 0;
             $ratePer100TakeOff = $monthly->revenue_take_off > 0 ? 
-                $formatRate(($technicalDelayTotal * 100) / $monthly->revenue_take_off) : 0;
+                $this->formatRate(($technicalDelayTotal * 100) / $monthly->revenue_take_off) : 0;
 
             $technicalIncidentTotal = $techIncident->technical_incident_total ?? 0;
             $technicalIncidentRate = $monthly->revenue_take_off > 0 ? 
-                $formatRate(($technicalIncidentTotal * 100) / $monthly->revenue_take_off) : 0;
+                $this->formatRate(($technicalIncidentTotal * 100) / $monthly->revenue_take_off) : 0;
 
             $technicalCancellationTotal = $techCancellation->technical_cancellation_total ?? 0;
             $dispatchReliability = $monthly->revenue_take_off > 0 ? 
-                $formatRate((($monthly->revenue_take_off - $technicalDelayTotal - $technicalCancellationTotal) 
+                $this->formatRate((($monthly->revenue_take_off - $technicalDelayTotal - $technicalCancellationTotal) 
                 / $monthly->revenue_take_off) * 100) : 0;
 
             $reportData[$currentPeriod] = [
@@ -263,7 +519,10 @@ class ReportController extends Controller
             $totalAverageDuration += $averageDuration;
         }
 
-        // Calculate averages
+        // Calculate averages using new method
+        $averages = $this->calculateAverages($reportData, $period);
+
+        // Keep existing averages for backward compatibility
         $avgFlightHoursPerTakeOffTotal = $this->convertDecimalToHoursMinutes($totalFlightHoursPerTakeOffTotal / 12);
         $avgRevenueFlightHoursPerTakeOff = $this->convertDecimalToHoursMinutes($totalRevenueFlightHoursPerTakeOff / 12);
         $avgDailyUtilizationFlyingHoursTotal = $this->convertDecimalToHoursMinutes($totalDailyUtilizationFlyingHoursTotal / 12);
@@ -273,6 +532,7 @@ class ReportController extends Controller
 
         return [
             'reportData' => $reportData,
+            'averages' => $averages,
             'avgFlightHoursPerTakeOffTotal' => $avgFlightHoursPerTakeOffTotal,
             'avgRevenueFlightHoursPerTakeOff' => $avgRevenueFlightHoursPerTakeOff,
             'avgDailyUtilizationFlyingHoursTotal' => $avgDailyUtilizationFlyingHoursTotal,
@@ -301,24 +561,40 @@ class ReportController extends Controller
         // Extract data from processed result
         extract($processedData);
 
+        // Get configurations
+        $metricsConfig = $this->getMetricsConfiguration();
+        $hourMetricsConfig = $this->getHourMetricsConfiguration();
+
+        // ✅ ADDED: Helper function untuk view
+        $formatNumber = function($value, $decimals = 2) {
+            if (!is_numeric($value)) {
+                return '0';
+            }
+            return rtrim(rtrim(number_format($value, $decimals, '.', ''), '0'), '.');
+        };
+
         // Return view with processed data
         return view('report.aos-result', compact(
-            'reportData', 'period', 'aircraftType', 'month', 'year', 
+            'reportData', 'period', 'aircraftType', 'month', 'year',
+            'averages', 'metricsConfig', 'hourMetricsConfig',
             'avgFlightHoursPerTakeOffTotal', 'avgRevenueFlightHoursPerTakeOff', 
             'avgDailyUtilizationFlyingHoursTotal', 'avgRevenueDailyUtilizationFlyingHoursTotal',
-            'avgTotalDuration', 'avgAverageDuration'
+            'avgTotalDuration', 'avgAverageDuration', 'formatNumber'
         ));
     }
 
     // Untuk convert format menjadi (HH : MM)
     private function convertDecimalToHoursMinutes($decimalHours) 
     {
+        if (!is_numeric($decimalHours)) {
+            return '0 : 00';
+        }
         $hours = floor($decimalHours);
         $minutes = round(($decimalHours - $hours) * 60);
         return sprintf('%d : %02d', $hours, $minutes);
     }
 
-    // EXPORT AOS TO PDF FORMAT
+    // Export PDF dengan enhanced data
     public function aosPdf(Request $request)
     {
         // Validate input
@@ -332,18 +608,31 @@ class ReportController extends Controller
         $month = date('m', strtotime($period));
         $year = date('Y', strtotime($period));
 
-        // Process report data using optimized method (same as aosStore)
+        // Process report data using optimized method
         $processedData = $this->processReportData($aircraftType, $period);
 
         // Extract data from processed result
         extract($processedData);
 
+        // Get configurations
+        $metricsConfig = $this->getMetricsConfiguration();
+        $hourMetricsConfig = $this->getHourMetricsConfiguration();
+
+        // ✅ ADDED: Helper function untuk format number dalam PDF
+        $formatNumber = function($value, $decimals = 2) {
+            if (!is_numeric($value)) {
+                return '0';
+            }
+            return rtrim(rtrim(number_format($value, $decimals, '.', ''), '0'), '.');
+        };
+
         // Generate PDF
         $pdf = PDF::loadView('pdf.aos-pdf', compact(
-            'reportData', 'period', 'aircraftType', 'month', 'year', 
+            'reportData', 'period', 'aircraftType', 'month', 'year',
+            'averages', 'metricsConfig', 'hourMetricsConfig',
             'avgFlightHoursPerTakeOffTotal', 'avgRevenueFlightHoursPerTakeOff', 
             'avgDailyUtilizationFlyingHoursTotal', 'avgRevenueDailyUtilizationFlyingHoursTotal',
-            'avgTotalDuration', 'avgAverageDuration'
+            'avgTotalDuration', 'avgAverageDuration', 'formatNumber'
         ));
 
         $pdf->setPaper('A4', 'landscape');

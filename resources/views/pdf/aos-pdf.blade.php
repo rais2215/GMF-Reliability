@@ -31,6 +31,35 @@
     </style>
 </head>
 <body>
+    @php
+        // Helper function untuk menghilangkan trailing zero
+        function formatNumber($value, $decimals = 2) {
+            return rtrim(rtrim(number_format($value, $decimals), '0'), '.');
+        }
+
+        // Inisialisasi total untuk setiap metrik
+        $totalAcInFleet = 0;
+        $totalAcInService = 0;
+        $totalDaysInService = 0;
+        $totalFlyingHoursTotal = 0;
+        $totalRevenueFlyingHours = 0;
+        $totalTakeOffTotal = 0;
+        $totalRevenueTakeOff = 0;
+        $totalFlightHoursPerTakeOffTotal = 0;
+        $totalRevenueFlightHoursPerTakeOff = 0;
+        $totalDailyUtilizationFlyingHoursTotal = 0;
+        $totalRevenueDailyUtilizationFlyingHoursTotal = 0;
+        $totalDailyUtilizationTakeOffTotal = 0;
+        $totalRevenueDailyUtilizationTakeOffTotal = 0;
+        $totalTechnicalDelayTotal = 0;
+        $totalTotalDuration = 0;
+        $totalAverageDuration = 0;
+        $totalRatePer100TakeOff = 0;
+        $totalTechnicalIncidentTotal= 0;
+        $totalTechnicalIncidentRate=0;
+        $totalTechnicalCancellationTotal=0;
+        $totalDispatchReliability=0;
+    @endphp
     <div>
         <table>
             <thead>
@@ -46,35 +75,6 @@
                 </tr>
             </thead>
             <tbody>
-                @php
-                    // Helper function untuk menghilangkan trailing zero
-                    function formatNumber($value, $decimals = 2) {
-                        return rtrim(rtrim(number_format($value, $decimals), '0'), '.');
-                    }
-
-                    // Inisialisasi total untuk setiap metrik
-                    $totalAcInFleet = 0;
-                    $totalAcInService = 0;
-                    $totalDaysInService = 0;
-                    $totalFlyingHoursTotal = 0;
-                    $totalRevenueFlyingHours = 0;
-                    $totalTakeOffTotal = 0;
-                    $totalRevenueTakeOff = 0;
-                    $totalFlightHoursPerTakeOffTotal = 0;
-                    $totalRevenueFlightHoursPerTakeOff = 0;
-                    $totalDailyUtilizationFlyingHoursTotal = 0;
-                    $totalRevenueDailyUtilizationFlyingHoursTotal = 0;
-                    $totalDailyUtilizationTakeOffTotal = 0;
-                    $totalRevenueDailyUtilizationTakeOffTotal = 0;
-                    $totalTechnicalDelayTotal = 0;
-                    $totalTotalDuration = 0;
-                    $totalAverageDuration = 0;
-                    $totalRatePer100TakeOff = 0;
-                    $totalTechnicalIncidentTotal= 0;
-                    $totalTechnicalIncidentRate=0;
-                    $totalTechnicalCancellationTotal=0;
-                    $totalDispatchReliability=0;
-                @endphp
                 <tr>
                     <td class="aos-label"></td>
                     @for ($i = 11; $i >= 0; $i--)
@@ -255,13 +255,13 @@
                 <tr>
                     <td class="aos-label">- Rate / 100 Take Off</td>
                     @for ($i = 11; $i >= 0; $i--)
-                        @php
-                            $ratePer100TakeOff = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['ratePer100TakeOff'];
-                            $totalRatePer100TakeOff += is_numeric($ratePer100TakeOff) ? $ratePer100TakeOff:0;
-                        @endphp
-                        <td>{{ formatNumber($ratePer100TakeOff) }}</td>
-                    @endfor
-                    <td>{{ formatNumber($totalRatePer100TakeOff / 12) }}</td>
+                            @php
+                                $ratePer100TakeOff = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['ratePer100TakeOff'];
+                                $totalRatePer100TakeOff += is_numeric($ratePer100TakeOff) ? $ratePer100TakeOff:0;
+                            @endphp
+                            <td>{{ formatNumber($ratePer100TakeOff) }}</td>
+                        @endfor
+                        <td>{{ formatNumber($totalRatePer100TakeOff / 12) }}</td>
                 </tr>
                 <tr>
                     <td class="aos-label">Technical Incident - Total</td>

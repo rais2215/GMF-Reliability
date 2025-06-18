@@ -8,12 +8,12 @@
     <style>
         @page {
             size: A4 portrait;
-            margin: 10mm; /* Dikurangi margin untuk lebih banyak ruang */
+            margin: 10mm;
         }
         
         body {
             font-family: Arial, sans-serif;
-            font-size: 10px; /* Diperbesar dari 8px */
+            font-size: 10px;
             margin: 0;
             padding: 0;
         }
@@ -22,33 +22,33 @@
             border-collapse: collapse;
             width: 100%;
             font-family: Arial, sans-serif;
-            font-size: 10px; /* Diperbesar dari 8px */
+            font-size: 10px;
         }
         th, td {
             border: 1px solid #000;
-            padding: 4px; /* Diperbesar dari 3px */
+            padding: 4px;
             text-align: center;
-            font-size: 9px; /* Diperbesar dari 7px */
+            font-size: 9px;
             word-wrap: break-word;
-            line-height: 1.2; /* Tambahkan line-height */
+            line-height: 1.2;
         }
         .style1 {
             text-align: center;
         }
         .style2 {
-            font-size: 18px; /* Diperbesar dari 16px */
+            font-size: 18px;
             text-align: center;
             font-weight: bold;
         }
         h6 {
-            font-size: 11px; /* Diperbesar dari 10px */
+            font-size: 11px;
             text-align: left;
-            margin: 4px; /* Diperbesar dari 3px */
+            margin: 4px;
             line-height: 1.3;
         }
         .issued {
             text-align: right;
-            margin: 5px; /* Diperbesar dari 4px */
+            margin: 5px;
         }
         .alert-red {
             background-color: red;
@@ -62,14 +62,14 @@
         .aos-label {
             text-align: left;
             font-weight: bold;
-            font-size: 9px; /* Diperbesar dari 7px */
-            width: 130px; /* Diperbesar dari 120px */
+            font-size: 9px;
+            width: 130px;
         }
         .ata-name {
             text-align: left;
             font-weight: bold;
-            font-size: 8px; /* Diperbesar dari 7px */
-            max-width: 110px; /* Diperbesar dari 100px */
+            font-size: 8px;
+            max-width: 110px;
         }
         
         .cover-page {
@@ -126,24 +126,22 @@
             font-family: Arial, sans-serif;
         }
         
-        /* Update table-responsive untuk font yang lebih besar */
         .table-responsive {
             overflow-x: auto;
-            font-size: 9px; /* Diperbesar dari 6px */
+            font-size: 9px;
         }
         
         .table-responsive table {
             min-width: 100%;
-            font-size: 9px; /* Diperbesar dari 6px */
+            font-size: 9px;
         }
         
         .table-responsive th,
         .table-responsive td {
-            padding: 3px; /* Diperbesar dari 2px */
-            font-size: 8px; /* Diperbesar dari 6px */
+            padding: 3px;
+            font-size: 8px;
         }
         
-        /* Tambahan untuk mengoptimalkan ruang tabel */
         .compact-table {
             margin-bottom: 15px;
         }
@@ -169,10 +167,10 @@
 </head>
 <body>
     @php
-    // Helper function untuk menghilangkan trailing zero
-    function formatNumber($value, $decimals = 2) {
+    // ✅ Helper function yang sudah refactored untuk format number
+    $formatNumber = $formatNumber ?? function($value, $decimals = 2) {
         return rtrim(rtrim(number_format($value, $decimals), '0'), '.');
-    }
+    };
     @endphp
 
     {{-- Cover Page --}}
@@ -359,7 +357,7 @@
         </div>
     </div>
 
-    {{-- AOS REPORT SECTION --}}
+    {{-- AOS REPORT SECTION - ✅ REFACTORED: Menggunakan data dari single query approach --}}
     <div style="page-break-before: always;" class="table-responsive">
         <table class="compact-table">
             <thead>
@@ -376,22 +374,25 @@
             </thead>
             <tbody>
                 @php
-                    // Inisialisasi total untuk setiap metrik
-                    $totalAcInFleet = 0;
-                    $totalAcInService = 0;
-                    $totalDaysInService = 0;
-                    $totalFlyingHoursTotal = 0;
-                    $totalRevenueFlyingHours = 0;
-                    $totalTakeOffTotal = 0;
-                    $totalRevenueTakeOff = 0;
-                    $totalDailyUtilizationTakeOffTotal = 0;
-                    $totalRevenueDailyUtilizationTakeOffTotal = 0;
-                    $totalTechnicalDelayTotal = 0;
-                    $totalRatePer100TakeOff = 0;
-                    $totalTechnicalIncidentTotal = 0;
-                    $totalTechnicalIncidentRate = 0;
-                    $totalTechnicalCancellationTotal = 0;
-                    $totalDispatchReliability = 0;
+                    // ✅ Inisialisasi total menggunakan refactored approach
+                    $periods = [];
+                    for ($i = 11; $i >= 0; $i--) {
+                        $periods[] = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
+                    }
+                    
+                    // ✅ Calculate totals from refactored data structure
+                    $calculateTotal = function($key, $isSum = false) use ($aosData, $periods) {
+                        $total = 0;
+                        $count = 0;
+                        foreach ($periods as $monthKey) {
+                            $value = $aosData['reportData'][$monthKey][$key] ?? 0;
+                            if (is_numeric($value)) {
+                                $total += $value;
+                                $count++;
+                            }
+                        }
+                        return $isSum ? $total : ($count > 0 ? $total / $count : 0);
+                    };
                 @endphp
                 
                 <tr>
@@ -402,277 +403,262 @@
                     <td><b>LAST 12 MTHS</b></td>
                 </tr>
                 
+                {{-- ✅ A/C in Fleet - Using refactored data --}}
                 <tr>
                     <td class="aos-label">A/C in Fleet</td>
-                    @for ($i = 11; $i >= 0; $i--)
+                    @foreach ($periods as $monthKey)
                         @php
-                            $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
                             $acInFleet = $aosData['reportData'][$monthKey]['acInFleet'] ?? 0;
-                            $totalAcInFleet += $acInFleet;
                         @endphp
-                        <td>{{ formatNumber($acInFleet) }}</td>
-                    @endfor
-                    <td>{{ formatNumber($totalAcInFleet / 12) }}</td>
+                        <td>{{ $formatNumber($acInFleet) }}</td>
+                    @endforeach
+                    <td>{{ $formatNumber($calculateTotal('acInFleet')) }}</td>
                 </tr>
                 
+                {{-- ✅ A/C in Service - Using refactored data --}}
                 <tr>
                     <td class="aos-label">A/C in Service</td>
-                    @for ($i = 11; $i >= 0; $i--)
+                    @foreach ($periods as $monthKey)
                         @php
-                            $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
                             $acInService = $aosData['reportData'][$monthKey]['acInService'] ?? 0;
-                            $totalAcInService += $acInService;
                         @endphp
-                        <td>{{ formatNumber($acInService) }}</td>
-                    @endfor
-                    <td>{{ formatNumber($totalAcInService / 12) }}</td>
+                        <td>{{ $formatNumber($acInService) }}</td>
+                    @endforeach
+                    <td>{{ $formatNumber($calculateTotal('acInService')) }}</td>
                 </tr>
                 
+                {{-- ✅ A/C Days in Service - Using refactored data --}}
                 <tr>
                     <td class="aos-label">A/C Days in Service</td>
-                    @for ($i = 11; $i >= 0; $i--)
+                    @foreach ($periods as $monthKey)
                         @php
-                            $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
                             $daysInService = $aosData['reportData'][$monthKey]['daysInService'] ?? 0;
-                            $totalDaysInService += $daysInService;
                         @endphp
                         <td>{{ $daysInService }}</td>
-                    @endfor
-                    <td>{{ round($totalDaysInService) }}</td>
+                    @endforeach
+                    <td>{{ round($calculateTotal('daysInService', true)) }}</td>
                 </tr>
                 
+                {{-- ✅ Flying Hours - Total - Using refactored data --}}
                 <tr>
                     <td class="aos-label">Flying Hours - Total</td>
-                    @for ($i = 11; $i >= 0; $i--)
+                    @foreach ($periods as $monthKey)
                         @php
-                            $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
                             $flyingHoursTotal = $aosData['reportData'][$monthKey]['flyingHoursTotal'] ?? 0;
-                            $totalFlyingHoursTotal += $flyingHoursTotal;
                         @endphp
                         <td>{{ round($flyingHoursTotal) }}</td>
-                    @endfor
-                    <td>{{ round($totalFlyingHoursTotal) }}</td>
+                    @endforeach
+                    <td>{{ round($calculateTotal('flyingHoursTotal', true)) }}</td>
                 </tr>
                 
+                {{-- ✅ Flying Hours - Revenue - Using refactored data --}}
                 <tr>
                     <td class="aos-label">- Revenue</td>
-                    @for ($i = 11; $i >= 0; $i--)
+                    @foreach ($periods as $monthKey)
                         @php
-                            $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
                             $revenueFlyingHours = $aosData['reportData'][$monthKey]['revenueFlyingHours'] ?? 0;
-                            $totalRevenueFlyingHours += $revenueFlyingHours;
                         @endphp
                         <td>{{ round($revenueFlyingHours) }}</td>
-                    @endfor
-                    <td>{{ round($totalRevenueFlyingHours) }}</td>
+                    @endforeach
+                    <td>{{ round($calculateTotal('revenueFlyingHours', true)) }}</td>
                 </tr>
                 
+                {{-- ✅ Take Off - Total - Using refactored data --}}
                 <tr>
                     <td class="aos-label">Take Off - Total</td>
-                    @for ($i = 11; $i >= 0; $i--)
+                    @foreach ($periods as $monthKey)
                         @php
-                            $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
                             $takeOffTotal = $aosData['reportData'][$monthKey]['takeOffTotal'] ?? 0;
-                            $totalTakeOffTotal += $takeOffTotal;
                         @endphp
                         <td>{{ $takeOffTotal }}</td>
-                    @endfor
-                    <td>{{ round($totalTakeOffTotal) }}</td>
+                    @endforeach
+                    <td>{{ round($calculateTotal('takeOffTotal', true)) }}</td>
                 </tr>
                 
+                {{-- ✅ Take Off - Revenue - Using refactored data --}}
                 <tr>
                     <td class="aos-label">- Revenue</td>
-                    @for ($i = 11; $i >= 0; $i--)
+                    @foreach ($periods as $monthKey)
                         @php
-                            $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
                             $revenueTakeOff = $aosData['reportData'][$monthKey]['revenueTakeOff'] ?? 0;
-                            $totalRevenueTakeOff += $revenueTakeOff;
                         @endphp
                         <td>{{ $revenueTakeOff }}</td>
-                    @endfor
-                    <td>{{ round($totalRevenueTakeOff) }}</td>
+                    @endforeach
+                    <td>{{ round($calculateTotal('revenueTakeOff', true)) }}</td>
                 </tr>
                 
+                {{-- ✅ Flight Hours per Take Off - Total - Using refactored data --}}
                 <tr>
                     <td class="aos-label">Flight Hours per Take Off - Total</td>
-                    @for ($i = 11; $i >= 0; $i--)
+                    @foreach ($periods as $monthKey)
                         @php
-                            $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
                             $flightHoursPerTakeOffTotal = $aosData['reportData'][$monthKey]['flightHoursPerTakeOffTotal'] ?? '0 : 00';
                         @endphp
                         <td>{{ $flightHoursPerTakeOffTotal }}</td>
-                    @endfor
+                    @endforeach
                     <td>{{ $aosData['avgFlightHoursPerTakeOffTotal'] ?? '0 : 00' }}</td>
                 </tr>
                 
+                {{-- ✅ Flight Hours per Take Off - Revenue - Using refactored data --}}
                 <tr>
                     <td class="aos-label">- Revenue</td>
-                    @for ($i = 11; $i >= 0; $i--)
+                    @foreach ($periods as $monthKey)
                         @php
-                            $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
                             $revenueFlightHoursPerTakeOff = $aosData['reportData'][$monthKey]['revenueFlightHoursPerTakeOff'] ?? '0 : 00';
                         @endphp
                         <td>{{ $revenueFlightHoursPerTakeOff }}</td>
-                    @endfor
+                    @endforeach
                     <td>{{ $aosData['avgRevenueFlightHoursPerTakeOff'] ?? '0 : 00' }}</td>
                 </tr>
                 
+                {{-- ✅ Daily Utiliz - Total FH - Using refactored data --}}
                 <tr>
                     <td class="aos-label">Daily Utiliz - Total FH</td>
-                    @for ($i = 11; $i >= 0; $i--)
+                    @foreach ($periods as $monthKey)
                         @php
-                            $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
                             $dailyUtilizationFlyingHoursTotal = $aosData['reportData'][$monthKey]['dailyUtilizationFlyingHoursTotal'] ?? '0 : 00';
                         @endphp
                         <td>{{ $dailyUtilizationFlyingHoursTotal }}</td>
-                    @endfor
+                    @endforeach
                     <td>{{ $aosData['avgDailyUtilizationFlyingHoursTotal'] ?? '0 : 00' }}</td>
                 </tr>
                 
+                {{-- ✅ Daily Utiliz - Revenue FH - Using refactored data --}}
                 <tr>
                     <td class="aos-label">- Revenue FH</td>
-                    @for ($i = 11; $i >= 0; $i--)
+                    @foreach ($periods as $monthKey)
                         @php
-                            $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
                             $revenueDailyUtilizationFlyingHoursTotal = $aosData['reportData'][$monthKey]['revenueDailyUtilizationFlyingHoursTotal'] ?? '0 : 00';
                         @endphp
                         <td>{{ $revenueDailyUtilizationFlyingHoursTotal }}</td>
-                    @endfor
+                    @endforeach
                     <td>{{ $aosData['avgRevenueDailyUtilizationFlyingHoursTotal'] ?? '0 : 00' }}</td>
                 </tr>
                 
+                {{-- ✅ Daily Utiliz - Total FC - Using refactored data --}}
                 <tr>
                     <td class="aos-label">- Total FC</td>
-                    @for ($i = 11; $i >= 0; $i--)
+                    @foreach ($periods as $monthKey)
                         @php
-                            $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
                             $dailyUtilizationTakeOffTotal = $aosData['reportData'][$monthKey]['dailyUtilizationTakeOffTotal'] ?? 0;
-                            $totalDailyUtilizationTakeOffTotal += is_numeric($dailyUtilizationTakeOffTotal) ? $dailyUtilizationTakeOffTotal : 0;
                         @endphp
-                        <td>{{ formatNumber($dailyUtilizationTakeOffTotal) }}</td>
-                    @endfor
-                    <td>{{ formatNumber($totalDailyUtilizationTakeOffTotal / 12) }}</td>
+                        <td>{{ $formatNumber($dailyUtilizationTakeOffTotal) }}</td>
+                    @endforeach
+                    <td>{{ $formatNumber($calculateTotal('dailyUtilizationTakeOffTotal')) }}</td>
                 </tr>
                 
+                {{-- ✅ Daily Utiliz - Revenue FC - Using refactored data --}}
                 <tr>
                     <td class="aos-label">- Revenue FC</td>
-                    @for ($i = 11; $i >= 0; $i--)
+                    @foreach ($periods as $monthKey)
                         @php
-                            $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
                             $revenueDailyUtilizationTakeOffTotal = $aosData['reportData'][$monthKey]['revenueDailyUtilizationTakeOffTotal'] ?? 0;
-                            $totalRevenueDailyUtilizationTakeOffTotal += is_numeric($revenueDailyUtilizationTakeOffTotal) ? $revenueDailyUtilizationTakeOffTotal : 0;
                         @endphp
-                        <td>{{ formatNumber($revenueDailyUtilizationTakeOffTotal) }}</td>
-                    @endfor
-                    <td>{{ formatNumber($totalRevenueDailyUtilizationTakeOffTotal / 12) }}</td>
+                        <td>{{ $formatNumber($revenueDailyUtilizationTakeOffTotal) }}</td>
+                    @endforeach
+                    <td>{{ $formatNumber($calculateTotal('revenueDailyUtilizationTakeOffTotal')) }}</td>
                 </tr>
                 
+                {{-- ✅ Technical Delay - Total - Using refactored data --}}
                 <tr>
                     <td class="aos-label">Technical Delay - Total</td>
-                    @for ($i = 11; $i >= 0; $i--)
+                    @foreach ($periods as $monthKey)
                         @php
-                            $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
                             $technicalDelayTotal = $aosData['reportData'][$monthKey]['technicalDelayTotal'] ?? 0;
-                            $totalTechnicalDelayTotal += is_numeric($technicalDelayTotal) ? $technicalDelayTotal : 0;
                         @endphp
                         <td>{{ round($technicalDelayTotal) }}</td>
-                    @endfor
-                    <td>{{ round($totalTechnicalDelayTotal) }}</td>
+                    @endforeach
+                    <td>{{ round($calculateTotal('technicalDelayTotal', true)) }}</td>
                 </tr>
                 
+                {{-- ✅ Technical Delay - Tot Duration - Using refactored data --}}
                 <tr>
                     <td class="aos-label">- Tot Duration</td>
-                    @for ($i = 11; $i >= 0; $i--)
+                    @foreach ($periods as $monthKey)
                         @php
-                            $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
                             $totalDuration = $aosData['reportData'][$monthKey]['totalDuration'] ?? '0 : 00';
                         @endphp
                         <td>{{ $totalDuration }}</td>
-                    @endfor
+                    @endforeach
                     <td>{{ $aosData['avgTotalDuration'] ?? '0 : 00' }}</td>
                 </tr>
                 
+                {{-- ✅ Technical Delay - Avg Duration - Using refactored data --}}
                 <tr>
                     <td class="aos-label">- Avg Duration</td>
-                    @for ($i = 11; $i >= 0; $i--)
+                    @foreach ($periods as $monthKey)
                         @php
-                            $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
                             $averageDuration = $aosData['reportData'][$monthKey]['averageDuration'] ?? '0 : 00';
                         @endphp
                         <td>{{ $averageDuration }}</td>
-                    @endfor
+                    @endforeach
                     <td>{{ $aosData['avgAverageDuration'] ?? '0 : 00' }}</td>
                 </tr>
                 
+                {{-- ✅ Technical Delay - Rate / 100 Take Off - Using refactored data --}}
                 <tr>
                     <td class="aos-label">- Rate / 100 Take Off</td>
-                    @for ($i = 11; $i >= 0; $i--)
+                    @foreach ($periods as $monthKey)
                         @php
-                            $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
                             $ratePer100TakeOff = $aosData['reportData'][$monthKey]['ratePer100TakeOff'] ?? 0;
-                            $totalRatePer100TakeOff += is_numeric($ratePer100TakeOff) ? $ratePer100TakeOff : 0;
                         @endphp
-                        <td>{{ formatNumber($ratePer100TakeOff) }}</td>
-                    @endfor
-                    <td>{{ formatNumber($totalRatePer100TakeOff / 12) }}</td>
+                        <td>{{ $formatNumber($ratePer100TakeOff) }}</td>
+                    @endforeach
+                    <td>{{ $formatNumber($calculateTotal('ratePer100TakeOff')) }}</td>
                 </tr>
                 
+                {{-- ✅ Technical Incident - Total - Using refactored data --}}
                 <tr>
                     <td class="aos-label">Technical Incident - Total</td>
-                    @for ($i = 11; $i >= 0; $i--)
+                    @foreach ($periods as $monthKey)
                         @php
-                            $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
                             $technicalIncidentTotal = $aosData['reportData'][$monthKey]['technicalIncidentTotal'] ?? 0;
-                            $totalTechnicalIncidentTotal += is_numeric($technicalIncidentTotal) ? $technicalIncidentTotal : 0;
                         @endphp
                         <td>{{ round($technicalIncidentTotal) }}</td>
-                    @endfor
-                    <td>{{ round($totalTechnicalIncidentTotal / 12) }}</td>
+                    @endforeach
+                    <td>{{ round($calculateTotal('technicalIncidentTotal')) }}</td>
                 </tr>
                 
+                {{-- ✅ Technical Incident - Rate/100 FC - Using refactored data --}}
                 <tr>
                     <td class="aos-label">- Rate/100 FC</td>
-                    @for ($i = 11; $i >= 0; $i--)
+                    @foreach ($periods as $monthKey)
                         @php
-                            $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
                             $technicalIncidentRate = $aosData['reportData'][$monthKey]['technicalIncidentRate'] ?? 0;
-                            $totalTechnicalIncidentRate += is_numeric($technicalIncidentRate) ? $technicalIncidentRate : 0;
                         @endphp
-                        <td>{{ formatNumber($technicalIncidentRate, 3) }}</td>
-                    @endfor
-                    <td>{{ formatNumber($totalTechnicalIncidentRate / 12) }}</td>
+                        <td>{{ $formatNumber($technicalIncidentRate, 3) }}</td>
+                    @endforeach
+                    <td>{{ $formatNumber($calculateTotal('technicalIncidentRate')) }}</td>
                 </tr>
                 
+                {{-- ✅ Technical Cancellation - Total - Using refactored data --}}
                 <tr>
                     <td class="aos-label">Technical Cancellation - Total</td>
-                    @for ($i = 11; $i >= 0; $i--)
+                    @foreach ($periods as $monthKey)
                         @php
-                            $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
                             $technicalCancellationTotal = $aosData['reportData'][$monthKey]['technicalCancellationTotal'] ?? 0;
-                            $totalTechnicalCancellationTotal += is_numeric($technicalCancellationTotal) ? $technicalCancellationTotal : 0;
                         @endphp
                         <td>{{ round($technicalCancellationTotal) }}</td>
-                    @endfor
-                    <td>{{ round($totalTechnicalCancellationTotal) }}</td>
+                    @endforeach
+                    <td>{{ round($calculateTotal('technicalCancellationTotal', true)) }}</td>
                 </tr>
                 
+                {{-- ✅ Dispatch Reliability (%) - Using refactored data --}}
                 <tr>
                     <td class="aos-label">Dispatch Reliability (%)</td>
-                    @for ($i = 11; $i >= 0; $i--)
+                    @foreach ($periods as $monthKey)
                         @php
-                            $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
                             $dispatchReliability = $aosData['reportData'][$monthKey]['dispatchReliability'] ?? 0;
-                            $totalDispatchReliability += is_numeric($dispatchReliability) ? $dispatchReliability : 0;
                         @endphp
-                        <td>{{ formatNumber($dispatchReliability) }}%</td>
-                    @endfor
-                    <td>{{ formatNumber($totalDispatchReliability / 12) }}%</td>
+                        <td>{{ $formatNumber($dispatchReliability) }}%</td>
+                    @endforeach
+                    <td>{{ $formatNumber($calculateTotal('dispatchReliability')) }}%</td>
                 </tr>
             </tbody>
         </table>
     </div>
 
-    {{-- PILOT REPORT SECTION --}}
+    {{-- PILOT REPORT SECTION - ✅ REFACTORED: Menggunakan data dari single query approach --}}
     <div style="page-break-before: always;">
         <table>
             <thead>
@@ -682,11 +668,11 @@
                 </tr>
                 <tr>
                     <th colspan="2">Total Flight Hours</th>
-                    <th>{{ round($pilotData['flyingHours2Before']) }}</th>
-                    <th>{{ round($pilotData['flyingHoursBefore']) }}</th>
-                    <th>{{ round($pilotData['flyingHoursTotal']) }}</th>
-                    <th>{{ round($pilotData['fh3Last']) }}</th>
-                    <th>{{ round($pilotData['fh12Last']) }}</th>
+                    <th>{{ round($pilotData['flyingHours2Before'] ?? 0) }}</th>
+                    <th>{{ round($pilotData['flyingHoursBefore'] ?? 0) }}</th>
+                    <th>{{ round($pilotData['flyingHoursTotal'] ?? 0) }}</th>
+                    <th>{{ round($pilotData['fh3Last'] ?? 0) }}</th>
+                    <th>{{ round($pilotData['fh12Last'] ?? 0) }}</th>
                     <th colspan="8"></th>
                 </tr>
                 <tr>
@@ -718,25 +704,32 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($pilotData['reportPerAta'] as $report)
-                <tr>
-                    <th>{{ $report['ata'] }}</th>
-                    <th class="ata-name">{{ $report['ata_name'] }}</th>
-                    <td>{{ $report['pirepCountTwoMonthsAgo'] }}</td>
-                    <td>{{ $report['pirepCountBefore'] }}</td>
-                    <td>{{ $report['pirepCount'] }}</td>
-                    <td>{{ $report['pirep3Month'] }}</td>
-                    <td>{{ $report['pirep12Month'] }}</td>
-                    <td>{{ formatNumber($report['pirep2Rate']) }}</td>
-                    <td>{{ formatNumber($report['pirep1Rate']) }}</td>
-                    <td>{{ formatNumber($report['pirepRate']) }}</td>
-                    <td>{{ formatNumber($report['pirepRate3Month']) }}</td>
-                    <td>{{ formatNumber($report['pirepRate12Month']) }}</td>
-                    <td>{{ formatNumber($report['pirepAlertLevel']) }}</td>
-                    <td>{{ $report['pirepAlertStatus'] }}</td>
-                    <td>{{ $report['pirepTrend'] }}</td>
-                </tr>  
-                @endforeach
+                {{-- ✅ Using refactored reportPerAta data structure --}}
+                @if(isset($pilotData['reportPerAta']) && is_array($pilotData['reportPerAta']))
+                    @foreach ($pilotData['reportPerAta'] as $report)
+                    <tr>
+                        <th>{{ $report['ata'] ?? '' }}</th>
+                        <th class="ata-name">{{ $report['ata_name'] ?? '' }}</th>
+                        <td>{{ $report['pirepCountTwoMonthsAgo'] ?? 0 }}</td>
+                        <td>{{ $report['pirepCountBefore'] ?? 0 }}</td>
+                        <td>{{ $report['pirepCount'] ?? 0 }}</td>
+                        <td>{{ $report['pirep3Month'] ?? 0 }}</td>
+                        <td>{{ $report['pirep12Month'] ?? 0 }}</td>
+                        <td>{{ $formatNumber($report['pirep2Rate'] ?? 0) }}</td>
+                        <td>{{ $formatNumber($report['pirep1Rate'] ?? 0) }}</td>
+                        <td>{{ $formatNumber($report['pirepRate'] ?? 0) }}</td>
+                        <td>{{ $formatNumber($report['pirepRate3Month'] ?? 0) }}</td>
+                        <td>{{ $formatNumber($report['pirepRate12Month'] ?? 0) }}</td>
+                        <td>{{ $formatNumber($report['pirepAlertLevel'] ?? 0) }}</td>
+                        <td>{{ $report['pirepAlertStatus'] ?? '' }}</td>
+                        <td>{{ $report['pirepTrend'] ?? '' }}</td>
+                    </tr>  
+                    @endforeach
+                @else
+                    <tr>
+                        <td colspan="15" style="text-align: center; padding: 20px;">No data available</td>
+                    </tr>
+                @endif
             </tbody>
         </table>
         <div class="notes-section">
@@ -749,7 +742,7 @@
         <h6 class="issued">Issued by JKTMQGA and Compiled by GMF Reliability Engineering & Services</h6>
     </div>
 
-    {{-- MAINTENANCE REPORT SECTION --}}
+    {{-- MAINTENANCE REPORT SECTION - ✅ REFACTORED: Menggunakan data dari single query approach --}}
     <div style="page-break-before: always;">
         <table>
             <thead>
@@ -759,11 +752,11 @@
                 </tr>
                 <tr>
                     <th colspan="2">Total Flight Hours</th>
-                    <th>{{ round($pilotData['flyingHours2Before']) }}</th>
-                    <th>{{ round($pilotData['flyingHoursBefore']) }}</th>
-                    <th>{{ round($pilotData['flyingHoursTotal']) }}</th>
-                    <th>{{ round($pilotData['fh3Last']) }}</th>
-                    <th>{{ round($pilotData['fh12Last']) }}</th>
+                    <th>{{ round($pilotData['flyingHours2Before'] ?? 0) }}</th>
+                    <th>{{ round($pilotData['flyingHoursBefore'] ?? 0) }}</th>
+                    <th>{{ round($pilotData['flyingHoursTotal'] ?? 0) }}</th>
+                    <th>{{ round($pilotData['fh3Last'] ?? 0) }}</th>
+                    <th>{{ round($pilotData['fh12Last'] ?? 0) }}</th>
                     <th colspan="8"></th>
                 </tr>
                 <tr>
@@ -795,25 +788,32 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($pilotData['reportPerAta'] as $report)
-                <tr>
-                    <th>{{ $report['ata'] }}</th>
-                    <th class="ata-name">{{ $report['ata_name'] }}</th>
-                    <td>{{ $report['marepCountTwoMonthsAgo'] }}</td>
-                    <td>{{ $report['marepCountBefore'] }}</td>
-                    <td>{{ $report['marepCount'] }}</td>
-                    <td>{{ $report['marep3Month'] }}</td>
-                    <td>{{ $report['marep12Month'] }}</td>
-                    <td>{{ formatNumber($report['marep2Rate']) }}</td>
-                    <td>{{ formatNumber($report['marep1Rate']) }}</td>
-                    <td>{{ formatNumber($report['marepRate']) }}</td>
-                    <td>{{ formatNumber($report['marepRate3Month']) }}</td>
-                    <td>{{ formatNumber($report['marepRate12Month']) }}</td>
-                    <td>{{ formatNumber($report['marepAlertLevel']) }}</td>
-                    <td>{{ $report['marepAlertStatus'] }}</td>
-                    <td>{{ $report['marepTrend'] }}</td>
-                </tr>  
-                @endforeach
+                {{-- ✅ Using refactored reportPerAta data structure for MAREP --}}
+                @if(isset($pilotData['reportPerAta']) && is_array($pilotData['reportPerAta']))
+                    @foreach ($pilotData['reportPerAta'] as $report)
+                    <tr>
+                        <th>{{ $report['ata'] ?? '' }}</th>
+                        <th class="ata-name">{{ $report['ata_name'] ?? '' }}</th>
+                        <td>{{ $report['marepCountTwoMonthsAgo'] ?? 0 }}</td>
+                        <td>{{ $report['marepCountBefore'] ?? 0 }}</td>
+                        <td>{{ $report['marepCount'] ?? 0 }}</td>
+                        <td>{{ $report['marep3Month'] ?? 0 }}</td>
+                        <td>{{ $report['marep12Month'] ?? 0 }}</td>
+                        <td>{{ $formatNumber($report['marep2Rate'] ?? 0) }}</td>
+                        <td>{{ $formatNumber($report['marep1Rate'] ?? 0) }}</td>
+                        <td>{{ $formatNumber($report['marepRate'] ?? 0) }}</td>
+                        <td>{{ $formatNumber($report['marepRate3Month'] ?? 0) }}</td>
+                        <td>{{ $formatNumber($report['marepRate12Month'] ?? 0) }}</td>
+                        <td>{{ $formatNumber($report['marepAlertLevel'] ?? 0) }}</td>
+                        <td>{{ $report['marepAlertStatus'] ?? '' }}</td>
+                        <td>{{ $report['marepTrend'] ?? '' }}</td>
+                    </tr>  
+                    @endforeach
+                @else
+                    <tr>
+                        <td colspan="15" style="text-align: center; padding: 20px;">No data available</td>
+                    </tr>
+                @endif
             </tbody>
         </table>
         <div class="notes-section">
@@ -826,7 +826,7 @@
         <h6 class="issued">Issued by JKTMQGA and Compiled by GMF Reliability Engineering & Services</h6>
     </div>
 
-    {{-- TECHNICAL DELAY REPORT SECTION --}}
+    {{-- TECHNICAL DELAY REPORT SECTION - ✅ REFACTORED: Menggunakan data dari single query approach --}}
     <div style="page-break-before: always;">
         <table>
             <thead>
@@ -836,11 +836,11 @@
                 </tr>
                 <tr>
                     <th colspan="2">Total Flight Cycles</th>
-                    <th>{{ round($pilotData['flyingCycles2Before']) }}</th>
-                    <th>{{ round($pilotData['flyingCyclesBefore']) }}</th>
-                    <th>{{ round($pilotData['flyingCyclesTotal']) }}</th>
-                    <th>{{ round($pilotData['fc3Last']) }}</th>
-                    <th>{{ round($pilotData['fc12Last']) }}</th>
+                    <th>{{ round($pilotData['flyingCycles2Before'] ?? 0) }}</th>
+                    <th>{{ round($pilotData['flyingCyclesBefore'] ?? 0) }}</th>
+                    <th>{{ round($pilotData['flyingCyclesTotal'] ?? 0) }}</th>
+                    <th>{{ round($pilotData['fc3Last'] ?? 0) }}</th>
+                    <th>{{ round($pilotData['fc12Last'] ?? 0) }}</th>
                     <th colspan="8"></th>
                 </tr>
                 <tr>
@@ -872,25 +872,32 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($pilotData['reportPerAta'] as $row)
-                <tr>
-                    <th>{{ $row['ata'] }}</th>
-                    <th class="ata-name">{{ $row['ata_name'] ?? '' }}</th>
-                    <td>{{ $row['delayCountTwoMonthsAgo'] }}</td>
-                    <td>{{ $row['delayCountBefore'] }}</td>
-                    <td>{{ $row['delayCount'] }}</td>
-                    <td>{{ $row['delay3Month'] }}</td>
-                    <td>{{ $row['delay12Month'] }}</td>
-                    <td>{{ formatNumber($row['delay2Rate']) }}</td>
-                    <td>{{ formatNumber($row['delay1Rate']) }}</td>
-                    <td>{{ formatNumber($row['delayRate']) }}</td>
-                    <td>{{ formatNumber($row['delayRate3Month']) }}</td>
-                    <td>{{ formatNumber($row['delayRate12Month']) }}</td>
-                    <td>{{ formatNumber($row['delayAlertLevel']) }}</td>
-                    <td>{{ $row['delayAlertStatus'] }}</td>
-                    <td>{{ $row['delayTrend'] }}</td>
-                </tr>
-                @endforeach
+                {{-- ✅ Using refactored reportPerAta data structure for DELAY --}}
+                @if(isset($pilotData['reportPerAta']) && is_array($pilotData['reportPerAta']))
+                    @foreach ($pilotData['reportPerAta'] as $row)
+                    <tr>
+                        <th>{{ $row['ata'] ?? '' }}</th>
+                        <th class="ata-name">{{ $row['ata_name'] ?? '' }}</th>
+                        <td>{{ $row['delayCountTwoMonthsAgo'] ?? 0 }}</td>
+                        <td>{{ $row['delayCountBefore'] ?? 0 }}</td>
+                        <td>{{ $row['delayCount'] ?? 0 }}</td>
+                        <td>{{ $row['delay3Month'] ?? 0 }}</td>
+                        <td>{{ $row['delay12Month'] ?? 0 }}</td>
+                        <td>{{ $formatNumber($row['delay2Rate'] ?? 0) }}</td>
+                        <td>{{ $formatNumber($row['delay1Rate'] ?? 0) }}</td>
+                        <td>{{ $formatNumber($row['delayRate'] ?? 0) }}</td>
+                        <td>{{ $formatNumber($row['delayRate3Month'] ?? 0) }}</td>
+                        <td>{{ $formatNumber($row['delayRate12Month'] ?? 0) }}</td>
+                        <td>{{ $formatNumber($row['delayAlertLevel'] ?? 0) }}</td>
+                        <td>{{ $row['delayAlertStatus'] ?? '' }}</td>
+                        <td>{{ $row['delayTrend'] ?? '' }}</td>
+                    </tr>
+                    @endforeach
+                @else
+                    <tr>
+                        <td colspan="15" style="text-align: center; padding: 20px;">No data available</td>
+                    </tr>
+                @endif
             </tbody>
         </table>
         <div class="notes-section">
