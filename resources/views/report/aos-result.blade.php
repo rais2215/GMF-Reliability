@@ -370,7 +370,7 @@
                                 $technicalIncidentRate = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['technicalIncidentRate'] ?? 0;
                                 $totalTechnicalIncidentRate += is_numeric($technicalIncidentRate) ? $technicalIncidentRate : 0;
                             @endphp
-                            <x-table.td>{{ formatNumber($technicalIncidentRate) }}</x-table.td>
+                            <x-table.td>{{ formatNumber($technicalIncidentRate, 3) }}</x-table.td>
                         @endfor
                         <x-table.td>{{ formatNumber($totalTechnicalIncidentRate / 12) }}</x-table.td>
                     </tr>

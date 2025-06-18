@@ -255,13 +255,13 @@
                 <tr>
                     <td class="aos-label">- Rate / 100 Take Off</td>
                     @for ($i = 11; $i >= 0; $i--)
-                            @php
-                                $ratePer100TakeOff = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['ratePer100TakeOff'];
-                                $totalRatePer100TakeOff += is_numeric($ratePer100TakeOff) ? $ratePer100TakeOff:0;
-                            @endphp
-                            <td>{{ formatNumber($ratePer100TakeOff) }}</td>
-                        @endfor
-                        <td>{{ formatNumber($totalRatePer100TakeOff / 12) }}</td>
+                        @php
+                            $ratePer100TakeOff = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['ratePer100TakeOff'];
+                            $totalRatePer100TakeOff += is_numeric($ratePer100TakeOff) ? $ratePer100TakeOff:0;
+                        @endphp
+                        <td>{{ formatNumber($ratePer100TakeOff) }}</td>
+                    @endfor
+                    <td>{{ formatNumber($totalRatePer100TakeOff / 12) }}</td>
                 </tr>
                 <tr>
                     <td class="aos-label">Technical Incident - Total</td>
