@@ -61,14 +61,14 @@
                         Export to PDF
                     </button>
                 </form>
-                <form action="#" method="POST" class="inline" onsubmit="showExportLoading('Excel')">
+                <form action="{{ route('report.pilot.export.excel') }}" method="POST" class="inline" onsubmit="showExportLoading('Excel')">
                     @csrf
                     <input type="hidden" name="period" value="{{ $period }}">
                     <input type="hidden" name="aircraft_type" value="{{ $aircraftType }}">
                     <button type="submit" class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-green-500 border border-green-500 rounded-md shadow-sm hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200">
                         Export to Excel
                     </button>
-                </form> 
+                </form>
             </div>
         </div>
 

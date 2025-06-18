@@ -90,6 +90,7 @@ Route::middleware(['auth', 'verified'])->prefix('report')->name('report.')->grou
     Route::get('/pilot', [PilotController::class, 'pilotIndex'])->name('pilot.index');
     Route::post('/pilot', [PilotController::class, 'pilotStore'])->name('pilot.store');
     Route::post('/pilot/pdf', [PilotController::class, 'pilotPdf'])->name('pilot.export.pdf');
+    Route::post('/pilot/excel', [PilotController::class, 'pilotExcel'])->name('pilot.export.excel');
 
     // Combined Report Routes
     Route::get('/combined', [CombinedReportController::class, 'index'])->name('combined.index');
