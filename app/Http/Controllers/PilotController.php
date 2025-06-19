@@ -70,7 +70,6 @@ class PilotController extends Controller
                 ->first()->total ?? 0;
         };
 
-
         // Hitung flying hours untuk periode sekarang dan sebelumnya
         $flyingHoursTotal = $getFlyingHours($aircraftType, $period);
         $flyingHoursBefore = $getFlyingHours($aircraftType, \Carbon\Carbon::parse($period)->subMonth(1)->format('Y-m-01'));
@@ -463,12 +462,12 @@ class PilotController extends Controller
 
          // Hitung flying hours untuk periode sekarang dan sebelumnya
         $flyingHoursTotal = $getFlyingHours($aircraftType, $period);
-        $flyingHoursBefore = $getFlyingHours($aircraftType, \Carbon\Carbon::parse($period)->subMonth(1)->format('Y-m-d'));
-        $flyingHours2Before = $getFlyingHours($aircraftType, \Carbon\Carbon::parse($period)->subMonth(2)->format('Y-m-d'));
+        $flyingHoursBefore = $getFlyingHours($aircraftType, \Carbon\Carbon::parse($period)->subMonth(1)->format('Y-m-01'));
+        $flyingHours2Before = $getFlyingHours($aircraftType, \Carbon\Carbon::parse($period)->subMonth(2)->format('Y-m-01'));
 
         $flyingCyclesTotal = $getFlyingCycles($aircraftType, $period);
-        $flyingCyclesBefore = $getFlyingCycles($aircraftType, \Carbon\Carbon::parse($period)->subMonth(1)->format('Y-m-d'));
-        $flyingCycles2Before = $getFlyingCycles($aircraftType, \Carbon\Carbon::parse($period)->subMonth(2)->format('Y-m-d'));
+        $flyingCyclesBefore = $getFlyingCycles($aircraftType, \Carbon\Carbon::parse($period)->subMonth(1)->format('Y-m-01'));
+        $flyingCycles2Before = $getFlyingCycles($aircraftType, \Carbon\Carbon::parse($period)->subMonth(2)->format('Y-m-01'));
         
         //Hitung Totals
         $fh3Last = $flyingHoursTotal + $flyingHoursBefore + $flyingHours2Before;
@@ -477,7 +476,7 @@ class PilotController extends Controller
         $fh12Last = 0;
         $fc12Last = 0;
         for ($i = 0; $i <= 11; $i++) {
-            $periodBefore = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m-d');
+            $periodBefore = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m-01');
             $fh12Last += $getFlyingHours($aircraftType, $periodBefore);
             $fc12Last += $getFlyingCycles($aircraftType, $periodBefore);
         }
