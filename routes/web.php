@@ -9,6 +9,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\PilotController;
 use App\Http\Controllers\CombinedReportController;
+use App\Http\Controllers\CumulativeController;
+use App\Http\Controllers\Report\EtopsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -80,13 +82,16 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'verified'])->prefix('report')->name('report.')->group(function () {
+    // Main report dashboard
     Route::get('/', fn() => view('report'))->name('index');
 
+    // AOS (Aircraft on Station) Report Routes
     Route::get('/aos', [ReportController::class, 'aosIndex'])->name('aos.index');
     Route::post('/aos', [ReportController::class, 'aosStore'])->name('aos.store');
     Route::post('/aos/pdf', [ReportController::class, 'aosPdf'])->name('aos.export.pdf');
     Route::post('/aos/export-excel', [ReportController::class, 'exportExcel'])->name('aos.export.excel');
 
+    // Pilot Report Routes
     Route::get('/pilot', [PilotController::class, 'pilotIndex'])->name('pilot.index');
     Route::post('/pilot', [PilotController::class, 'pilotStore'])->name('pilot.store');
     Route::post('/pilot/pdf', [PilotController::class, 'pilotPdf'])->name('pilot.export.pdf');
@@ -97,9 +102,16 @@ Route::middleware(['auth', 'verified'])->prefix('report')->name('report.')->grou
     Route::post('/combined', [CombinedReportController::class, 'store'])->name('combined.store');
     Route::post('/combined/pdf', [CombinedReportController::class, 'exportPdf'])->name('combined.export.pdf');
 
-    Route::get('/cumulative', [ReportController::class, 'cumulativeContent'])->name('cumulative');
-    Route::get('/aos-pilot', [ReportController::class, 'aosPilot'])->name('aos_pilot.index');
+    // Cumulative Report Routes
+    Route::get('/cumulative', [CumulativeController::class, 'index'])->name('cumulative.index');
+    Route::post('/cumulative', [CumulativeController::class, 'store'])->name('cumulative.store');
+    Route::post('/cumulative/pdf', [CumulativeController::class, 'exportPdf'])->name('cumulative.export.pdf');
+    Route::post('/cumulative/excel', [CumulativeController::class, 'exportExcel'])->name('cumulative.export.excel');
 
+    // Etops Report Routes
+    Route::get('/etops', [EtopsController::class, 'index'])->name('etops.index');
+
+    // Legacy Combined Report Export (consider removing if duplicate)
     Route::post('/combined-report/export-pdf', [CombinedReportController::class, 'exportPdf'])->name('combined-report.export-pdf');
 });
 
