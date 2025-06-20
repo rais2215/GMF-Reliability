@@ -103,10 +103,10 @@ Route::middleware(['auth', 'verified'])->prefix('report')->name('report.')->grou
     Route::post('/combined/pdf', [CombinedReportController::class, 'exportPdf'])->name('combined.export.pdf');
 
     // Cumulative Report Routes
-    Route::get('/cumulative', [CumulativeController::class, 'index'])->name('cumulative.index');
-    Route::post('/cumulative', [CumulativeController::class, 'store'])->name('cumulative.store');
-    Route::post('/cumulative/pdf', [CumulativeController::class, 'exportPdf'])->name('cumulative.export.pdf');
-    Route::post('/cumulative/excel', [CumulativeController::class, 'exportExcel'])->name('cumulative.export.excel');
+    Route::get('/cumulative', [CumulativeController::class, 'cumulativeIndex'])->name('cumulative.index');
+    Route::post('/cumulative', [CumulativeController::class, 'cumulativeStore'])->name('cumulative.store');
+    Route::post('/cumulative/pdf', [CumulativeController::class, 'cumulativeExportPdf'])->name('cumulative.export.pdf');
+    Route::post('/cumulative/excel', [CumulativeController::class, 'cumulativeExportExcel'])->name('cumulative.export.excel');
 
     // Etops Report Routes
     Route::get('/etops', [EtopsController::class, 'index'])->name('etops.index');
