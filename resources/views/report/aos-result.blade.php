@@ -140,6 +140,12 @@
                 <x-table.thead>
                     <tr>
                         <x-table.th>Metrics</x-table.th>
+                        @php
+                            $startYear = \Carbon\Carbon::parse($period)->subMonth(11)->format('Y');
+                        @endphp
+                        
+                        <x-table.th>{{ $startYear }}</x-table.th>
+                        
                         @for ($i = 11; $i >= 0; $i--)
                             <x-table.th>{{ substr(\Carbon\Carbon::parse($period)->subMonth($i)->format('F'), 0, 3) }}</x-table.th>
                         @endfor
@@ -173,6 +179,10 @@
                     @endphp
                     <tr>
                         <x-table.th class="text-left">A/C In Fleet</x-table.th>
+                        @php
+                            $startYearData = $reportData[\Carbon\Carbon::parse($period)->subMonth(11)->format('Y-m')]['acInFleet'];
+                        @endphp
+                        <x-table.td>{{ round($startYearData) }}</x-table.td>
                         @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $acInFleet = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['acInFleet'];
@@ -184,6 +194,10 @@
                     </tr>
                     <tr>
                         <x-table.th class="text-left">A/C In Service (Revenue)</x-table.th>
+                        @php
+                            $startYearData = $reportData[\Carbon\Carbon::parse($period)->subMonth(11)->format('Y-m')]['acInService'];
+                        @endphp
+                        <x-table.td>{{ formatNumber($startYearData) }}</x-table.td>
                         @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $acInService = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['acInService'];
@@ -195,6 +209,10 @@
                     </tr>
                     <tr>
                         <x-table.th class="text-left">A/C Days In Service (Revenue)</x-table.th>
+                        @php
+                            $startYearData = $reportData[\Carbon\Carbon::parse($period)->subMonth(11)->format('Y-m')]['daysInService'];
+                        @endphp
+                        <x-table.td>{{ $startYearData }}</x-table.td>
                         @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $daysInService = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['daysInService'];
@@ -206,6 +224,10 @@
                     </tr>
                     <tr>
                         <x-table.th class="text-left">Flying Hours - Total</x-table.th>
+                        @php
+                            $startYearData = $reportData[\Carbon\Carbon::parse($period)->subMonth(11)->format('Y-m')]['flyingHoursTotal'];
+                        @endphp
+                        <x-table.td>{{ round($startYearData) }}</x-table.td>
                         @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $flyingHoursTotal = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['flyingHoursTotal'];
@@ -217,6 +239,10 @@
                     </tr>
                     <tr>
                         <x-table.th class="text-left">- Revenue</x-table.th>
+                        @php
+                            $startYearData = $reportData[\Carbon\Carbon::parse($period)->subMonth(11)->format('Y-m')]['revenueFlyingHours'];
+                        @endphp
+                        <x-table.td>{{ round($startYearData) }}</x-table.td>
                         @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $revenueFlyingHours = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['revenueFlyingHours'];
@@ -228,6 +254,10 @@
                     </tr>
                     <tr>
                         <x-table.th class="text-left">Take Off - Total</x-table.th>
+                        @php
+                            $startYearData = $reportData[\Carbon\Carbon::parse($period)->subMonth(11)->format('Y-m')]['takeOffTotal'];
+                        @endphp
+                        <x-table.td>{{ $startYearData ?? 0 }}</x-table.td>
                         @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $takeOffTotal = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['takeOffTotal'];
@@ -239,6 +269,10 @@
                     </tr>
                     <tr>
                         <x-table.th class="text-left">- Revenue</x-table.th>
+                        @php
+                            $startYearData = $reportData[\Carbon\Carbon::parse($period)->subMonth(11)->format('Y-m')]['revenueTakeOff'];
+                        @endphp
+                        <x-table.td>{{ $startYearData }}</x-table.td>
                         @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $revenueTakeOff = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['revenueTakeOff'];
@@ -250,6 +284,10 @@
                     </tr>
                     <tr>
                         <x-table.th class="text-left">Flight Hours per Take Off - Total</x-table.th>
+                        @php
+                            $startYearData = $reportData[\Carbon\Carbon::parse($period)->subMonth(11)->format('Y-m')]['flightHoursPerTakeOffTotal'];
+                        @endphp
+                        <x-table.td>{{ $startYearData }}</x-table.td>
                         @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $flightHoursPerTakeOffTotal = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['flightHoursPerTakeOffTotal'];
@@ -260,6 +298,10 @@
                     </tr>
                     <tr>
                         <x-table.th class="text-left">- Revenue</x-table.th>
+                        @php
+                            $startYearData = $reportData[\Carbon\Carbon::parse($period)->subMonth(11)->format('Y-m')]['revenueFlightHoursPerTakeOff'];
+                        @endphp
+                        <x-table.td>{{ $startYearData }}</x-table.td>
                         @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $revenueFlightHoursPerTakeOff = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['revenueFlightHoursPerTakeOff'];
@@ -270,6 +312,10 @@
                     </tr>
                     <tr>
                         <x-table.th class="text-left">Daily Utiliz - Total FH</x-table.th>
+                        @php
+                            $startYearData = $reportData[\Carbon\Carbon::parse($period)->subMonth(11)->format('Y-m')]['dailyUtilizationFlyingHoursTotal'];
+                        @endphp
+                        <x-table.td>{{ $startYearData }}</x-table.td>
                         @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $dailyUtilizationFlyingHoursTotal = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['dailyUtilizationFlyingHoursTotal'];
@@ -280,6 +326,10 @@
                     </tr>
                     <tr>
                         <x-table.th class="text-left">- Revenue FH</x-table.th>
+                        @php
+                            $startYearData = $reportData[\Carbon\Carbon::parse($period)->subMonth(11)->format('Y-m')]['revenueDailyUtilizationFlyingHoursTotal'];
+                        @endphp
+                        <x-table.td>{{ $startYearData }}</x-table.td>
                         @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $revenueDailyUtilizationFlyingHoursTotal = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['revenueDailyUtilizationFlyingHoursTotal'];
@@ -290,6 +340,10 @@
                     </tr>
                     <tr>
                         <x-table.th class="text-left">- Total FC</x-table.th>
+                        @php
+                            $startYearData = $reportData[\Carbon\Carbon::parse($period)->subMonth(11)->format('Y-m')]['dailyUtilizationTakeOffTotal'];
+                        @endphp
+                        <x-table.td>{{ formatNumber($startYearData) }}</x-table.td>
                         @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $dailyUtilizationTakeOffTotal = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['dailyUtilizationTakeOffTotal'];
@@ -301,6 +355,10 @@
                     </tr>
                     <tr>
                         <x-table.th class="text-left">- Revenue FC</x-table.th>
+                        @php
+                            $startYearData = $reportData[\Carbon\Carbon::parse($period)->subMonth(11)->format('Y-m')]['revenueDailyUtilizationTakeOffTotal'];
+                        @endphp
+                        <x-table.td>{{ formatNumber($startYearData) }}</x-table.td>
                         @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $revenueDailyUtilizationTakeOffTotal = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['revenueDailyUtilizationTakeOffTotal'];
@@ -312,6 +370,10 @@
                     </tr>
                     <tr>
                         <x-table.th class="text-left">Technical Delay - Total</x-table.th>
+                        @php
+                            $startYearData = $reportData[\Carbon\Carbon::parse($period)->subMonth(11)->format('Y-m')]['technicalDelayTotal'];
+                        @endphp
+                        <x-table.td>{{ round($startYearData) }}</x-table.td>
                         @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $technicalDelayTotal = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['technicalDelayTotal'];
@@ -323,6 +385,10 @@
                     </tr>
                     <tr>
                         <x-table.th class="text-left">- Tot Duration</x-table.th>
+                        @php
+                            $startYearData = $reportData[\Carbon\Carbon::parse($period)->subMonth(11)->format('Y-m')]['totalDuration'];
+                        @endphp
+                        <x-table.td>{{ $startYearData }}</x-table.td>
                         @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $totalDuration = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['totalDuration'];
@@ -333,6 +399,10 @@
                     </tr>
                     <tr>
                         <x-table.th class="text-left">- Avg Duration</x-table.th>
+                        @php
+                            $startYearData = $reportData[\Carbon\Carbon::parse($period)->subMonth(11)->format('Y-m')]['averageDuration'];
+                        @endphp
+                        <x-table.td>{{ $startYearData }}</x-table.td>
                         @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $averageDuration = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['averageDuration']
@@ -343,6 +413,10 @@
                     </tr>
                     <tr>
                         <x-table.th class="text-left">- Rate/100 Take-Off</x-table.th>
+                        @php
+                            $startYearData = $reportData[\Carbon\Carbon::parse($period)->subMonth(11)->format('Y-m')]['ratePer100TakeOff'];
+                        @endphp
+                        <x-table.td>{{ formatNumber($startYearData) }}</x-table.td>
                         @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $ratePer100TakeOff = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['ratePer100TakeOff'];
@@ -354,6 +428,10 @@
                     </tr>
                     <tr>
                         <x-table.th class="text-left">Technical Incident - Total</x-table.th>
+                        @php
+                            $startYearData = $reportData[\Carbon\Carbon::parse($period)->subMonth(11)->format('Y-m')]['technicalIncidentTotal'];
+                        @endphp
+                        <x-table.td>{{ round($startYearData) }}</x-table.td>
                         @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $technicalIncidentTotal = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['technicalIncidentTotal'];
@@ -365,6 +443,10 @@
                     </tr>
                     <tr>
                         <x-table.th class="text-left">- Rate / 100 FC</x-table.th>
+                        @php
+                            $startYearData = $reportData[\Carbon\Carbon::parse($period)->subMonth(11)->format('Y-m')]['technicalIncidentRate'] ?? 0;
+                        @endphp
+                        <x-table.td>{{ formatNumber($startYearData, 3) }}</x-table.td>
                         @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $technicalIncidentRate = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['technicalIncidentRate'] ?? 0;
@@ -376,6 +458,10 @@
                     </tr>
                     <tr>
                         <x-table.th class="text-left">Technical Cancellation - Total</x-table.th>
+                        @php
+                            $startYearData = $reportData[\Carbon\Carbon::parse($period)->subMonth(11)->format('Y-m')]['technicalCancellationTotal'] ?? 0;
+                        @endphp
+                        <x-table.td>{{ round($startYearData) }}</x-table.td>
                         @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $technicalCancellationTotal = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['technicalCancellationTotal'] ?? 0;
@@ -387,6 +473,10 @@
                     </tr>
                     <tr>
                         <x-table.th class="text-left">Dispatch Reliability (%)</x-table.th>
+                        @php
+                            $startYearData = $reportData[\Carbon\Carbon::parse($period)->subMonth(11)->format('Y-m')]['dispatchReliability'] ?? 0;
+                        @endphp
+                        <x-table.td>{{ formatNumber($startYearData) }}%</x-table.td>
                         @for ($i = 11; $i >= 0; $i--)
                             @php
                                 $dispatchReliability = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['dispatchReliability'] ?? 0;
