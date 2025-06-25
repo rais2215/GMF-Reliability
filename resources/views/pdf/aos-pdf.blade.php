@@ -184,7 +184,7 @@
                         @php
                             $acInFleet = $safeNumber($reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['acInFleet'] ?? 0);
                         @endphp
-                        <td>{{ $formatNumber($acInFleet) }}</td>
+                        <td>{{ round($acInFleet) }}</td>
                     @endfor
                     <td>{{ $formatNumber($totalAcInFleet / 12) }}</td>
                 </tr>
@@ -202,69 +202,69 @@
                     <td>{{ $formatNumber($totalAcInService / 12) }}</td>
                 </tr>
 
-                <!-- A/C Days In Service Row - DIPERBAIKI -->
+                <!-- A/C Days In Service Row - SAMA seperti aos-result -->
                 <tr>
                     <td class="aos-label">A/C Days in Service (Revenue)</td>
-                    <td>{{ $formatNumber($totalDaysInService / 12) }}</td>
+                    <td>{{ round($safeNumber($totalDaysInService)) }}</td>
                     @for ($i = 11; $i >= 0; $i--)
                         @php
                             $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['daysInService'] ?? 0;
                         @endphp
-                        <td>{{ $formatNumber($safeNumber($value)) }}</td>
+                        <td>{{ round($safeNumber($value)) }}</td>
                     @endfor
-                    <td>{{ $formatNumber($totalDaysInService) }}</td>
+                    <td>{{ round($safeNumber($totalDaysInService)) }}</td>
                 </tr>
 
                 <!-- Flying Hours - Total Row - SAMA seperti aos-result -->
                 <tr>
                     <td class="aos-label">Flying Hours - Total</td>
-                    <td>{{ $formatNumber($totalFlyingHoursTotal / 12) }}</td>
+                    <td>{{ round($safeNumber($totalFlyingHoursTotal)) }}</td>
                     @for ($i = 11; $i >= 0; $i--)
                         @php
                             $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['flyingHoursTotal'] ?? 0;
                         @endphp
-                        <td>{{ $formatNumber($safeNumber($value)) }}</td>
+                        <td>{{ round($safeNumber($value)) }}</td>
                     @endfor
-                    <td>{{ $formatNumber($totalFlyingHoursTotal) }}</td>
+                    <td>{{ round($safeNumber($totalFlyingHoursTotal)) }}</td>
                 </tr>
 
                 <!-- Flying Hours - Revenue Row - SAMA seperti aos-result -->
                 <tr>
                     <td class="aos-label">- Revenue</td>
-                    <td>{{ $formatNumber($totalRevenueFlyingHours / 12) }}</td>
+                    <td>{{ round($safeNumber($totalRevenueFlyingHours)) }}</td>
                     @for ($i = 11; $i >= 0; $i--)
                         @php
                             $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['revenueFlyingHours'] ?? 0;
                         @endphp
-                        <td>{{ $formatNumber($safeNumber($value)) }}</td>
+                        <td>{{ round($safeNumber($value)) }}</td>
                     @endfor
-                    <td>{{ $formatNumber($totalRevenueFlyingHours) }}</td>
+                    <td>{{ round($safeNumber($totalRevenueFlyingHours)) }}</td>
                 </tr>
 
                 <!-- Take Off - Total Row - SAMA seperti aos-result -->
                 <tr>
                     <td class="aos-label">Take Off - Total</td>
-                    <td>{{ $formatNumber($totalTakeOffTotal / 12) }}</td>
+                    <td>{{ round($safeNumber($totalTakeOffTotal)) }}</td>
                     @for ($i = 11; $i >= 0; $i--)
                         @php
                             $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['takeOffTotal'] ?? 0;
                         @endphp
-                        <td>{{ $formatNumber($safeNumber($value)) }}</td>
+                        <td>{{ round($safeNumber($value)) }}</td>
                     @endfor
-                    <td>{{ $formatNumber($totalTakeOffTotal) }}</td>
+                    <td>{{ round($safeNumber($totalTakeOffTotal)) }}</td>
                 </tr>
 
                 <!-- Take Off - Revenue Row - SAMA seperti aos-result -->
                 <tr>
                     <td class="aos-label">- Revenue</td>
-                    <td>{{ $formatNumber($totalRevenueTakeOff / 12) }}</td>
+                    <td>{{ round($safeNumber($totalRevenueTakeOff)) }}</td>
                     @for ($i = 11; $i >= 0; $i--)
                         @php
                             $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['revenueTakeOff'] ?? 0;
                         @endphp
-                        <td>{{ $formatNumber($safeNumber($value)) }}</td>
+                        <td>{{ round($safeNumber($value)) }}</td>
                     @endfor
-                    <td>{{ $formatNumber($totalRevenueTakeOff) }}</td>
+                    <td>{{ round($safeNumber($totalRevenueTakeOff)) }}</td>
                 </tr>
 
                 <!-- Flight Hours per Take Off - Total Row - SAMA seperti aos-result -->
@@ -348,7 +348,7 @@
                 <!-- Technical Delay - Total Row - SAMA seperti aos-result -->
                 <tr>
                     <td class="aos-label">Technical Delay - Total</td>
-                    <td>{{ $formatNumber($totalTechnicalDelayTotal / 12) }}</td>
+                    <td>{{ round($safeNumber($totalTechnicalDelayTotal)) }}</td>
                     @for ($i = 11; $i >= 0; $i--)
                         @php
                             $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['technicalDelayTotal'] ?? 0;
@@ -400,7 +400,7 @@
                 <!-- Technical Incident - Total Row - SAMA seperti aos-result -->
                 <tr>
                     <td class="aos-label">Technical Incident - Total</td>
-                    <td>{{ $formatNumber($totalTechnicalIncidentTotal / 12) }}</td>
+                    <td>{{ round($safeNumber($totalTechnicalIncidentTotal)) }}</td>
                     @for ($i = 11; $i >= 0; $i--)
                         @php
                             $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['technicalIncidentTotal'] ?? 0;
@@ -426,7 +426,7 @@
                 <!-- Technical Cancellation - Total Row - SAMA seperti aos-result -->
                 <tr>
                     <td class="aos-label">Technical Cancellation - Total</td>
-                    <td>{{ $formatNumber($totalTechnicalCancellationTotal / 12) }}</td>
+                    <td>{{ round($safeNumber($totalTechnicalCancellationTotal)) }}</td>
                     @for ($i = 11; $i >= 0; $i--)
                         @php
                             $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['technicalCancellationTotal'] ?? 0;
@@ -448,6 +448,7 @@
                     @endfor
                     <td>{{ $formatNumber($totalDispatchReliability / 12) }}%</td>
                 </tr>
+
             </tbody>
         </table>
     </div>
