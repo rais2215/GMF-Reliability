@@ -3,12 +3,55 @@
         <div class="max-w-full mx-auto px-2 sm:px-4 lg:px-6">
             
             <!-- Header Section -->
-            <div class="mb-4 sm:mb-8 text-center">
-                <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-green-500 bg-clip-text text-transparent mb-2 sm:mb-4">
-                    Aircraft Operations Summary
-                </h1>
-                <p class="text-base sm:text-lg md:text-xl text-gray-600 mb-3 sm:mb-6">{{ $aircraftType }} - {{ \Carbon\Carbon::parse($period)->subMonth(11)->format('Y') }} - {{ \Carbon\Carbon::parse($period)->format('Y') }}</p>
-                <div class="w-24 sm:w-32 h-1 bg-gradient-to-r from-blue-500 via-green-500 to-green-500 mx-auto rounded-full animate-pulse"></div>
+            <div class="mb-4 sm:mb-8">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+                    <button onclick="showLoadingAndGoBack()" 
+                            class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        Back to Report
+                    </button>
+                </div>
+
+                <div class="text-center">
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-green-500 bg-clip-text text-transparent mb-2 sm:mb-4">
+                        Aircraft Operations Summary
+                    </h1>
+                    <p class="text-base sm:text-lg md:text-xl text-gray-600 mb-3 sm:mb-6">{{ $aircraftType }} | {{ \Carbon\Carbon::parse($period)->subMonth(11)->format('Y') }} - {{ \Carbon\Carbon::parse($period)->format('Y') }}</p>
+                    <div class="w-24 sm:w-32 h-1 bg-gradient-to-r from-blue-500 via-green-500 to-green-500 mx-auto rounded-full animate-pulse"></div>
+                </div>
+            </div>
+
+            <!-- Export Buttons -->
+            <div class="flex justify-end mb-6">
+                <div class="flex space-x-3">
+                    <form action="{{ route('report.aos.export.pdf') }}" method="POST" class="inline" onsubmit="showExportLoading('PDF')">
+                        @csrf
+                        <input type="hidden" name="period" value="{{ $period }}">
+                        <input type="hidden" name="aircraft_type" value="{{ $aircraftType }}">
+                        <button type="submit" 
+                                class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            Export PDF
+                        </button>
+                    </form>
+
+                    <form action="{{ route('report.aos.export.excel') }}" method="POST" class="inline" onsubmit="showExportLoading('Excel')">
+                        @csrf
+                        <input type="hidden" name="period" value="{{ $period }}">
+                        <input type="hidden" name="aircraft_type" value="{{ $aircraftType }}">
+                        <button type="submit" 
+                                class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-green-600 rounded-lg shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            Export Excel
+                        </button>
+                    </form>
+                </div>
             </div>
 
             <!-- Main Data Table -->
@@ -317,3 +360,45 @@
         </div>
     </div>
 </x-app-layout>
+
+<script>
+function showLoadingAndGoBack() {
+    // Show loading state
+    const button = event.target;
+    const originalText = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = `
+        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Loading...
+    `;
+    
+    // Navigate back to the previous page
+    setTimeout(() => {
+        window.history.back();
+    }, 500);
+}
+
+function showExportLoading(type) {
+    const form = event.target.closest('form');
+    const button = form.querySelector('button[type="submit"]');
+    const originalText = button.innerHTML;
+    
+    button.disabled = true;
+    button.innerHTML = `
+        <svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Exporting ${type}...
+    `;
+    
+    // Reset button after a delay (in case of errors)
+    setTimeout(() => {
+        button.disabled = false;
+        button.innerHTML = originalText;
+    }, 10000);
+}
+</script>
