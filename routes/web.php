@@ -89,7 +89,7 @@ Route::middleware(['auth', 'verified'])->prefix('report')->name('report.')->grou
     Route::get('/aos', [ReportController::class, 'aosIndex'])->name('aos.index');
     Route::post('/aos', [ReportController::class, 'aosStore'])->name('aos.store');
     Route::post('/aos/pdf', [ReportController::class, 'aosPdf'])->name('aos.export.pdf');
-    Route::post('/aos/export-excel', [ReportController::class, 'exportExcel'])->name('aos.export.excel');
+    Route::post('/aos/excel', [ReportController::class, 'aosExcel'])->name('aos.export.excel');
 
     // Pilot Report Routes
     Route::get('/pilot', [PilotController::class, 'pilotIndex'])->name('pilot.index');

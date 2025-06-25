@@ -672,7 +672,7 @@ class ReportController extends Controller
         return $pdf->download('AOS-Report-' . $year . '-' . $month . '.pdf');
     }
 
-    public function exportExcel(Request $request)
+    public function aosExcel(Request $request)
     {
         $request->validate([
             'period' => 'required',
@@ -687,10 +687,5 @@ class ReportController extends Controller
         $reportData = $processedData['reportData'];
 
         return Excel::download(new AosExport($reportData, $period, $aircraftType), 'AOS-Report-' . substr($period, 0, 7) . '.xlsx');
-    }
-    
-    public function cumulativeContent()
-    {
-        return view('report.cumulative-content');
     }
 }
