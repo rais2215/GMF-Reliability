@@ -65,233 +65,245 @@
         }
     @endphp
 
-    <div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-        <!-- Loading Skeleton -->
-        <div id="loadingSkeleton" class="fixed inset-0 z-50 flex-col items-center justify-center bg-white bg-opacity-95 backdrop-blur-sm hidden transition-all duration-300">
-            <div class="flex space-x-3 mb-6">
-                <div class="w-4 h-16 bg-gradient-to-t from-blue-600 to-blue-400 rounded-lg animate-loader-bar shadow-lg"></div>
-                <div class="w-4 h-16 bg-gradient-to-t from-blue-600 to-blue-400 rounded-lg animate-loader-bar delay-150 shadow-lg"></div>
-                <div class="w-4 h-16 bg-gradient-to-t from-blue-600 to-blue-400 rounded-lg animate-loader-bar delay-300 shadow-lg"></div>
-            </div>
-            <span id="loader-text" class="text-lg font-semibold text-gray-800 animate-pulse">Loading data...</span>
-        </div>
+    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 py-4 sm:py-8">
+        <div class="max-w-full mx-auto px-2 sm:px-4 lg:px-6">
 
-        <style>
-            @keyframes bar-bounce {
-                0%, 100% { transform: scaleY(0.4); opacity: 0.5; }
-                50% { transform: scaleY(1.2); opacity: 1; }
-            }
-            .animate-loader-bar { animation: bar-bounce 1.2s infinite ease-in-out; }
-            .delay-150 { animation-delay: 0.15s; }
-            .delay-300 { animation-delay: 0.3s; }
-        </style>
-
-        <script>
-            function showLoadingAndGoBack() {
-                const loader = document.getElementById("loadingSkeleton");
-                const text = document.getElementById("loader-text");
-                loader.classList.remove("hidden");
-                loader.classList.add("flex");
-                text.textContent = "Navigating back...";
-                setTimeout(() => { history.back(); }, 800);
-            }
-
-            function showExportLoading(type) {
-                const loader = document.getElementById("loadingSkeleton");
-                const text = document.getElementById("loader-text");
-                loader.classList.remove("hidden");
-                loader.classList.add("flex");
-                text.textContent = `Exporting to ${type}...`;
-                setTimeout(() => {
-                    loader.classList.add("hidden");
-                    loader.classList.remove("flex");
-                    text.textContent = "Loading data...";
-                }, 4000);
-            }
-        </script>
-
-        <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
-            <!-- Header Section -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-                <button onclick="showLoadingAndGoBack()" 
-                        class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                    </svg>
-                    Back to Report
-                </button>
-
-                <div class="flex space-x-3">
-                    <form action="{{ route('report.cumulative.export.pdf') }}" method="POST" class="inline" onsubmit="showExportLoading('PDF')">
-                        @csrf
-                        @if(isset($period))<input type="hidden" name="period" value="{{ $period }}">@endif
-                        @if(isset($operator))<input type="hidden" name="operator" value="{{ $operator }}">@endif
-                        @if(isset($aircraft_type))<input type="hidden" name="aircraft_type" value="{{ $aircraft_type }}">@endif
-                        @if(isset($reg))<input type="hidden" name="reg" value="{{ $reg }}">@endif
-                        <button type="submit" 
-                                class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
-                            Export PDF
-                        </button>
-                    </form>
-
-                    <form action="{{ route('report.cumulative.export.excel') }}" method="POST" class="inline" onsubmit="showExportLoading('Excel')">
-                        @csrf
-                        @if(isset($period))<input type="hidden" name="period" value="{{ $period }}">@endif
-                        @if(isset($operator))<input type="hidden" name="operator" value="{{ $operator }}">@endif
-                        @if(isset($aircraft_type))<input type="hidden" name="aircraft_type" value="{{ $aircraft_type }}">@endif
-                        @if(isset($reg))<input type="hidden" name="reg" value="{{ $reg }}">@endif
-                        <button type="submit" 
-                                class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-green-600 rounded-lg shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
-                            Export Excel
-                        </button>
-                    </form>
+            {{-- Loading 3 Bar Loader Overlay (hidden by default) --}}
+            <div id="loadingSkeleton" class="fixed inset-0 z-50 flex-col items-center justify-center bg-white bg-opacity-90 hidden transition-opacity duration-300">
+                <div class="flex space-x-2 mb-4">
+                    <div class="w-3 h-12 bg-sky-800 rounded animate-loader-bar"></div>
+                    <div class="w-3 h-12 bg-sky-800 rounded animate-loader-bar delay-150"></div>
+                    <div class="w-3 h-12 bg-sky-800 rounded animate-loader-bar delay-300"></div>
                 </div>
+                <span id="loader-text" class="text-sm font-medium text-gray-800">Loading data...</span>
             </div>
 
-            <!-- Title Section -->
-            <div class="text-center mb-10">
-                <div class="bg-white rounded-xl shadow-lg p-8 border border-gray-200">
-                    <h1 class="text-3xl font-bold text-gray-900 mb-2 tracking-wide">
+            {{-- Loading Animation Style --}}
+            <style>
+                @keyframes bar-bounce {
+                    0%, 100% { transform: scaleY(0.5); opacity: 0.5; }
+                    50% { transform: scaleY(1.2); opacity: 1; }
+                }
+
+                .animate-loader-bar {
+                    animation: bar-bounce 1s infinite ease-in-out;
+                }
+
+                .delay-150 {
+                    animation-delay: 0.15s;
+                }
+
+                .delay-300 {
+                    animation-delay: 0.3s;
+                }
+            </style>
+
+            <!-- Header Section -->
+            <div class="mb-4 sm:mb-8">
+                <div class="flex flex-col space-y-4 lg:flex-row lg:justify-between lg:items-start lg:space-y-0 mb-6 sm:mb-8 gap-2 sm:gap-4">
+                    <button onclick="showLoadingAndGoBack()" 
+                            class="w-full sm:w-auto inline-flex items-center justify-center px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-800 transition-all duration-200">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        <span class="truncate">Back to Report</span>
+                    </button>
+
+                    <!-- Export Buttons -->
+                    <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full lg:w-auto">
+                        <form action="{{ route('report.cumulative.export.pdf') }}" method="POST" class="inline w-full sm:w-auto" onsubmit="showExportLoading('PDF')">
+                            @csrf
+                            @if(isset($period))<input type="hidden" name="period" value="{{ $period }}">@endif
+                            @if(isset($operator))<input type="hidden" name="operator" value="{{ $operator }}">@endif
+                            @if(isset($aircraft_type))<input type="hidden" name="aircraft_type" value="{{ $aircraft_type }}">@endif
+                            @if(isset($reg))<input type="hidden" name="reg" value="{{ $reg }}">@endif
+                            <button type="submit" 
+                                    class="w-full sm:w-auto inline-flex items-center justify-center px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-medium text-white bg-red-600 rounded-lg shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200">
+                                <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                <span class="truncate">Export PDF</span>
+                            </button>
+                        </form>
+                        <form action="{{ route('report.cumulative.export.excel') }}" method="POST" class="inline w-full sm:w-auto" onsubmit="showExportLoading('Excel')">
+                            @csrf
+                            @if(isset($period))<input type="hidden" name="period" value="{{ $period }}">@endif
+                            @if(isset($operator))<input type="hidden" name="operator" value="{{ $operator }}">@endif
+                            @if(isset($aircraft_type))<input type="hidden" name="aircraft_type" value="{{ $aircraft_type }}">@endif
+                            @if(isset($reg))<input type="hidden" name="reg" value="{{ $reg }}">@endif
+                            <button type="submit" 
+                                    class="w-full sm:w-auto inline-flex items-center justify-center px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-medium text-white bg-lime-600 rounded-lg shadow-sm hover:bg-lime-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lime-500 transition-all duration-200">
+                                <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                <span class="truncate">Export Excel</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-sky-800 to-lime-600 bg-clip-text text-transparent mb-2 sm:mb-4">
                         CUMULATIVE FLIGHT HOURS AND TAKE OFF
                     </h1>
-                    <div class="text-xl font-semibold text-blue-600 mb-2">{{ $yearRange }}</div>
-                    <div class="text-lg font-medium text-gray-700 bg-gray-50 rounded-lg px-4 py-2 inline-block">
-                        {{ $aircraftType }}
-                    </div>
+                    <p class="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 mb-3 sm:mb-6">{{ $aircraftType }} | {{ $yearRange }}</p>
+                    <div class="w-24 sm:w-32 h-1 bg-gradient-to-r from-sky-800 via-lime-600 to-lime-600 mx-auto rounded-full animate-pulse"></div>
                 </div>
             </div>
 
             <!-- Tables Section -->
-            <div class="space-y-10">
+            <div class="space-y-8">
                 @if (!empty($pivotedData))
-                    <!-- Flight Hours Table -->
-                    <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
-                        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
-                            <h3 class="text-lg font-bold text-white flex items-center">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                FLIGHT HOURS
-                            </h3>
-                        </div>
-                        
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-200">
-                                    <!-- Baris pertama: Header utama dengan periode -->
-                                    <tr>
-                                        <th rowspan="2" class="px-6 py-6 text-left text-sm font-black text-gray-900 uppercase tracking-wider border-r border-b border-gray-300">
-                                            A/C REG
-                                        </th>
-                                        <th rowspan="2" class="px-6 py-6 text-center text-sm font-black text-gray-900 uppercase tracking-wider border-r border-b border-gray-300">
-                                            YEAR
-                                        </th>
-                                        <th colspan="12" class="px-4 py-3 text-center text-sm font-black text-gray-900 uppercase tracking-wider border-b border-gray-300">
-                                            {{ $yearRange }}
-                                        </th>
-                                    </tr>
-                                    <!-- Baris kedua: Nama-nama bulan -->
-                                    <tr>
-                                        @foreach ($months as $month)
-                                            <th class="px-4 py-3 text-center text-sm font-black text-gray-900 uppercase tracking-wider {{ !$loop->last ? 'border-r border-gray-300' : '' }}">
-                                                {{ $month }}
+                    {{-- Flight Hours Section --}}
+                    <div class="mb-8">
+                        <div class="bg-white rounded-xl sm:rounded-2xl shadow-xl sm:shadow-2xl overflow-hidden border border-gray-200">
+                            <!-- Header -->
+                            <div class="bg-gradient-to-r from-sky-800 to-lime-600 px-6 py-4">
+                                <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center">
+                                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    FLIGHT HOURS
+                                </h2>
+                            </div>
+                            
+                            <!-- Responsive table wrapper -->
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
+                                        <!-- Baris pertama: Header utama dengan periode -->
+                                        <tr class="border-b-2 border-sky-200">
+                                            <th rowspan="2" class="px-4 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider bg-gradient-to-r from-gray-50 to-gray-100 border-r-2 border-gray-300">
+                                                <span class="flex items-center">
+                                                    <svg class="w-4 h-4 mr-2 text-sky-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H5m0 0h4M9 7h6m-6 4h6m-6 4h6"></path>
+                                                    </svg>
+                                                    A/C REG
+                                                </span>
                                             </th>
-                                        @endforeach
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    @foreach ($pivotedData as $registration => $monthlyData)
-                                        <tr class="hover:bg-gray-50 transition-colors duration-200">
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 border-r border-gray-200 bg-gray-50">
-                                                {{ $registration }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700 border-r border-gray-200 bg-gray-50">
-                                                {{ $startYearForDisplay }}
-                                            </td>
+                                            <th rowspan="2" class="px-4 py-4 text-center text-sm font-bold text-gray-700 uppercase tracking-wider bg-gradient-to-r from-gray-50 to-gray-100 border-r-2 border-gray-300">
+                                                <span class="flex items-center justify-center">
+                                                    <svg class="w-4 h-4 mr-2 text-sky-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3"></path>
+                                                    </svg>
+                                                    YEAR
+                                                </span>
+                                            </th>
+                                            <th colspan="12" class="px-4 py-3 text-center text-sm font-bold text-white bg-sky-700 uppercase tracking-wider">
+                                                {{ $yearRange }}
+                                            </th>
+                                        </tr>
+                                        <!-- Baris kedua: Nama-nama bulan -->
+                                        <tr>
                                             @foreach ($months as $month)
-                                                <td class="px-4 py-4 whitespace-nowrap text-sm text-right text-gray-900 {{ !$loop->last ? 'border-r border-gray-200' : '' }}">
-                                                    @if(isset($monthlyData['fh'][$month]) && $monthlyData['fh'][$month] !== null)
-                                                        <span class="font-medium">{{ formatTableNumber($monthlyData['fh'][$month]) }}</span>
-                                                    @else
-                                                        <span class="text-gray-400">-</span>
-                                                    @endif
-                                                </td>
+                                                <th class="px-3 py-3 text-center text-sm font-bold text-gray-700 uppercase tracking-wider {{ $loop->index % 2 == 0 ? 'bg-gray-50' : 'bg-white' }} {{ !$loop->last ? 'border-r border-gray-300' : '' }}">
+                                                    {{ $month }}
+                                                </th>
                                             @endforeach
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        @foreach ($pivotedData as $registration => $monthlyData)
+                                            <tr class="hover:bg-sky-50 transition-all duration-300 transform hover:scale-[1.01] {{ $loop->index % 2 == 0 ? 'bg-gray-50' : 'bg-white' }}">
+                                                <td class="px-4 py-3 whitespace-nowrap text-sm font-bold text-gray-900 bg-gradient-to-r from-gray-50 to-gray-100 border-r border-gray-300">
+                                                    {{ $registration }}
+                                                </td>
+                                                <td class="px-4 py-3 whitespace-nowrap text-sm text-center font-semibold text-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 border-r border-gray-300">
+                                                    {{ $startYearForDisplay }}
+                                                </td>
+                                                @foreach ($months as $month)
+                                                    <td class="px-3 py-3 whitespace-nowrap text-sm text-center font-semibold hover:bg-sky-100 transition-colors {{ !$loop->last ? 'border-r border-gray-200' : '' }}">
+                                                        @if(isset($monthlyData['fh'][$month]) && $monthlyData['fh'][$month] !== null)
+                                                            <span class="px-2 py-1 rounded-lg bg-white shadow-sm border font-medium">{{ formatTableNumber($monthlyData['fh'][$month]) }}</span>
+                                                        @else
+                                                            <span class="text-gray-400">-</span>
+                                                        @endif
+                                                    </td>
+                                                @endforeach
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Flight Cycle Table -->
-                    <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
-                        <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
-                            <h3 class="text-lg font-bold text-white flex items-center">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                                </svg>
-                                FLIGHT CYCLE
-                            </h3>
-                        </div>
-                        
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-200">
-                                    <!-- Baris pertama: Header utama dengan periode -->
-                                    <tr>
-                                        <th rowspan="2" class="px-6 py-6 text-left text-sm font-black text-gray-900 uppercase tracking-wider border-r border-b border-gray-300">
-                                            A/C REG
-                                        </th>
-                                        <th rowspan="2" class="px-6 py-6 text-center text-sm font-black text-gray-900 uppercase tracking-wider border-r border-b border-gray-300">
-                                            YEAR
-                                        </th>
-                                        <th colspan="12" class="px-4 py-3 text-center text-sm font-black text-gray-900 uppercase tracking-wider border-b border-gray-300">
-                                            {{ $yearRange }}
-                                        </th>
-                                    </tr>
-                                    <!-- Baris kedua: Nama-nama bulan -->
-                                    <tr>
-                                        @foreach ($months as $month)
-                                            <th class="px-4 py-3 text-center text-sm font-black text-gray-900 uppercase tracking-wider {{ !$loop->last ? 'border-r border-gray-300' : '' }}">
-                                                {{ $month }}
+                    {{-- Flight Cycle Section --}}
+                    <div class="mb-8">
+                        <div class="bg-white rounded-xl sm:rounded-2xl shadow-xl sm:shadow-2xl overflow-hidden border border-gray-200">
+                            <!-- Header -->
+                            <div class="bg-gradient-to-r from-lime-600 to-sky-700 px-6 py-4">
+                                <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center">
+                                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                    </svg>
+                                    FLIGHT CYCLE
+                                </h2>
+                            </div>
+                            
+                            <!-- Responsive table wrapper -->
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
+                                        <!-- Baris pertama: Header utama dengan periode -->
+                                        <tr class="border-b-2 border-lime-200">
+                                            <th rowspan="2" class="px-4 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider bg-gradient-to-r from-gray-50 to-gray-100 border-r-2 border-gray-300">
+                                                <span class="flex items-center">
+                                                    <svg class="w-4 h-4 mr-2 text-lime-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H5m0 0h4M9 7h6m-6 4h6m-6 4h6"></path>
+                                                    </svg>
+                                                    A/C REG
+                                                </span>
                                             </th>
-                                        @endforeach
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    @foreach ($pivotedData as $registration => $monthlyData)
-                                        <tr class="hover:bg-gray-50 transition-colors duration-200">
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 border-r border-gray-200 bg-gray-50">
-                                                {{ $registration }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-700 border-r border-gray-200 bg-gray-50">
-                                                {{ $startYearForDisplay }}
-                                            </td>
+                                            <th rowspan="2" class="px-4 py-4 text-center text-sm font-bold text-gray-700 uppercase tracking-wider bg-gradient-to-r from-gray-50 to-gray-100 border-r-2 border-gray-300">
+                                                <span class="flex items-center justify-center">
+                                                    <svg class="w-4 h-4 mr-2 text-lime-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3"></path>
+                                                    </svg>
+                                                    YEAR
+                                                </span>
+                                            </th>
+                                            <th colspan="12" class="px-4 py-3 text-center text-sm font-bold text-white bg-lime-600 uppercase tracking-wider">
+                                                {{ $yearRange }}
+                                            </th>
+                                        </tr>
+                                        <!-- Baris kedua: Nama-nama bulan -->
+                                        <tr>
                                             @foreach ($months as $month)
-                                                <td class="px-4 py-4 whitespace-nowrap text-sm text-right text-gray-900 {{ !$loop->last ? 'border-r border-gray-200' : '' }}">
-                                                    @if(isset($monthlyData['fc'][$month]) && $monthlyData['fc'][$month] !== null)
-                                                        <span class="font-medium">{{ formatTableNumber($monthlyData['fc'][$month]) }}</span>
-                                                    @else
-                                                        <span class="text-gray-400">-</span>
-                                                    @endif
-                                                </td>
+                                                <th class="px-3 py-3 text-center text-sm font-bold text-gray-700 uppercase tracking-wider {{ $loop->index % 2 == 0 ? 'bg-gray-50' : 'bg-white' }} {{ !$loop->last ? 'border-r border-gray-300' : '' }}">
+                                                    {{ $month }}
+                                                </th>
                                             @endforeach
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        @foreach ($pivotedData as $registration => $monthlyData)
+                                            <tr class="hover:bg-lime-50 transition-all duration-300 transform hover:scale-[1.01] {{ $loop->index % 2 == 0 ? 'bg-gray-50' : 'bg-white' }}">
+                                                <td class="px-4 py-3 whitespace-nowrap text-sm font-bold text-gray-900 bg-gradient-to-r from-gray-50 to-gray-100 border-r border-gray-300">
+                                                    {{ $registration }}
+                                                </td>
+                                                <td class="px-4 py-3 whitespace-nowrap text-sm text-center font-semibold text-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 border-r border-gray-300">
+                                                    {{ $startYearForDisplay }}
+                                                </td>
+                                                @foreach ($months as $month)
+                                                    <td class="px-3 py-3 whitespace-nowrap text-sm text-center font-semibold hover:bg-lime-100 transition-colors {{ !$loop->last ? 'border-r border-gray-200' : '' }}">
+                                                        @if(isset($monthlyData['fc'][$month]) && $monthlyData['fc'][$month] !== null)
+                                                            <span class="px-2 py-1 rounded-lg bg-white shadow-sm border font-medium">{{ formatTableNumber($monthlyData['fc'][$month]) }}</span>
+                                                        @else
+                                                            <span class="text-gray-400">-</span>
+                                                        @endif
+                                                    </td>
+                                                @endforeach
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 @else
                     <!-- No Data State -->
-                    <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-12">
+                    <div class="bg-white rounded-xl sm:rounded-2xl shadow-xl sm:shadow-2xl border border-gray-200 p-12">
                         <div class="text-center">
                             <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -304,17 +316,60 @@
                 @endif
             </div>
 
-            <!-- Footer -->
-            <div class="mt-12 text-center">
-                <div class="bg-white rounded-lg shadow p-4 inline-block border border-gray-200">
-                    <p class="text-sm text-gray-600 flex items-center justify-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        Report generated on {{ date('d F Y, H:i:s') }}
-                    </p>
-                </div>
+            <!-- Mobile scroll indicator -->
+            <div class="mt-2 text-center lg:hidden">
+                <p class="text-xs text-gray-500 flex items-center justify-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18"></path>
+                    </svg>
+                    Swipe left/right to see more data
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                    </svg>
+                </p>
             </div>
-        </div>
     </div>
+
+    <!-- JavaScript Functions -->
+    <script>
+    function showLoadingAndGoBack() {
+        // Show loading state
+        const button = event.target;
+        const originalText = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = `
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Loading...
+        `;
+        
+        // Navigate back to the previous page
+        setTimeout(() => {
+            window.history.back();
+        }, 500);
+    }
+
+    function showExportLoading(type) {
+        const form = event.target.closest('form');
+        const button = form.querySelector('button[type="submit"]');
+        const originalText = button.innerHTML;
+        
+        button.disabled = true;
+        button.innerHTML = `
+            <svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Exporting ${type}...
+        `;
+        
+        // Reset button after a delay (in case of errors)
+        setTimeout(() => {
+            button.disabled = false;
+            button.innerHTML = originalText;
+        }, 10000);
+    }
+    </script>
 </x-app-layout>

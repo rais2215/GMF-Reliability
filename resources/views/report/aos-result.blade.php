@@ -1,56 +1,53 @@
 <x-app-layout>
-    <div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-green-50 py-4 sm:py-8">
+    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 py-4 sm:py-8">
         <div class="max-w-full mx-auto px-2 sm:px-4 lg:px-6">
             
             <!-- Header Section -->
             <div class="mb-4 sm:mb-8">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+                <div class="flex flex-col space-y-4 lg:flex-row lg:justify-between lg:items-start lg:space-y-0 mb-6 sm:mb-8 gap-2 sm:gap-4">
                     <button onclick="showLoadingAndGoBack()" 
-                            class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="w-full sm:w-auto inline-flex items-center justify-center px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-800 transition-all duration-200">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                         </svg>
-                        Back to Report
+                        <span class="truncate">Back to Report</span>
                     </button>
+
+                    <!-- Export Buttons -->
+                    <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full lg:w-auto">
+                        <form action="{{ route('report.aos.export.pdf') }}" method="POST" class="inline w-full sm:w-auto" onsubmit="showExportLoading('PDF')">
+                            @csrf
+                            <input type="hidden" name="period" value="{{ $period }}">
+                            <input type="hidden" name="aircraft_type" value="{{ $aircraftType }}">
+                            <button type="submit" 
+                                    class="w-full sm:w-auto inline-flex items-center justify-center px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-medium text-white bg-red-600 rounded-lg shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200">
+                                <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                <span class="truncate">Export PDF</span>
+                            </button>
+                        </form>
+                        <form action="{{ route('report.aos.export.excel') }}" method="POST" class="inline w-full sm:w-auto" onsubmit="showExportLoading('Excel')">
+                            @csrf
+                            <input type="hidden" name="period" value="{{ $period }}">
+                            <input type="hidden" name="aircraft_type" value="{{ $aircraftType }}">
+                            <button type="submit" 
+                                    class="w-full sm:w-auto inline-flex items-center justify-center px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-medium text-white bg-lime-600 rounded-lg shadow-sm hover:bg-lime-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lime-500 transition-all duration-200">
+                                <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                <span class="truncate">Export Excel</span>
+                            </button>
+                        </form>
+                    </div>
                 </div>
 
                 <div class="text-center">
-                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-green-500 bg-clip-text text-transparent mb-2 sm:mb-4">
+                    <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-sky-800 to-lime-600 bg-clip-text text-transparent mb-2 sm:mb-4">
                         Aircraft Operations Summary
                     </h1>
-                    <p class="text-base sm:text-lg md:text-xl text-gray-600 mb-3 sm:mb-6">{{ $aircraftType }} | {{ \Carbon\Carbon::parse($period)->subMonth(11)->format('Y') }} - {{ \Carbon\Carbon::parse($period)->format('Y') }}</p>
-                    <div class="w-24 sm:w-32 h-1 bg-gradient-to-r from-blue-500 via-green-500 to-green-500 mx-auto rounded-full animate-pulse"></div>
-                </div>
-            </div>
-
-            <!-- Export Buttons -->
-            <div class="flex justify-end mb-6">
-                <div class="flex space-x-3">
-                    <form action="{{ route('report.aos.export.pdf') }}" method="POST" class="inline" onsubmit="showExportLoading('PDF')">
-                        @csrf
-                        <input type="hidden" name="period" value="{{ $period }}">
-                        <input type="hidden" name="aircraft_type" value="{{ $aircraftType }}">
-                        <button type="submit" 
-                                class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
-                            Export PDF
-                        </button>
-                    </form>
-
-                    <form action="{{ route('report.aos.export.excel') }}" method="POST" class="inline" onsubmit="showExportLoading('Excel')">
-                        @csrf
-                        <input type="hidden" name="period" value="{{ $period }}">
-                        <input type="hidden" name="aircraft_type" value="{{ $aircraftType }}">
-                        <button type="submit" 
-                                class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-green-600 rounded-lg shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
-                            Export Excel
-                        </button>
-                    </form>
+                    <p class="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 mb-3 sm:mb-6">{{ $aircraftType }} | {{ \Carbon\Carbon::parse($period)->subMonth(11)->format('Y') }} - {{ \Carbon\Carbon::parse($period)->format('Y') }}</p>
+                    <div class="w-20 sm:w-24 md:w-32 h-1 bg-gradient-to-r from-sky-800 via-lime-600 to-lime-600 mx-auto rounded-full animate-pulse"></div>
                 </div>
             </div>
 
@@ -64,7 +61,7 @@
                             <tr>
                                 <th class="w-48 sm:w-56 lg:w-60 px-4 sm:px-6 py-4 sm:py-6 text-left text-sm font-bold text-gray-700 uppercase tracking-wider sticky left-0 bg-gradient-to-r from-gray-50 to-gray-100 z-20 border-r-2 border-gray-300 shadow-lg">
                                     <span class="flex items-center">
-                                        <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-sky-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                                         </svg>
                                         Metrics
@@ -137,17 +134,17 @@
                                     };
                                 @endphp
                                 
-                                <th class="w-16 sm:w-18 lg:w-20 px-2 sm:px-3 py-4 sm:py-6 text-center text-sm font-bold text-white uppercase tracking-wider bg-gradient-to-r from-blue-500 to-blue-600">
+                                <th class="w-16 sm:w-18 lg:w-20 px-2 sm:px-3 py-4 sm:py-6 text-center text-sm font-bold text-white uppercase tracking-wider bg-gradient-to-r from-sky-700 to-sky-800">
                                     {{ $startYear }}
                                 </th>
                                 
                                 @for ($i = 11; $i >= 0; $i--)
-                                    <th class="w-14 sm:w-16 px-2 py-4 sm:py-6 text-center text-sm font-bold text-gray-700 uppercase tracking-wider {{ $i % 2 == 0 ? 'bg-gradient-to-b from-gray-50 to-gray-100' : 'bg-gradient-to-b from-white to-gray-50' }} hover:bg-gradient-to-b hover:from-blue-50 hover:to-blue-100 transition-all duration-300">
+                                    <th class="w-14 sm:w-16 px-2 py-4 sm:py-6 text-center text-sm font-bold text-gray-700 uppercase tracking-wider {{ $i % 2 == 0 ? 'bg-gradient-to-b from-gray-50 to-gray-100' : 'bg-gradient-to-b from-white to-gray-50' }} hover:bg-gradient-to-b hover:from-sky-50 hover:to-sky-100 transition-all duration-300">
                                         {{ substr(\Carbon\Carbon::parse($period)->subMonth($i)->format('F'), 0, 3) }}
                                     </th>
                                 @endfor
                                 
-                                <th class="w-16 sm:w-18 lg:w-20 px-2 sm:px-3 py-4 sm:py-6 text-center text-sm font-bold text-white uppercase tracking-wider bg-gradient-to-r from-blue-500 to-blue-600">
+                                <th class="w-16 sm:w-18 lg:w-20 px-2 sm:px-3 py-4 sm:py-6 text-center text-sm font-bold text-white uppercase tracking-wider bg-gradient-to-r from-sky-700 to-sky-800">
                                     <span class="hidden sm:inline">Last 12 MONTHS</span>
                                     <span class="sm:hidden">Total</span>
                                 </th>
@@ -216,25 +213,25 @@
                             @endphp
 
                             <!-- A/C In Fleet Row -->
-                            <tr class="bg-blue-50 hover:bg-blue-100 transition-all duration-300 transform hover:scale-[1.01]">
-                                <td class="w-48 sm:w-56 lg:w-60 px-4 sm:px-6 py-3 sm:py-6 whitespace-nowrap text-sm font-bold text-gray-900 sticky left-0 bg-blue-50 z-10 border-r-2 border-blue-200 shadow-lg">
+                            <tr class="bg-sky-50 hover:bg-sky-100 transition-all duration-300 transform hover:scale-[1.01]">
+                                <td class="w-48 sm:w-56 lg:w-60 px-4 sm:px-6 py-3 sm:py-6 whitespace-nowrap text-sm font-bold text-gray-900 sticky left-0 bg-sky-50 z-10 border-r-2 border-sky-200 shadow-lg">
                                     <span class="inline-flex items-center group">
-                                        <div class="w-3 h-3 sm:w-4 sm:h-4 bg-blue-500 rounded-full mr-2 sm:mr-3 group-hover:animate-pulse"></div>
+                                        <div class="w-3 h-3 sm:w-4 sm:h-4 bg-sky-700 rounded-full mr-2 sm:mr-3 group-hover:animate-pulse"></div>
                                         <span class="text-gray-800">A/C In Fleet</span>
                                     </span>
                                 </td>
-                                <td class="w-16 sm:w-18 lg:w-20 px-2 sm:px-3 py-3 sm:py-6 whitespace-nowrap text-sm text-white text-center font-bold bg-blue-500">
+                                <td class="w-16 sm:w-18 lg:w-20 px-2 sm:px-3 py-3 sm:py-6 whitespace-nowrap text-sm text-white text-center font-bold bg-sky-700">
                                     {{ $formatNumber($totalAcInFleet / 12) }}
                                 </td>
                                 @for ($i = 11; $i >= 0; $i--)
                                     @php
                                         $acInFleet = $safeNumber($reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['acInFleet'] ?? 0);
                                     @endphp
-                                    <td class="w-14 sm:w-16 px-2 py-3 sm:py-6 whitespace-nowrap text-sm text-gray-900 text-center font-semibold {{ $i % 2 == 0 ? 'bg-gray-50' : 'bg-white' }} hover:bg-blue-50 transition-all duration-300">
+                                    <td class="w-14 sm:w-16 px-2 py-3 sm:py-6 whitespace-nowrap text-sm text-gray-900 text-center font-semibold {{ $i % 2 == 0 ? 'bg-gray-50' : 'bg-white' }} hover:bg-sky-50 transition-all duration-300">
                                         <span class="px-2 py-1 rounded-lg bg-white shadow-sm">{{ round($acInFleet) }}</span>
                                     </td>
                                 @endfor
-                                <td class="w-16 sm:w-18 lg:w-20 px-2 sm:px-3 py-3 sm:py-6 whitespace-nowrap text-sm text-white text-center font-bold bg-blue-600">
+                                <td class="w-16 sm:w-18 lg:w-20 px-2 sm:px-3 py-3 sm:py-6 whitespace-nowrap text-sm text-white text-center font-bold bg-sky-800">
                                     {{ $formatNumber($totalAcInFleet / 12) }}
                                 </td>
                             </tr>
@@ -261,13 +258,13 @@
                                 ['label' => '- Rate per 100 Take Off', 'short' => '- Rate per 100 TO', 'total' => $totalTechnicalIncidentRate, 'key' => 'technicalIncidentRate', 'format' => 'number', 'indent' => true],
                                 ['label' => 'Technical Cancellation - Total', 'short' => 'Tech Cancel - Total', 'total' => $totalTechnicalCancellationTotal, 'key' => 'technicalCancellationTotal', 'format' => 'round'],
                             ] as $row)
-                                <tr class="bg-blue-50 hover:bg-blue-100 transition-all duration-300 transform hover:scale-[1.01]">
-                                    <td class="w-48 sm:w-56 lg:w-60 px-4 sm:px-6 py-3 sm:py-6 whitespace-nowrap text-sm font-bold text-gray-900 sticky left-0 bg-blue-50 z-10 border-r-2 border-blue-200 shadow-lg">
+                                <tr class="bg-sky-50 hover:bg-sky-100 transition-all duration-300 transform hover:scale-[1.01]">
+                                    <td class="w-48 sm:w-56 lg:w-60 px-4 sm:px-6 py-3 sm:py-6 whitespace-nowrap text-sm font-bold text-gray-900 sticky left-0 bg-sky-50 z-10 border-r-2 border-sky-200 shadow-lg">
                                         <span class="inline-flex items-center group {{ isset($row['indent']) ? 'ml-4 sm:ml-6 lg:ml-8' : '' }}">
                                             @if(!isset($row['indent']))
-                                                <div class="w-3 h-3 sm:w-4 sm:h-4 bg-blue-500 rounded-full mr-2 sm:mr-3 group-hover:animate-pulse"></div>
+                                                <div class="w-3 h-3 sm:w-4 sm:h-4 bg-sky-700 rounded-full mr-2 sm:mr-3 group-hover:animate-pulse"></div>
                                             @else
-                                                <div class="w-2 h-2 bg-blue-400 rounded-full mr-2 sm:mr-3"></div>
+                                                <div class="w-2 h-2 bg-sky-600 rounded-full mr-2 sm:mr-3"></div>
                                             @endif
                                             <span class="text-gray-800">
                                                 <span class="hidden lg:inline">{{ $row['label'] }}</span>
@@ -275,7 +272,7 @@
                                             </span>
                                         </span>
                                     </td>
-                                    <td class="w-16 sm:w-18 lg:w-20 px-2 sm:px-3 py-3 sm:py-6 whitespace-nowrap text-sm text-white text-center font-bold bg-blue-500">
+                                    <td class="w-16 sm:w-18 lg:w-20 px-2 sm:px-3 py-3 sm:py-6 whitespace-nowrap text-sm text-white text-center font-bold bg-sky-700">
                                         @if($row['format'] === 'number')
                                             {{ $formatNumber($row['total'] / 12) }}
                                         @elseif($row['format'] === 'time')
@@ -288,7 +285,7 @@
                                         @php
                                             $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')][$row['key']] ?? 0;
                                         @endphp
-                                        <td class="w-14 sm:w-16 px-2 py-3 sm:py-6 whitespace-nowrap text-sm text-gray-900 text-center font-semibold {{ $i % 2 == 0 ? 'bg-gray-50' : 'bg-white' }} hover:bg-blue-50 transition-all duration-300">
+                                        <td class="w-14 sm:w-16 px-2 py-3 sm:py-6 whitespace-nowrap text-sm text-gray-900 text-center font-semibold {{ $i % 2 == 0 ? 'bg-gray-50' : 'bg-white' }} hover:bg-sky-50 transition-all duration-300">
                                             <span class="px-2 py-1 rounded-lg bg-white shadow-sm">
                                                 @if($row['format'] === 'number')
                                                     {{ $formatNumber($safeNumber($value)) }}
@@ -300,7 +297,7 @@
                                             </span>
                                         </td>
                                     @endfor
-                                    <td class="w-16 sm:w-18 lg:w-20 px-2 sm:px-3 py-3 sm:py-6 whitespace-nowrap text-sm text-white text-center font-bold bg-blue-600">
+                                    <td class="w-16 sm:w-18 lg:w-20 px-2 sm:px-3 py-3 sm:py-6 whitespace-nowrap text-sm text-white text-center font-bold bg-sky-800">
                                         @if($row['format'] === 'number')
                                             {{ $formatNumber($row['total'] / 12) }}
                                         @elseif($row['format'] === 'time')
@@ -313,30 +310,30 @@
                             @endforeach
 
                             <!-- Dispatch Reliability Row -->
-                            <tr class="bg-blue-50 hover:bg-blue-100 transition-all duration-300 transform hover:scale-[1.01]">
-                                <td class="w-48 sm:w-56 lg:w-60 px-4 sm:px-6 py-3 sm:py-6 whitespace-nowrap text-sm font-bold text-gray-900 sticky left-0 bg-blue-50 z-10 border-r-2 border-blue-200 shadow-lg">
+                            <tr class="bg-sky-50 hover:bg-sky-100 transition-all duration-300 transform hover:scale-[1.01]">
+                                <td class="w-48 sm:w-56 lg:w-60 px-4 sm:px-6 py-3 sm:py-6 whitespace-nowrap text-sm font-bold text-gray-900 sticky left-0 bg-sky-50 z-10 border-r-2 border-sky-200 shadow-lg">
                                     <span class="inline-flex items-center group">
-                                        <div class="w-3 h-3 sm:w-4 sm:h-4 bg-blue-500 rounded-full mr-2 sm:mr-3 group-hover:animate-pulse"></div>
+                                        <div class="w-3 h-3 sm:w-4 sm:h-4 bg-sky-700 rounded-full mr-2 sm:mr-3 group-hover:animate-pulse"></div>
                                         <span class="text-gray-800">
                                             <span class="hidden sm:inline">Dispatch Reliability (%)</span>
                                             <span class="sm:hidden">Dispatch Rel (%)</span>
                                         </span>
                                     </span>
                                 </td>
-                                <td class="w-16 sm:w-18 lg:w-20 px-2 sm:px-3 py-3 sm:py-6 whitespace-nowrap text-sm text-white text-center font-bold bg-blue-500">
+                                <td class="w-16 sm:w-18 lg:w-20 px-2 sm:px-3 py-3 sm:py-6 whitespace-nowrap text-sm text-white text-center font-bold bg-sky-700">
                                     {{ $formatNumber($totalDispatchReliability / 12) }}%
                                 </td>
                                 @for ($i = 11; $i >= 0; $i--)
                                     @php
                                         $dispatchReliability = $safeNumber($reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['dispatchReliability'] ?? 0);
                                     @endphp
-                                    <td class="w-14 sm:w-16 px-2 py-3 sm:py-6 whitespace-nowrap text-sm text-gray-900 text-center font-semibold {{ $i % 2 == 0 ? 'bg-gray-50' : 'bg-white' }} hover:bg-blue-50 transition-all duration-300">
+                                    <td class="w-14 sm:w-16 px-2 py-3 sm:py-6 whitespace-nowrap text-sm text-gray-900 text-center font-semibold {{ $i % 2 == 0 ? 'bg-gray-50' : 'bg-white' }} hover:bg-sky-50 transition-all duration-300">
                                         <span class="px-2 py-1 rounded-lg bg-white shadow-sm">
                                             {{ $formatNumber($dispatchReliability) }}%
                                         </span>
                                     </td>
                                 @endfor
-                                <td class="w-16 sm:w-18 lg:w-20 px-2 sm:px-3 py-3 sm:py-6 whitespace-nowrap text-sm text-white text-center font-bold bg-blue-600">
+                                <td class="w-16 sm:w-18 lg:w-20 px-2 sm:px-3 py-3 sm:py-6 whitespace-nowrap text-sm text-white text-center font-bold bg-sky-800">
                                     {{ $formatNumber($totalDispatchReliability / 12) }}%
                                 </td>
                             </tr>
