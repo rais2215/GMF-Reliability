@@ -254,7 +254,7 @@
 
             {{-- Welcome Card --}}
             <div class="px-8 mb-10 dashboard-fade dashboard-delay-2">
-                <div class="relative rounded-2xl overflow-hidden shadow-2xl bg-cover bg-center text-white w-full h-64 md:h-72 xl:h-80" style="background-image: url('{{ asset('images/bgwelcome.jpg') }}');">
+                <div class="relative rounded-2xl overflow-hidden shadow-2xl bg-cover bg-center text-white w-full h-64 md:h-72 xl:h-80" style="background-image: url('{{ asset('images/bgdashboard.png') }}');">
                     {{-- Overlay --}}
                     <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent"></div>
 
@@ -262,10 +262,7 @@
                     <div class="relative h-full p-6 md:p-8 flex flex-col justify-between">
                         <div class="flex justify-between items-start">
                             <div class="space-y-2">
-                                <div class="inline-flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
-                                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                                    <span class="text-sm font-medium">Engineering Services</span>
-                                </div>
+                                <img src="{{ asset('images/gmfwhite.png') }}" alt="Engineering Services" class="h-1 w-auto rounded-xl shadow-lg bg-white/30 backdrop-blur-sm">
                             </div>
                         </div>
 
