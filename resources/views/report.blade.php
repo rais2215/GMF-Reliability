@@ -175,9 +175,11 @@
                         <span class="mr-2 text-xl">✈</span> <strong>Cabin Reliability Report</strong>
                     </a>
                 </li>
-                <li><hr class="border-t border-gray-200 my-2"></li>
+                <li class="my-4 animate-fade-in-up delay-700">
+                    <hr class="border-t-2 border-gray-300 font-bold transition-all duration-700 ease-in-out">
+                </li>
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-green-400 animate-fade-in-up delay-700"
+                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-red-50 hover:bg-red-100 text-red-700 hover:text-red-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-red-400 animate-fade-in-up delay-400"
                        data-url="{{ route('report.combined.index') }}">
                         <i data-lucide="download" class="mr-2 w-5 h-5"></i> <strong>Export AOS & Pilot Report (PDF)</strong>
                     </a>
