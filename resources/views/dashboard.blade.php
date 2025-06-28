@@ -267,11 +267,6 @@
                                     <span class="text-sm font-medium">Engineering Services</span>
                                 </div>
                             </div>
-
-                            {{-- Clock Widget --}}
-                            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-                                <div id="clock" class="text-sm md:text-base font-semibold text-center whitespace-nowrap"></div>
-                            </div>
                         </div>
 
                         <div class="space-y-4">
