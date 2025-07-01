@@ -164,11 +164,21 @@
                                             </th>
                                         </tr>
                                         <!-- Baris kedua: Nama-nama bulan -->
-                                        <tr>
+                                        <tr class="border-b-2 border-gray-300">
                                             @foreach ($months as $month)
                                                 <th class="px-3 py-3 text-center text-sm font-bold text-gray-700 uppercase tracking-wider {{ $loop->index % 2 == 0 ? 'bg-gray-50' : 'bg-white' }} {{ !$loop->last ? 'border-r border-gray-300' : '' }}">
                                                     {{ $month }}
                                                 </th>
+                                            @endforeach
+                                        </tr>
+                                        <!-- Baris ketiga-->
+                                        <tr>
+                                            <th class="px-4 py-2 bg-gradient-to-r from-gray-50 to-gray-100"></th>
+                                            <th class="px-4 py-2 text-center text-sm font-semibold text-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 border-l-2 border-r-2 border-t border-b border-gray-300">
+                                                {{ $startYearForDisplay }}
+                                            </th>
+                                            @foreach ($months as $month)
+                                                <th class="px-3 py-2 text-sm"></th>
                                             @endforeach
                                         </tr>
                                     </thead>
@@ -205,7 +215,7 @@
                             <div class="bg-gradient-to-r from-lime-600 to-sky-700 px-6 py-4">
                                 <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center">
                                     <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                                     </svg>
                                     FLIGHT CYCLE
                                 </h2>
@@ -243,6 +253,16 @@
                                                 <th class="px-3 py-3 text-center text-sm font-bold text-gray-700 uppercase tracking-wider {{ $loop->index % 2 == 0 ? 'bg-gray-50' : 'bg-white' }} {{ !$loop->last ? 'border-r border-gray-300' : '' }}">
                                                     {{ $month }}
                                                 </th>
+                                            @endforeach
+                                        </tr>
+                                        <!-- Baris ketiga-->
+                                        <tr>
+                                            <th class="px-4 py-2 bg-gradient-to-r from-gray-50 to-gray-100"></th>
+                                            <th class="px-4 py-2 text-center text-sm font-semibold text-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 border-l-2 border-r-2 border-t border-b border-gray-300">
+                                                {{ $startYearForDisplay }}
+                                            </th>
+                                            @foreach ($months as $month)
+                                                <th class="px-3 py-2 text-sm"></th>
                                             @endforeach
                                         </tr>
                                     </thead>

@@ -15,15 +15,17 @@ class CumulativeController extends Controller
 {
     public function cumulativeIndex()
     {
-        $aircraftTypes = TblPirepSwift::select('ACTYPE')->distinct()
-            ->whereNotNull('ACTYPE')
-            ->where('ACTYPE', '!=', '')
-            ->where('ACTYPE', '!=', 'default')
+        // Ambil aircraft types dari TblMasterac, bukan TblPirepSwift
+        $aircraftTypes = TblMasterac::select('ACType')->distinct()
+            ->whereNotNull('ACType')
+            ->where('ACType', '!=', '')
+            ->orderBy('ACType')
             ->get();
 
         $operators = TblMasterac::select('Operator')->distinct()
             ->whereNotNull('Operator')
             ->where('Operator', '!=', '')
+            ->orderBy('Operator')
             ->get();
 
         $periods = TblMonthlyfhfc::select('MonthEval')->distinct()
@@ -58,17 +60,17 @@ class CumulativeController extends Controller
 
         if ($request->filled('operator') || $request->filled('aircraft_type')) {
             $masteracQuery = TblMasterac::query();
-            
+
             if ($request->filled('operator')) {
                 $masteracQuery->where('Operator', $request->operator);
             }
-            
+
             if ($request->filled('aircraft_type')) {
                 $masteracQuery->where('ACType', $request->aircraft_type);
             }
-            
+
             $registrations = $masteracQuery->pluck('ACReg');
-            
+
             $query->whereIn('tbl_monthlyfhfc.Reg', $registrations);
         }
 
@@ -123,7 +125,7 @@ class CumulativeController extends Controller
 
         return view('report.cumulative-result', compact(
             'data', // Nama variabel dikembalikan ke 'data'
-            'summary', 
+            'summary',
             'formatted_period'
         ))->with([
             'operator' => $request->operator,

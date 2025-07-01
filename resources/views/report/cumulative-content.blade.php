@@ -33,7 +33,7 @@
             <select name="aircraft_type" id="aircraft_type" class="w-full border border-[#0572a6] rounded-xl px-4 py-2 bg-[#e6f4fa] text-[#0572a6] font-semibold focus:ring-2 focus:ring-[#0572a6] focus:outline-none transition-all duration-200 shadow-sm">
                 <option value="">Select Aircraft Type</option>
                 @foreach ($aircraftTypes as $type)
-                    <option value="{{ $type->ACTYPE }}">{{ $type->ACTYPE }}</option>
+                    <option value="{{ $type->ACType }}">{{ $type->ACType }}</option>
                 @endforeach
             </select>
         </div>
