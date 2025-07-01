@@ -47,7 +47,7 @@
         // Buat daftar bulan mundur selama 12 bulan
         $months = [];
         $currentDate = $endDate->copy()->subMonths(11)->startOfMonth();
-        
+
         // Simpan tahun awal dari periode untuk ditampilkan di kolom YEAR
         $startYearForDisplay = $currentDate->year;
 
@@ -68,41 +68,11 @@
     <div class="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 py-4 sm:py-8">
         <div class="max-w-full mx-auto px-2 sm:px-4 lg:px-6">
 
-            {{-- Loading 3 Bar Loader Overlay (hidden by default) --}}
-            <div id="loadingSkeleton" class="fixed inset-0 z-50 flex-col items-center justify-center bg-white bg-opacity-90 hidden transition-opacity duration-300">
-                <div class="flex space-x-2 mb-4">
-                    <div class="w-3 h-12 bg-sky-800 rounded animate-loader-bar"></div>
-                    <div class="w-3 h-12 bg-sky-800 rounded animate-loader-bar delay-150"></div>
-                    <div class="w-3 h-12 bg-sky-800 rounded animate-loader-bar delay-300"></div>
-                </div>
-                <span id="loader-text" class="text-sm font-medium text-gray-800">Loading data...</span>
-            </div>
-
-            {{-- Loading Animation Style --}}
-            <style>
-                @keyframes bar-bounce {
-                    0%, 100% { transform: scaleY(0.5); opacity: 0.5; }
-                    50% { transform: scaleY(1.2); opacity: 1; }
-                }
-
-                .animate-loader-bar {
-                    animation: bar-bounce 1s infinite ease-in-out;
-                }
-
-                .delay-150 {
-                    animation-delay: 0.15s;
-                }
-
-                .delay-300 {
-                    animation-delay: 0.3s;
-                }
-            </style>
-
             <!-- Header Section -->
-            <div class="mb-4 sm:mb-8">
+            <div class="mb-4 sm:mb-8 fade-in">
                 <div class="flex flex-col space-y-4 lg:flex-row lg:justify-between lg:items-start lg:space-y-0 mb-6 sm:mb-8 gap-2 sm:gap-4">
-                    <button onclick="showLoadingAndGoBack()" 
-                            class="w-full sm:w-auto inline-flex items-center justify-center px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-800 transition-all duration-200">
+                    <button onclick="showLoadingAndGoBack()"
+                            class="w-full sm:w-auto inline-flex items-center justify-center px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-800 transition-all duration-200 hover:shadow-lg fade-in-left">
                         <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                         </svg>
@@ -110,15 +80,15 @@
                     </button>
 
                     <!-- Export Buttons -->
-                    <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full lg:w-auto">
+                    <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full lg:w-auto fade-in-right">
                         <form action="{{ route('report.cumulative.export.pdf') }}" method="POST" class="inline w-full sm:w-auto" onsubmit="showExportLoading('PDF')">
                             @csrf
                             @if(isset($period))<input type="hidden" name="period" value="{{ $period }}">@endif
                             @if(isset($operator))<input type="hidden" name="operator" value="{{ $operator }}">@endif
                             @if(isset($aircraft_type))<input type="hidden" name="aircraft_type" value="{{ $aircraft_type }}">@endif
                             @if(isset($reg))<input type="hidden" name="reg" value="{{ $reg }}">@endif
-                            <button type="submit" 
-                                    class="w-full sm:w-auto inline-flex items-center justify-center px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-medium text-white bg-red-600 rounded-lg shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200">
+                            <button type="submit"
+                                    class="export-btn w-full sm:w-auto inline-flex items-center justify-center px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-medium text-white bg-red-600 rounded-lg shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 hover:shadow-md">
                                 <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                 </svg>
@@ -131,8 +101,8 @@
                             @if(isset($operator))<input type="hidden" name="operator" value="{{ $operator }}">@endif
                             @if(isset($aircraft_type))<input type="hidden" name="aircraft_type" value="{{ $aircraft_type }}">@endif
                             @if(isset($reg))<input type="hidden" name="reg" value="{{ $reg }}">@endif
-                            <button type="submit" 
-                                    class="w-full sm:w-auto inline-flex items-center justify-center px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-medium text-white bg-lime-600 rounded-lg shadow-sm hover:bg-lime-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lime-500 transition-all duration-200">
+                            <button type="submit"
+                                    class="export-btn w-full sm:w-auto inline-flex items-center justify-center px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-medium text-white bg-lime-600 rounded-lg shadow-sm hover:bg-lime-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-lime-500 transition-all duration-200 hover:shadow-md">
                                 <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                 </svg>
@@ -142,12 +112,12 @@
                     </div>
                 </div>
 
-                <div class="text-center">
+                <div class="text-center fade-in-up">
                     <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-sky-800 to-lime-600 bg-clip-text text-transparent mb-2 sm:mb-4">
                         CUMULATIVE FLIGHT HOURS AND TAKE OFF
                     </h1>
                     <p class="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 mb-3 sm:mb-6">{{ $aircraftType }} | {{ $yearRange }}</p>
-                    <div class="w-24 sm:w-32 h-1 bg-gradient-to-r from-sky-800 via-lime-600 to-lime-600 mx-auto rounded-full animate-pulse"></div>
+                    <div class="w-24 sm:w-32 h-1 bg-gradient-to-r from-sky-800 via-lime-600 to-lime-600 mx-auto rounded-full"></div>
                 </div>
             </div>
 
@@ -155,7 +125,7 @@
             <div class="space-y-8">
                 @if (!empty($pivotedData))
                     {{-- Flight Hours Section --}}
-                    <div class="mb-8">
+                    <div class="mb-8 fade-in-up">
                         <div class="bg-white rounded-xl sm:rounded-2xl shadow-xl sm:shadow-2xl overflow-hidden border border-gray-200">
                             <!-- Header -->
                             <div class="bg-gradient-to-r from-sky-800 to-lime-600 px-6 py-4">
@@ -166,7 +136,7 @@
                                     FLIGHT HOURS
                                 </h2>
                             </div>
-                            
+
                             <!-- Responsive table wrapper -->
                             <div class="overflow-x-auto">
                                 <table class="min-w-full divide-y divide-gray-200">
@@ -204,7 +174,7 @@
                                     </thead>
                                     <tbody class="bg-white divide-y divide-gray-200">
                                         @foreach ($pivotedData as $registration => $monthlyData)
-                                            <tr class="hover:bg-sky-50 transition-all duration-300 transform hover:scale-[1.01] {{ $loop->index % 2 == 0 ? 'bg-gray-50' : 'bg-white' }}">
+                                            <tr class="table-row hover:bg-sky-50 transition-colors duration-200 fade-in-row {{ $loop->index % 2 == 0 ? 'bg-gray-50' : 'bg-white' }}">
                                                 <td class="px-4 py-3 whitespace-nowrap text-sm font-bold text-gray-900 bg-gradient-to-r from-gray-50 to-gray-100 border-r border-gray-300">
                                                     {{ $registration }}
                                                 </td>
@@ -229,7 +199,7 @@
                     </div>
 
                     {{-- Flight Cycle Section --}}
-                    <div class="mb-8">
+                    <div class="mb-8 fade-in-up">
                         <div class="bg-white rounded-xl sm:rounded-2xl shadow-xl sm:shadow-2xl overflow-hidden border border-gray-200">
                             <!-- Header -->
                             <div class="bg-gradient-to-r from-lime-600 to-sky-700 px-6 py-4">
@@ -240,7 +210,7 @@
                                     FLIGHT CYCLE
                                 </h2>
                             </div>
-                            
+
                             <!-- Responsive table wrapper -->
                             <div class="overflow-x-auto">
                                 <table class="min-w-full divide-y divide-gray-200">
@@ -278,7 +248,7 @@
                                     </thead>
                                     <tbody class="bg-white divide-y divide-gray-200">
                                         @foreach ($pivotedData as $registration => $monthlyData)
-                                            <tr class="hover:bg-lime-50 transition-all duration-300 transform hover:scale-[1.01] {{ $loop->index % 2 == 0 ? 'bg-gray-50' : 'bg-white' }}">
+                                            <tr class="table-row hover:bg-lime-50 transition-colors duration-200 fade-in-row {{ $loop->index % 2 == 0 ? 'bg-gray-50' : 'bg-white' }}">
                                                 <td class="px-4 py-3 whitespace-nowrap text-sm font-bold text-gray-900 bg-gradient-to-r from-gray-50 to-gray-100 border-r border-gray-300">
                                                     {{ $registration }}
                                                 </td>
@@ -303,7 +273,7 @@
                     </div>
                 @else
                     <!-- No Data State -->
-                    <div class="bg-white rounded-xl sm:rounded-2xl shadow-xl sm:shadow-2xl border border-gray-200 p-12">
+                    <div class="bg-white rounded-xl sm:rounded-2xl shadow-xl sm:shadow-2xl border border-gray-200 p-12 fade-in-up">
                         <div class="text-center">
                             <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -317,35 +287,118 @@
             </div>
 
             <!-- Mobile scroll indicator -->
-            <div class="mt-2 text-center lg:hidden">
+            <div class="mt-2 text-center lg:hidden fade-in-up">
                 <p class="text-xs text-gray-500 flex items-center justify-center">
                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18"></path>
                     </svg>
-                    Swipe left/right to see more data
+                    <span>Swipe left/right to see more data</span>
                     <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
                     </svg>
                 </p>
             </div>
+        </div>
     </div>
+
+    <!-- Simple CSS Animations -->
+    <style>
+    /* Simple fade animations */
+    .fade-in {
+        opacity: 0;
+        animation: fadeIn 0.6s ease-out forwards;
+    }
+
+    .fade-in-left {
+        opacity: 0;
+        transform: translateX(-20px);
+        animation: fadeInLeft 0.5s ease-out forwards;
+        animation-delay: 0.1s;
+    }
+
+    .fade-in-right {
+        opacity: 0;
+        transform: translateX(20px);
+        animation: fadeInRight 0.5s ease-out forwards;
+        animation-delay: 0.2s;
+    }
+
+    .fade-in-up {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 0.5s ease-out forwards;
+        animation-delay: 0.3s;
+    }
+
+    .fade-in-row {
+        opacity: 0;
+        animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    .fade-in-row:nth-child(1) { animation-delay: 0.1s; }
+    .fade-in-row:nth-child(2) { animation-delay: 0.15s; }
+    .fade-in-row:nth-child(3) { animation-delay: 0.2s; }
+    .fade-in-row:nth-child(4) { animation-delay: 0.25s; }
+    .fade-in-row:nth-child(5) { animation-delay: 0.3s; }
+    .fade-in-row:nth-child(n+6) { animation-delay: 0.35s; }
+
+    /* Keyframes */
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeInLeft {
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes fadeInRight {
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Hover effects */
+    .table-row:hover {
+        transform: translateY(-1px);
+        transition: transform 0.2s ease;
+    }
+
+    .export-btn:hover {
+        transform: translateY(-1px);
+        transition: transform 0.2s ease;
+    }
+    </style>
 
     <!-- JavaScript Functions -->
     <script>
     function showLoadingAndGoBack() {
-        // Show loading state
-        const button = event.target;
+        const button = event.target.closest('button');
         const originalText = button.innerHTML;
+
         button.disabled = true;
         button.innerHTML = `
-            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Loading...
+            <div class="flex items-center">
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Loading...</span>
+            </div>
         `;
-        
-        // Navigate back to the previous page
+
         setTimeout(() => {
             window.history.back();
         }, 500);
@@ -355,21 +408,22 @@
         const form = event.target.closest('form');
         const button = form.querySelector('button[type="submit"]');
         const originalText = button.innerHTML;
-        
+
         button.disabled = true;
         button.innerHTML = `
-            <svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Exporting ${type}...
+            <div class="flex items-center">
+                <svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Exporting...</span>
+            </div>
         `;
-        
-        // Reset button after a delay (in case of errors)
+
         setTimeout(() => {
             button.disabled = false;
             button.innerHTML = originalText;
-        }, 10000);
+        }, 5000);
     }
     </script>
 </x-app-layout>
