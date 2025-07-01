@@ -4,7 +4,7 @@
     @csrf
 
     <!-- Baris dropdown -->
-    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-10 animate-fade-in-up delay-200">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-center gap-6 mb-10 animate-fade-in-up delay-200">
         <!-- Periode -->
         <div class="w-full md:w-1/3 animate-fade-in-up delay-300">
             <label for="period" class="block text-base font-bold mb-2 tracking-wide text-[#0572a6]">Periode</label>
@@ -17,7 +17,7 @@
         </div>
 
         <!-- Operator -->
-        <div class="w-full md:w-1/3 animate-fade-in-up delay-400">
+        <div class="w-full md:w-1/3 animate-fade-in-up delay-500">
             <label for="operator-dropdown" class="block text-base font-bold mb-2 tracking-wide text-[#0572a6]">Operator</label>
             <select name="operator" id="operator-dropdown" class="w-full border border-[#0572a6] rounded-xl px-4 py-2 bg-[#e6f4fa] text-[#0572a6] font-semibold focus:ring-2 focus:ring-[#0572a6] focus:outline-none transition-all duration-200 shadow-sm">
                 <option value="">Select Operator</option>
@@ -28,12 +28,12 @@
         </div>
 
         <!-- Aircraft Type -->
-        <div class="w-full md:w-1/3 animate-fade-in-up delay-500">
+        <div class="w-full md:w-1/3 animate-fade-in-up delay-400">
             <label for="aircraft-type-dropdown" class="block text-base font-bold mb-2 tracking-wide text-[#0572a6]">AC Type</label>
             <select name="aircraft_type" id="aircraft-type-dropdown" class="w-full border border-[#0572a6] rounded-xl px-4 py-2 bg-[#e6f4fa] text-[#0572a6] font-semibold focus:ring-2 focus:ring-[#0572a6] focus:outline-none transition-all duration-200 shadow-sm">
                 <option value="">Select Aircraft Type</option>
                 @foreach ($aircraftTypes as $type)
-                    <option value="{{ $type->ACTYPE }}">{{ $type->ACTYPE }}</option>
+                    <option value="{{ $type->ACType }}">{{ $type->ACType }}</option>
                 @endforeach
             </select>
         </div>
@@ -55,7 +55,7 @@
 <div class="mt-8 flex justify-center animate-fade-in-up delay-700">
     <div class="text-lg text-white px-6 py-4 transition-all duration-700 text-center font-semibold"
          style="min-width:320px;">
-        Please select Periode, Operator, and Aircraft Type to display the report.
+        Please select Periode, Aircraft Type, and Operator to display the report.
     </div>
 </div>
 
@@ -81,26 +81,3 @@
 .delay-600 { animation-delay: 0.6s !important; }
 .delay-700 { animation-delay: 0.7s !important; }
 </style>
-
-<script>
-document.getElementById('operator-dropdown').addEventListener('change', function () {
-    const operator = this.value;
-    const aircraftTypeDropdown = document.getElementById('aircraft-type-dropdown');
-
-    aircraftTypeDropdown.innerHTML = '<option value="">Select Aircraft Type</option>';
-
-    if (operator) {
-        fetch(`/get-aircraft-types?operator=${operator}`)
-            .then(response => response.json())
-            .then(data => {
-                data.forEach(type => {
-                    const option = document.createElement('option');
-                    option.value = type.ACType;
-                    option.textContent = type.ACType;
-                    aircraftTypeDropdown.appendChild(option);
-                });
-            })
-            .catch(error => console.error('Error fetching aircraft types:', error));
-    }
-});
-</script>

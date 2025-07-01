@@ -1,3 +1,4 @@
+{{-- filepath: c:\Users\Noval Rais\Documents\Github Repository\GMF-Reliability\resources\views\report\combined-content.blade.php --}}
 <h2 class="text-2xl md:text-3xl font-extrabold text-white mb-8 text-center animate-fade-in-up">
     Export AOS & Pilot Report and Technical Delay
 </h2>
@@ -6,7 +7,7 @@
     @csrf
 
     <!-- Baris Dropdown -->
-   <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-10 animate-fade-in-up delay-200">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-10 animate-fade-in-up delay-200">
         <!-- Periode -->
         <div class="w-full md:w-1/3 animate-fade-in-up delay-300">
             <label for="period" class="block text-base font-bold mb-2 tracking-wide text-[#0572a6]">Periode</label>
@@ -37,39 +38,24 @@
             </select>
         </div>
 
-        <!-- Aircraft Type AOS -->
+        <!-- Aircraft Type - UNIFIED (Hanya 1 dropdown untuk kedua report) -->
         <div class="w-full md:w-1/3 animate-fade-in-up delay-500">
-            <label for="aircraft_type_aos" class="block text-base font-bold mb-2 tracking-wide text-[#0572a6]">AC Type (AOS)</label>
-            <select name="aircraft_type_aos" id="aircraft_type_aos" required class="w-full border border-[#0572a6] rounded-xl px-4 py-2 bg-[#e6f4fa] text-[#0572a6] font-semibold focus:ring-2 focus:ring-[#0572a6] focus:outline-none transition-all duration-200 shadow-sm">
-                <option value="">Select Aircraft Type (AOS)</option>
-                @if(isset($aircraftTypesFromMaster) && $aircraftTypesFromMaster->count() > 0)
-                    @foreach ($aircraftTypesFromMaster as $type)
+            <label for="aircraft_type" class="block text-base font-bold mb-2 tracking-wide text-[#0572a6]">Aircraft Type</label>
+            <select name="aircraft_type" id="aircraft_type" required class="w-full border border-[#0572a6] rounded-xl px-4 py-2 bg-[#e6f4fa] text-[#0572a6] font-semibold focus:ring-2 focus:ring-[#0572a6] focus:outline-none transition-all duration-200 shadow-sm">
+                <option value="">Select Aircraft Type</option>
+                @if(isset($aircraftTypes) && $aircraftTypes->count() > 0)
+                    @foreach ($aircraftTypes as $type)
                         <option value="{{ $type->ACType }}">{{ $type->ACType }}</option>
                     @endforeach
                 @else
-                    <option value="" disabled>No AOS aircraft types available</option>
-                @endif
-            </select>
-        </div>
-
-        <!-- Aircraft Type Pilot -->
-        <div class="w-full md:w-1/3 animate-fade-in-up delay-600">
-            <label for="aircraft_type_pilot" class="block text-base font-bold mb-2 tracking-wide text-[#0572a6]">AC Type (Pilot)</label>
-            <select name="aircraft_type_pilot" id="aircraft_type_pilot" required class="w-full border border-[#0572a6] rounded-xl px-4 py-2 bg-[#e6f4fa] text-[#0572a6] font-semibold focus:ring-2 focus:ring-[#0572a6] focus:outline-none transition-all duration-200 shadow-sm">
-                <option value="">Select Aircraft Type (Pilot)</option>
-                @if(isset($aircraftTypesFromPirep) && $aircraftTypesFromPirep->count() > 0)
-                    @foreach ($aircraftTypesFromPirep as $type)
-                        <option value="{{ $type->ACType }}">{{ $type->ACType }}</option>
-                    @endforeach
-                @else
-                    <option value="" disabled>No Pilot aircraft types available</option>
+                    <option value="" disabled>No aircraft types available</option>
                 @endif
             </select>
         </div>
     </div>
 
     <!-- Tombol di Tengah -->
-    <div class="flex justify-center mt-8 animate-fade-in-up delay-700">
+    <div class="flex justify-center mt-8 animate-fade-in-up delay-600">
         <button type="submit"
             class="bg-gradient-to-r from-[#d32f2f] to-[#6ba539] hover:from-[#b71c1c] hover:to-[#55882c] text-white font-bold py-3 px-10 rounded-2xl shadow-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#d32f2f] flex items-center gap-2 group">
             <!-- Changed to a download icon -->
@@ -82,7 +68,7 @@
 </form>
 
 <!-- Pesan di bawah form dengan animasi -->
-<div class="mt-8 flex justify-center animate-fade-in-up delay-800">
+<div class="mt-8 flex justify-center animate-fade-in-up delay-700">
     <div class="text-lg text-white px-6 py-4 transition-all duration-700 text-center font-semibold"
          style="min-width:320px;">
         Please select Periode, Operator, and Aircraft Type to export the combined report.
@@ -116,13 +102,13 @@
 <script>
 document.getElementById('operator').addEventListener('change', function () {
     const operator = this.value;
-    const aosDropdown = document.getElementById('aircraft_type_aos');
-    const pilotDropdown = document.getElementById('aircraft_type_pilot');
+    const aircraftDropdown = document.getElementById('aircraft_type');
 
-    aosDropdown.innerHTML = '<option value="">Select Aircraft Type (AOS)</option>';
-    pilotDropdown.innerHTML = '<option value="">Select Aircraft Type (Pilot)</option>';
+    // Reset dropdown
+    aircraftDropdown.innerHTML = '<option value="">Select Aircraft Type</option>';
 
     if (operator) {
+        // Fetch aircraft types berdasarkan operator dari TblMasterac
         fetch(`/get-aircraft-types?operator=${operator}&source=master`)
             .then(response => response.json())
             .then(data => {
@@ -130,19 +116,12 @@ document.getElementById('operator').addEventListener('change', function () {
                     const option = document.createElement('option');
                     option.value = type.ACType;
                     option.textContent = type.ACType;
-                    aosDropdown.appendChild(option);
+                    aircraftDropdown.appendChild(option);
                 });
-            });
-
-        fetch(`/get-aircraft-types?operator=${operator}&source=pirep`)
-            .then(response => response.json())
-            .then(data => {
-                data.forEach(type => {
-                    const option = document.createElement('option');
-                    option.value = type.ACType;
-                    option.textContent = type.ACType;
-                    pilotDropdown.appendChild(option);
-                });
+            })
+            .catch(error => {
+                console.error('Error fetching aircraft types:', error);
             });
     }
 });
+</script>

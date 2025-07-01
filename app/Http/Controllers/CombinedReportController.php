@@ -1,5 +1,4 @@
 <?php
-// filepath: c:\Users\Noval Rais\Documents\Github Repository\GMF-Reliability\app\Http\Controllers\CombinedReportController.php
 
 namespace App\Http\Controllers;
 
@@ -19,16 +18,8 @@ class CombinedReportController extends Controller
 {
     public function index()
     {
-        // Ambil Aircraft Types dari TblPirepSwift (untuk Pilot Report)
-        $aircraftTypesFromPirep = TblPirepSwift::select('ACTYPE as ACType')->distinct()
-            ->whereNotNull('ACTYPE')
-            ->where('ACTYPE', '!=', '')
-            ->where('ACTYPE', '!=', 'default')
-            ->orderBy('ACTYPE')
-            ->get();
-
-        // Ambil Aircraft Types dari TblMasterac (untuk AOS Report)
-        $aircraftTypesFromMaster = TblMasterac::select('ACType')->distinct()
+        // UNIFIED: Hanya ambil Aircraft Types dari TblMasterac untuk kedua report
+        $aircraftTypes = TblMasterac::select('ACType')->distinct()
             ->whereNotNull('ACType')
             ->where('ACType', '!=', '')
             ->orderBy('ACType')
@@ -38,6 +29,7 @@ class CombinedReportController extends Controller
         $operators = TblMasterac::select('Operator')->distinct()
             ->whereNotNull('Operator')
             ->where('Operator', '!=', '')
+            ->orderBy('Operator')
             ->get();
 
         // Ambil dan format data periode dari TblMonthlyfhfc
@@ -52,38 +44,34 @@ class CombinedReportController extends Controller
             });
 
         return view('report.combined-content', compact(
-            'aircraftTypesFromPirep', 
-            'aircraftTypesFromMaster', 
-            'operators', 
+            'aircraftTypes',  // Sekarang hanya 1 variable untuk aircraft types
+            'operators',
             'periods'
         ));
     }
 
     public function store(Request $request)
     {
-        // Validate input
+        // Validate input - sekarang hanya perlu 1 aircraft_type
         $request->validate([
             'period' => 'required',
-            'aircraft_type_aos' => 'required',
-            'aircraft_type_pilot' => 'required',
+            'aircraft_type' => 'required',  // Hanya 1 field aircraft_type
         ]);
 
         $period = $request->period;
         $operator = $request->operator;
-        $aircraftTypeAos = $request->aircraft_type_aos;
-        $aircraftTypePilot = $request->aircraft_type_pilot;
+        $aircraftType = $request->aircraft_type;  // Same aircraft type for both reports
 
         // ===== GET AOS DATA =====
-        $aosData = $this->getAosData($aircraftTypeAos, $period);
+        $aosData = $this->getAosData($aircraftType, $period);
 
         // ===== GET PILOT DATA =====
-        $pilotData = $this->getPilotData($aircraftTypePilot, $period, $request);
+        $pilotData = $this->getPilotData($aircraftType, $period, $request);
 
         return view('report.combined-result', [
             'aosData' => $aosData,
             'pilotData' => $pilotData,
-            'aircraftTypeAos' => $aircraftTypeAos,
-            'aircraftTypePilot' => $aircraftTypePilot,
+            'aircraftType' => $aircraftType,  // Same aircraft type for both
             'period' => $period,
             'operator' => $operator
         ]);
@@ -93,20 +81,18 @@ class CombinedReportController extends Controller
     {
         $request->validate([
             'period' => 'required',
-            'aircraft_type_aos' => 'required',
-            'aircraft_type_pilot' => 'required',
+            'aircraft_type' => 'required',  // Hanya 1 field aircraft_type
         ]);
 
         $period = $request->period;
         $operator = $request->operator;
-        $aircraftTypeAos = $request->aircraft_type_aos;     
-        $aircraftTypePilot = $request->aircraft_type_pilot;  
+        $aircraftType = $request->aircraft_type;  // Same aircraft type for both
 
         // ===== GET AOS DATA =====
-        $aosData = $this->getAosData($aircraftTypeAos, $period);
+        $aosData = $this->getAosData($aircraftType, $period);
 
         // ===== GET PILOT DATA =====
-        $pilotData = $this->getPilotData($aircraftTypePilot, $period, $request);
+        $pilotData = $this->getPilotData($aircraftType, $period, $request);
 
         // Helper function untuk format number
         $formatNumber = function($value, $decimals = 2) {
@@ -116,8 +102,7 @@ class CombinedReportController extends Controller
         $data = [
             'aosData' => $aosData,
             'pilotData' => $pilotData,
-            'aircraftTypeAos' => $aircraftTypeAos,        
-            'aircraftTypePilot' => $aircraftTypePilot,    
+            'aircraftType' => $aircraftType,  // Same aircraft type for both
             'period' => $period,
             'operator' => $operator,
             'formatNumber' => $formatNumber
@@ -131,10 +116,10 @@ class CombinedReportController extends Controller
             'isRemoteEnabled' => true,
             'defaultFont' => 'sans-serif'
         ]);
-        
+
         $periodFormatted = \Carbon\Carbon::parse($period)->format('Y-m');
-        $filename = "Fleet_Reliability_Report_{$aircraftTypeAos}_{$periodFormatted}.pdf";
-        
+        $filename = "Fleet_Reliability_Report_{$aircraftType}_{$periodFormatted}.pdf";
+
         return $pdf->download($filename);
     }
 
@@ -161,7 +146,7 @@ class CombinedReportController extends Controller
     {
         $endDate = Carbon::parse($period)->endOfMonth();
         $startDate = Carbon::parse($period)->subMonths(11)->startOfMonth();
-        
+
         // Query terpisah untuk A/C in Fleet (exclude remark "out")
         $acInFleetData = TblMonthlyfhfc::where('Actype', $aircraftType)
             ->whereBetween('MonthEval', [$startDate, $endDate])
@@ -303,14 +288,14 @@ class CombinedReportController extends Controller
             $total = 0;
             $validCount = 0;
             $monthlyValues = [];
-            
+
             for ($i = 11; $i >= 0; $i--) {
                 $monthKey = Carbon::parse($period)->subMonth($i)->format('Y-m');
                 $value = $reportData[$monthKey][$metric] ?? 0;
-                
+
                 $monthlyValues[] = $value;
                 $total += $value;
-                
+
                 // Untuk A/C In Fleet, count all months (including zero values) for proper average
                 if ($metric === 'acInFleet') {
                     $validCount++;
@@ -318,7 +303,7 @@ class CombinedReportController extends Controller
                     $validCount++;
                 }
             }
-            
+
             // Calculate based on metric type
             switch ($config['type']) {
                 case 'average_valid':
@@ -336,7 +321,7 @@ class CombinedReportController extends Controller
                     $result = $total / 12;
                     break;
             }
-            
+
             $averages[$metric] = [
                 'value' => $result,
                 'total' => $total,
@@ -354,7 +339,7 @@ class CombinedReportController extends Controller
     {
         // Ambil semua data dengan queries terpisah
         $data = $this->getAosReportData($aircraftType, $period);
-        
+
         $reportData = [];
         $totalFlightHoursPerTakeOffTotal = 0;
         $totalRevenueFlightHoursPerTakeOff = 0;
@@ -368,7 +353,7 @@ class CombinedReportController extends Controller
             $currentPeriod = Carbon::parse($period)->subMonth($i)->format('Y-m');
             $month = (int)substr($currentPeriod, 5, 2);
             $year = (int)substr($currentPeriod, 0, 4);
-            
+
             // Ambil data dari hasil query yang terpisah
             $acInFleetOnly = $data['acInFleetData'][$currentPeriod] ?? null; // Data A/C In Fleet (exclude remark "out")
             $monthly = $data['monthlyData'][$currentPeriod] ?? null; // Data lainnya (semua data)
@@ -390,38 +375,38 @@ class CombinedReportController extends Controller
             $acInService = $daysInMonth > 0 ? $this->formatRate($monthly->days_in_service / $daysInMonth) : 0;
 
             // Calculations based on existing data (semua data)
-            $flightHoursPerTakeOffTotal = $monthly->take_off_total > 0 ? 
+            $flightHoursPerTakeOffTotal = $monthly->take_off_total > 0 ?
                 $monthly->flying_hours_total / $monthly->take_off_total : 0;
 
-            $revenueFlightHoursPerTakeOff = $monthly->revenue_take_off > 0 ? 
+            $revenueFlightHoursPerTakeOff = $monthly->revenue_take_off > 0 ?
                 $monthly->revenue_flying_hours / $monthly->revenue_take_off : 0;
 
-            $dailyUtilizationFlyingHoursTotal = $monthly->days_in_service > 0 ? 
+            $dailyUtilizationFlyingHoursTotal = $monthly->days_in_service > 0 ?
                 $monthly->flying_hours_total / $monthly->days_in_service : 0;
 
-            $revenueDailyUtilizationFlyingHoursTotal = $monthly->days_in_service > 0 ? 
+            $revenueDailyUtilizationFlyingHoursTotal = $monthly->days_in_service > 0 ?
                 $monthly->revenue_flying_hours / $monthly->days_in_service : 0;
 
-            $dailyUtilizationTakeOffTotal = $monthly->days_in_service > 0 ? 
+            $dailyUtilizationTakeOffTotal = $monthly->days_in_service > 0 ?
                 $monthly->take_off_total / $monthly->days_in_service : 0;
 
-            $revenueDailyUtilizationTakeOffTotal = $monthly->days_in_service > 0 ? 
+            $revenueDailyUtilizationTakeOffTotal = $monthly->days_in_service > 0 ?
                 $monthly->revenue_take_off / $monthly->days_in_service : 0;
 
             // Technical data with null checks
             $technicalDelayTotal = $techDelay->technical_delay_total ?? 0;
             $totalDuration = $techDelay->total_duration ?? 0;
             $averageDuration = $technicalDelayTotal > 0 ? $totalDuration / $technicalDelayTotal : 0;
-            $ratePer100TakeOff = $monthly->revenue_take_off > 0 ? 
+            $ratePer100TakeOff = $monthly->revenue_take_off > 0 ?
                 $this->formatRate(($technicalDelayTotal * 100) / $monthly->revenue_take_off) : 0;
 
             $technicalIncidentTotal = $techIncident->technical_incident_total ?? 0;
-            $technicalIncidentRate = $monthly->revenue_take_off > 0 ? 
+            $technicalIncidentRate = $monthly->revenue_take_off > 0 ?
                 $this->formatRate(($technicalIncidentTotal * 100) / $monthly->revenue_take_off) : 0;
 
             $technicalCancellationTotal = $techCancellation->technical_cancellation_total ?? 0;
-            $dispatchReliability = $monthly->revenue_take_off > 0 ? 
-                $this->formatRate((($monthly->revenue_take_off - $technicalDelayTotal - $technicalCancellationTotal) 
+            $dispatchReliability = $monthly->revenue_take_off > 0 ?
+                $this->formatRate((($monthly->revenue_take_off - $technicalDelayTotal - $technicalCancellationTotal)
                 / $monthly->revenue_take_off) * 100) : 0;
 
             $reportData[$currentPeriod] = [
@@ -480,12 +465,12 @@ class CombinedReportController extends Controller
         ];
     }
 
-    // ✅ KEEP: Pilot Data method (optimized)
+    // ✅ MODIFIED: Pilot Data method - sekarang menggunakan TblMasterac untuk aircraft type
     private function getPilotData($aircraftType, $period, $request = null)
     {
         $endDate = Carbon::parse($period)->endOfMonth();
         $startDate = Carbon::parse($period)->subMonths(11)->startOfMonth();
-        
+
         // Helper function untuk format rate
         $formatRate = function($value) {
             return (float) number_format($value, 10, '.', '');
@@ -604,7 +589,7 @@ class CombinedReportController extends Controller
             $pirepCountBefore = $getCountFromGroupedData($pirepData, $beforeYear, $beforeMonth, $ata);
             $pirepCountTwoMonthsAgo = $getCountFromGroupedData($pirepData, $twoMonthsAgoYear, $twoMonthsAgoMonth, $ata);
             $pirep3Month = $pirepCount + $pirepCountBefore + $pirepCountTwoMonthsAgo;
-            
+
             // Calculate 12 months PIREP
             $pirep12Month = 0;
             for ($i = 0; $i < 12; $i++) {
@@ -618,7 +603,7 @@ class CombinedReportController extends Controller
             $pirep2Rate = $formatRate($pirepCountTwoMonthsAgo * 1000 / ($flyingHours2Before ?: 1));
             $pirepRate3Month = $formatRate(($pirepRate + $pirep1Rate + $pirep2Rate) / 3);
             $pirepRate12Month = $formatRate($pirep12Month * 1000 / ($fh12Last ?: 1));
-            
+
             // PIREP Alert Level
             $pirepAlertLevel = $alertLevels[$ata]['ALP'][0]->alertlevel ?? null;
             if (is_null($pirepAlertLevel)) {
@@ -630,7 +615,7 @@ class CombinedReportController extends Controller
                     $rate = $count * 1000 / $fh;
                     $pirepRates[] = $rate;
                 }
-                
+
                 $mean = array_sum($pirepRates) / count($pirepRates);
                 $variance = array_sum(array_map(function($rate) use ($mean) {
                     return pow($rate - $mean, 2);
@@ -648,7 +633,7 @@ class CombinedReportController extends Controller
             } elseif ($pirepRate > $pirepAlertLevel){
                 $pirepAlertStatus = 'RED-1';
             }
-            
+
             // PIREP Trend
             $pirepTrend = '';
             if ($pirepRate < $pirep1Rate && $pirep1Rate < $pirep2Rate) {
@@ -662,7 +647,7 @@ class CombinedReportController extends Controller
             $marepCountBefore = $getCountFromGroupedData($marepData, $beforeYear, $beforeMonth, $ata);
             $marepCountTwoMonthsAgo = $getCountFromGroupedData($marepData, $twoMonthsAgoYear, $twoMonthsAgoMonth, $ata);
             $marep3Month = $marepCount + $marepCountBefore + $marepCountTwoMonthsAgo;
-            
+
             // Calculate 12 months MAREP
             $marep12Month = 0;
             for ($i = 0; $i < 12; $i++) {
@@ -676,7 +661,7 @@ class CombinedReportController extends Controller
             $marep2Rate = $formatRate($marepCountTwoMonthsAgo * 1000 / ($flyingHours2Before ?: 1));
             $marepRate3Month = $formatRate(($marepRate + $marep1Rate + $marep2Rate) / 3);
             $marepRate12Month = $formatRate($marep12Month * 1000 / ($fh12Last ?: 1));
-            
+
             // MAREP Alert Level
             $marepAlertLevel = $alertLevels[$ata]['ALM'][0]->alertlevel ?? null;
             if (is_null($marepAlertLevel)) {
@@ -688,7 +673,7 @@ class CombinedReportController extends Controller
                     $rate = $count * 1000 / $fh;
                     $marepRates[] = $rate;
                 }
-                
+
                 $mean = array_sum($marepRates) / count($marepRates);
                 $variance = array_sum(array_map(function($rate) use ($mean) {
                     return pow($rate - $mean, 2);
@@ -706,7 +691,7 @@ class CombinedReportController extends Controller
             } elseif ($marepRate > $marepAlertLevel) {
                 $marepAlertStatus = 'RED-1';
             }
-            
+
             // MAREP Trend
             $marepTrend = '';
             if ($marepRate < $marep1Rate && $marep1Rate < $marep2Rate) {
@@ -720,7 +705,7 @@ class CombinedReportController extends Controller
             $delayCountBefore = $getCountFromGroupedData($delayData, $beforeYear, $beforeMonth, $ata);
             $delayCountTwoMonthsAgo = $getCountFromGroupedData($delayData, $twoMonthsAgoYear, $twoMonthsAgoMonth, $ata);
             $delay3Month = $delayCount + $delayCountBefore + $delayCountTwoMonthsAgo;
-            
+
             // Calculate 12 months DELAY
             $delay12Month = 0;
             for ($i = 0; $i < 12; $i++) {
@@ -746,7 +731,7 @@ class CombinedReportController extends Controller
                     $rate = $count * 1000 / $fc;
                     $delayRates[] = $rate;
                 }
-                
+
                 $mean = array_sum($delayRates) / count($delayRates);
                 $variance = array_sum(array_map(function($rate) use ($mean) {
                     return pow($rate - $mean, 2);
@@ -764,7 +749,7 @@ class CombinedReportController extends Controller
             } elseif ($delayRate > $delayAlertLevel){
                 $delayAlertStatus = 'RED-1';
             }
-            
+
             // DELAY Trend
             $delayTrend = '';
             if ($delayRate < $delay1Rate && $delay1Rate < $delay2Rate) {
@@ -837,7 +822,7 @@ class CombinedReportController extends Controller
     }
 
     // Helper method untuk convert decimal ke format HH:MM
-    private function convertDecimalToHoursMinutes($decimalHours) 
+    private function convertDecimalToHoursMinutes($decimalHours)
     {
         if (!is_numeric($decimalHours)) {
             return '0 : 00';

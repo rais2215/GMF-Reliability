@@ -1,3 +1,4 @@
+{{-- filepath: c:\Users\Noval Rais\Documents\Github Repository\GMF-Reliability\resources\views\pdf\combined-pdf.blade.php --}}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,7 +12,7 @@
             size: A4 portrait;
             margin: 10mm;
         }
-        
+
         /* Base Typography and Layout */
         body {
             font-family: Arial, sans-serif;
@@ -19,7 +20,7 @@
             margin: 0;
             padding: 0;
         }
-        
+
         /* Table Base Styles */
         table {
             border-collapse: collapse;
@@ -27,7 +28,7 @@
             font-family: Arial, sans-serif;
             font-size: 10px;
         }
-        
+
         th, td {
             border: 1px solid #000;
             padding: 4px;
@@ -37,18 +38,18 @@
             line-height: 1.2;
             vertical-align: middle;
         }
-        
+
         /* Text Alignment Utilities */
         .style1 {
             text-align: center;
         }
-        
+
         .style2 {
             font-size: 18px;
             text-align: center;
             font-weight: bold;
         }
-        
+
         /* Typography Components */
         h6 {
             font-size: 11px;
@@ -56,18 +57,18 @@
             margin: 4px;
             line-height: 1.3;
         }
-        
+
         .issued {
             text-align: right;
             margin: 5px;
         }
-        
+
         /* Alert Styling */
         .alert-red {
             background-color: red;
             color: white;
         }
-        
+
         /* Specialized Table Cell Styles */
         .aos-label {
             text-align: left;
@@ -75,14 +76,14 @@
             font-size: 9px;
             width: 130px;
         }
-        
+
         .ata-name {
             text-align: left;
             font-weight: bold;
             font-size: 8px;
             max-width: 110px;
         }
-        
+
         /* Cover Page Layout */
         .cover-page {
             text-align: center;
@@ -93,25 +94,25 @@
             justify-content: center;
             align-items: center;
         }
-        
+
         /* Cover Page Typography */
         .cover-title {
-            font-size: 48px; 
+            font-size: 48px;
             font-weight: bold;
             color: #000000;
             margin-bottom: 15px;
             font-family: Arial, sans-serif;
             line-height: 1.2;
         }
-        
+
         .cover-subtitle {
-            font-size: 18px; 
+            font-size: 18px;
             font-weight: bold;
             color: #374151;
             margin-bottom: 10px;
             font-family: Arial, sans-serif;
         }
-        
+
         .cover-info {
             font-size: 40px;
             font-weight: bold;
@@ -119,15 +120,15 @@
             margin-bottom: 8px;
             font-family: Arial, sans-serif;
         }
-        
+
         .cover-period {
-            font-size: 40px; 
+            font-size: 40px;
             font-weight: bold;
             color: #1e3a8a;
             margin-top: 20px;
             font-family: Arial, sans-serif;
         }
-        
+
         .cover-footer {
             position: absolute;
             bottom: 30px;
@@ -137,42 +138,42 @@
             color: #9ca3af;
             font-family: Arial, sans-serif;
         }
-        
+
         /* Responsive Table Layout */
         .table-responsive {
             overflow-x: auto;
             font-size: 9px;
         }
-        
+
         .table-responsive table {
             min-width: 100%;
             font-size: 9px;
         }
-        
+
         .table-responsive th,
         .table-responsive td {
             padding: 3px;
             font-size: 8px;
         }
-        
+
         /* Compact Table for Dense Data Display */
         .compact-table {
             margin-bottom: 15px;
         }
-        
+
         .compact-table th,
         .compact-table td {
             padding: 3px 2px;
             font-size: 8px;
             line-height: 1.1;
         }
-        
+
         /* Notes Section Styling */
         .notes-section {
             margin-top: 15px;
             font-size: 11px;
         }
-        
+
         .notes-section h6 {
             font-size: 11px;
             margin: 2px 0;
@@ -185,7 +186,7 @@
     /**
      * Helper function for number formatting
      * Removes trailing zeros and decimal points for cleaner display
-     * 
+     *
      * @param float $value The numeric value to format
      * @param int $decimals Number of decimal places
      * @return string Formatted number
@@ -199,20 +200,20 @@
     };
     @endphp
 
-    {{-- =================================== 
+    {{-- ===================================
          COVER PAGE SECTION
          =================================== --}}
     <div class="cover-page" style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; text-align: center; padding: 0;">
-        
+
         <!-- Main Title -->
         <div class="cover-title" style="margin-bottom: 30px;">Fleet Reliability Report</div>
-        
+
         <!-- Company Logo Section -->
         @php
             $logoPath = public_path('images/coverPDF.jpg');
             $logoExists = file_exists($logoPath);
         @endphp
-        
+
         @if($logoExists)
             @php
             try {
@@ -223,7 +224,7 @@
                 $imageSrc = null;
             }
             @endphp
-            
+
             @if(isset($imageSrc))
             <!-- Primary Logo Display -->
             <div style="display: flex; justify-content: center; align-items: center; margin: 60px auto; width: 100%; text-align: center;">
@@ -247,37 +248,37 @@
                 </div>
             </div>
         @endif
-        
+
         <!-- Report Information -->
         <div style="position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); text-align: center;">
-            <div class="cover-info">Garuda Indonesia</div>
+            <div class="cover-info">{{ ($operator ?? 'Garuda Indonesia') }}</div>
             <div class="cover-period" style="margin-bottom: 15px;">
                 {{ isset($period) ? \Carbon\Carbon::parse($period)->format('F Y') : 'N/A' }}
             </div>
         </div>
-        
+
         <!-- Footer Information -->
         <div style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); font-size: 12px; color: #9ca3af; font-family: Arial, sans-serif;">
             Generated by GMF Reliability Engineering & Services
         </div>
     </div>
 
-    {{-- =================================== 
+    {{-- ===================================
          ENGINEERING RELIABILITY REPORT PAGE
          =================================== --}}
     <div style="page-break-before: always;" class="engineering-report-page">
         <div style="min-height: 100vh; display: flex; flex-direction: column; padding: 10mm;">
-            
+
             <!-- Report Container with Border -->
             <div style="min-height: calc(100vh - 30mm); border: 2px solid #000000; margin: 0; padding: 10mm; position: relative; display: flex; flex-direction: column; box-sizing: border-box;">
-                
+
                 <!-- Header Logo Section -->
                 <div style="text-align: center; margin-bottom: 10px; margin-top: -5px;">
                     @php
                         $garudaLogoPath = public_path('images/GarudaIndonesia.jpg');
                         $garudaLogoExists = file_exists($garudaLogoPath);
                     @endphp
-                    
+
                     @if($garudaLogoExists)
                         @php
                         try {
@@ -288,7 +289,7 @@
                             $garudaImageSrc = null;
                         }
                         @endphp
-                        
+
                         @if(isset($garudaImageSrc))
                         <!-- Garuda Indonesia Logo -->
                         <img src="{{ $garudaImageSrc }}" alt="Garuda Indonesia Logo" style="max-width: 200px; height: auto; margin: 0 auto;">
@@ -327,7 +328,7 @@
 
                 <!-- Footer Section -->
                 <div style="margin-top: auto;">
-                    
+
                     <!-- Report Attribution -->
                     <div style="text-align: right; margin-bottom: 20px;">
                         <div style="font-size: 14px; color: #000000; margin-bottom: 5px; font-family: Arial, sans-serif; line-height: 1.2;">
@@ -337,10 +338,10 @@
                             Compiled by GMF Reliability & Engineering Services
                         </div>
                     </div>
-                    
+
                     <!-- GMF AeroAsia Footer Section -->
                     <div style="margin-bottom: 0;">
-                        
+
                         <!-- Company Banner -->
                         <div style="display: flex; align-items: center; margin: 0 -10mm 10px -10mm; width: calc(100% + 20mm);">
                             @php
@@ -361,7 +362,7 @@
                                     $gmfImageSrc = null;
                                 }
                                 @endphp
-                                
+
                                 @if(isset($gmfImageSrc))
                                 <img src="{{ $gmfImageSrc }}" alt="GMF Logo" style="width: 100%; height: 40px; object-fit: contain; object-position: center; image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges;">
                                 @else
@@ -377,7 +378,7 @@
                                 </div>
                             @endif
                         </div>
-                        
+
                         <!-- Company Address Information -->
                         <div style="text-align: right; font-size: 14px; line-height: 1.2; color: #000000; margin-top: 3px; margin-bottom: 0; margin-right: 0;">
                             <div style="margin-bottom: 1px;">Hangar 3 Room 231</div>
@@ -392,7 +393,7 @@
         </div>
     </div>
 
-    {{-- =================================== 
+    {{-- ===================================
          AIRCRAFT OPERATION SUMMARY (AOS) SECTION
          Enhanced with StartYear column implementation
          =================================== --}}
@@ -404,9 +405,9 @@
                     <th colspan="15" class="style2">AIRCRAFT OPERATION SUMMARY</th>
                 </tr>
                 <tr>
-                    <th colspan="15" class="style2">{{ $aircraftTypeAos }}</th>
+                    <th colspan="15" class="style2">{{ $aircraftType ?? 'N/A' }}</th>
                 </tr>
-                
+
                 <!-- Period Range Header -->
                 <tr>
                     <th></th>
@@ -420,7 +421,7 @@
                  * Data Processing for AOS Report
                  * Initialize period arrays and calculation functions
                  */
-                
+
                 // Generate 12-month period array for data iteration
                 $periods = [];
                 for ($i = 11; $i >= 0; $i--) {
@@ -506,7 +507,7 @@
                 // Calculate totals for 12 months - SAMA seperti aos-pdf.blade.php
                 foreach ($periods as $monthKey) {
                     $monthData = $aosData['reportData'][$monthKey] ?? [];
-                    
+
                     $totalAcInFleet += $safeNumber($monthData['acInFleet'] ?? 0);
                     $totalAcInService += $safeNumber($monthData['acInService'] ?? 0);
                     $totalDaysInService += $safeNumber($monthData['daysInService'] ?? 0);
@@ -514,21 +515,21 @@
                     $totalRevenueFlyingHours += $safeNumber($monthData['revenueFlyingHours'] ?? 0);
                     $totalTakeOffTotal += $safeNumber($monthData['takeOffTotal'] ?? 0);
                     $totalRevenueTakeOff += $safeNumber($monthData['revenueTakeOff'] ?? 0);
-                    
+
                     // Convert time values to decimal for proper calculation
                     $totalFlightHoursPerTakeOffTotal += $timeToDecimal($monthData['flightHoursPerTakeOffTotal'] ?? 0);
                     $totalRevenueFlightHoursPerTakeOff += $timeToDecimal($monthData['revenueFlightHoursPerTakeOff'] ?? 0);
                     $totalDailyUtilizationFlyingHoursTotal += $timeToDecimal($monthData['dailyUtilizationFlyingHoursTotal'] ?? 0);
                     $totalRevenueDailyUtilizationFlyingHoursTotal += $timeToDecimal($monthData['revenueDailyUtilizationFlyingHoursTotal'] ?? 0);
-                    
+
                     $totalDailyUtilizationTakeOffTotal += $safeNumber($monthData['dailyUtilizationTakeOffTotal'] ?? 0);
                     $totalRevenueDailyUtilizationTakeOffTotal += $safeNumber($monthData['revenueDailyUtilizationTakeOffTotal'] ?? 0);
                     $totalTechnicalDelayTotal += $safeNumber($monthData['technicalDelayTotal'] ?? 0);
-                    
+
                     // Convert time values to decimal for proper calculation
                     $totalTotalDuration += $timeToDecimal($monthData['totalDuration'] ?? 0);
                     $totalAverageDuration += $timeToDecimal($monthData['averageDuration'] ?? 0);
-                    
+
                     $totalRatePer100TakeOff += $safeNumber($monthData['ratePer100TakeOff'] ?? 0);
                     $totalTechnicalIncidentTotal += $safeNumber($monthData['technicalIncidentTotal'] ?? 0);
                     $totalTechnicalIncidentRate += $safeNumber($monthData['technicalIncidentRate'] ?? 0);
@@ -536,7 +537,7 @@
                     $totalDispatchReliability += $safeNumber($monthData['dispatchReliability'] ?? 0);
                 }
                 @endphp
-                
+
                 <!-- Column Headers with Month Abbreviations -->
                 <tr>
                     <td class="aos-label"></td>
@@ -546,7 +547,7 @@
                     @endfor
                     <td><b>LAST 12 MTHS</b></td>
                 </tr>
-                
+
                 <!-- Aircraft Fleet Metrics -->
                 <tr>
                     <td class="aos-label">A/C in Fleet</td>
@@ -559,7 +560,7 @@
                     @endforeach
                     <td>{{ $formatNumber($totalAcInFleet / 12) }}</td>
                 </tr>
-                
+
                 <tr>
                     <td class="aos-label">A/C in Service</td>
                     <td>{{ $formatNumber($totalAcInService / 12) }}</td>
@@ -571,7 +572,7 @@
                     @endforeach
                     <td>{{ $formatNumber($totalAcInService / 12) }}</td>
                 </tr>
-                
+
                 <tr>
                     <td class="aos-label">A/C Days in Service</td>
                     <td>{{ round($safeNumber($totalDaysInService)) }}</td>
@@ -583,7 +584,7 @@
                     @endforeach
                     <td>{{ round($safeNumber($totalDaysInService)) }}</td>
                 </tr>
-                
+
                 <!-- Flight Operations Metrics -->
                 <tr>
                     <td class="aos-label">Flying Hours - Total</td>
@@ -596,7 +597,7 @@
                     @endforeach
                     <td>{{ round($safeNumber($totalFlyingHoursTotal)) }}</td>
                 </tr>
-                
+
                 <tr>
                     <td class="aos-label">- Revenue</td>
                     <td>{{ round($safeNumber($totalRevenueFlyingHours)) }}</td>
@@ -608,7 +609,7 @@
                     @endforeach
                     <td>{{ round($safeNumber($totalRevenueFlyingHours)) }}</td>
                 </tr>
-                
+
                 <tr>
                     <td class="aos-label">Take Off - Total</td>
                     <td>{{ round($safeNumber($totalTakeOffTotal)) }}</td>
@@ -620,7 +621,7 @@
                     @endforeach
                     <td>{{ round($safeNumber($totalTakeOffTotal)) }}</td>
                 </tr>
-                
+
                 <tr>
                     <td class="aos-label">- Revenue</td>
                     <td>{{ round($safeNumber($totalRevenueTakeOff)) }}</td>
@@ -632,7 +633,7 @@
                     @endforeach
                     <td>{{ round($safeNumber($totalRevenueTakeOff)) }}</td>
                 </tr>
-                
+
                 <!-- Flight Efficiency Metrics -->
                 <tr>
                     <td class="aos-label">Flight Hours per Take Off - Total</td>
@@ -645,7 +646,7 @@
                     @endforeach
                     <td>{{ $calculateAvgTime($totalFlightHoursPerTakeOffTotal) }}</td>
                 </tr>
-                
+
                 <tr>
                     <td class="aos-label">- Revenue</td>
                     <td>{{ $calculateAvgTime($totalRevenueFlightHoursPerTakeOff) }}</td>
@@ -657,7 +658,7 @@
                     @endforeach
                     <td>{{ $calculateAvgTime($totalRevenueFlightHoursPerTakeOff) }}</td>
                 </tr>
-                
+
                 <!-- Daily Utilization Metrics -->
                 <tr>
                     <td class="aos-label">Daily Utiliz - Total FH</td>
@@ -670,7 +671,7 @@
                     @endforeach
                     <td>{{ $calculateAvgTime($totalDailyUtilizationFlyingHoursTotal) }}</td>
                 </tr>
-                
+
                 <tr>
                     <td class="aos-label">- Revenue FH</td>
                     <td>{{ $calculateAvgTime($totalRevenueDailyUtilizationFlyingHoursTotal) }}</td>
@@ -682,7 +683,7 @@
                     @endforeach
                     <td>{{ $calculateAvgTime($totalRevenueDailyUtilizationFlyingHoursTotal) }}</td>
                 </tr>
-                
+
                 <tr>
                     <td class="aos-label">- Total FC</td>
                     <td>{{ $formatNumber($totalDailyUtilizationTakeOffTotal / 12) }}</td>
@@ -694,7 +695,7 @@
                     @endforeach
                     <td>{{ $formatNumber($totalDailyUtilizationTakeOffTotal / 12) }}</td>
                 </tr>
-                
+
                 <tr>
                     <td class="aos-label">- Revenue FC</td>
                     <td>{{ $formatNumber($totalRevenueDailyUtilizationTakeOffTotal / 12) }}</td>
@@ -706,7 +707,7 @@
                     @endforeach
                     <td>{{ $formatNumber($totalRevenueDailyUtilizationTakeOffTotal / 12) }}</td>
                 </tr>
-                
+
                 <!-- Technical Performance Metrics -->
                 <tr>
                     <td class="aos-label">Technical Delay - Total</td>
@@ -719,7 +720,7 @@
                     @endforeach
                     <td>{{ round($safeNumber($totalTechnicalDelayTotal)) }}</td>
                 </tr>
-                
+
                 <tr>
                     <td class="aos-label">- Tot Duration</td>
                     <td>{{ $calculateAvgTime($totalTotalDuration) }}</td>
@@ -731,7 +732,7 @@
                     @endforeach
                     <td>{{ $calculateAvgTime($totalTotalDuration) }}</td>
                 </tr>
-                
+
                 <tr>
                     <td class="aos-label">- Avg Duration</td>
                     <td>{{ $calculateAvgTime($totalAverageDuration) }}</td>
@@ -743,7 +744,7 @@
                     @endforeach
                     <td>{{ $calculateAvgTime($totalAverageDuration) }}</td>
                 </tr>
-                
+
                 <tr>
                     <td class="aos-label">- Rate / 100 Take Off</td>
                     <td>{{ $formatNumber($totalRatePer100TakeOff / 12) }}</td>
@@ -755,7 +756,7 @@
                     @endforeach
                     <td>{{ $formatNumber($totalRatePer100TakeOff / 12) }}</td>
                 </tr>
-                
+
                 <!-- Technical Incident Metrics -->
                 <tr>
                     <td class="aos-label">Technical Incident - Total</td>
@@ -768,7 +769,7 @@
                     @endforeach
                     <td>{{ round($safeNumber($totalTechnicalIncidentTotal)) }}</td>
                 </tr>
-                
+
                 <tr>
                     <td class="aos-label">- Rate/100 FC</td>
                     <td>{{ $formatNumber($totalTechnicalIncidentRate / 12) }}</td>
@@ -780,7 +781,7 @@
                     @endforeach
                     <td>{{ $formatNumber($totalTechnicalIncidentRate / 12) }}</td>
                 </tr>
-                
+
                 <!-- Technical Cancellation and Reliability Metrics -->
                 <tr>
                     <td class="aos-label">Technical Cancellation - Total</td>
@@ -793,7 +794,7 @@
                     @endforeach
                     <td>{{ round($safeNumber($totalTechnicalCancellationTotal)) }}</td>
                 </tr>
-                
+
                 <tr>
                     <td class="aos-label">Dispatch Reliability (%)</td>
                     <td>{{ $formatNumber($totalDispatchReliability / 12) }}%</td>
@@ -809,7 +810,7 @@
         </table>
     </div>
 
-    {{-- =================================== 
+    {{-- ===================================
          PILOT REPORT SECTION
          Technical Pilot Report Analysis by ATA Chapter
          =================================== --}}
@@ -818,10 +819,10 @@
             <thead>
                 <!-- Report Header -->
                 <tr>
-                    <th colspan="2">{{ $aircraftTypePilot }}</th>
+                    <th colspan="2">{{ $aircraftType ?? 'N/A' }}</th>
                     <th colspan="13">PILOT REPORT</th>
                 </tr>
-                
+
                 <!-- Flight Hours Summary -->
                 <tr>
                     <th colspan="2">Total Flight Hours</th>
@@ -832,7 +833,7 @@
                     <th>{{ round($pilotData['fh12Last'] ?? 0) }}</th>
                     <th colspan="8"></th>
                 </tr>
-                
+
                 <!-- Column Headers with Period Information -->
                 <tr>
                     <th colspan="2" rowspan="2">ATA CHAPTER</th>
@@ -882,7 +883,7 @@
                         <td>{{ $formatNumber($report['pirepAlertLevel'] ?? 0) }}</td>
                         <td>{{ $report['pirepAlertStatus'] ?? '' }}</td>
                         <td>{{ $report['pirepTrend'] ?? '' }}</td>
-                    </tr>  
+                    </tr>
                     @endforeach
                 @else
                     <tr>
@@ -891,7 +892,7 @@
                 @endif
             </tbody>
         </table>
-        
+
         <!-- Report Notes and Documentation -->
         <div class="notes-section">
             <h6>NOTE :</h6>
@@ -903,7 +904,7 @@
         <h6 class="issued">Issued by JKTMQGA and Compiled by GMF Reliability Engineering & Services</h6>
     </div>
 
-    {{-- =================================== 
+    {{-- ===================================
          MAINTENANCE FINDING REPORT SECTION
          Maintenance Finding Report Analysis by ATA Chapter
          =================================== --}}
@@ -912,10 +913,10 @@
             <thead>
                 <!-- Report Header -->
                 <tr>
-                    <th colspan="2">{{ $aircraftTypePilot }}</th>
+                    <th colspan="2">{{ $aircraftType ?? 'N/A' }}</th>
                     <th colspan="13">MAINTENANCE FINDING REPORT</th>
                 </tr>
-                
+
                 <!-- Flight Hours Summary -->
                 <tr>
                     <th colspan="2">Total Flight Hours</th>
@@ -926,7 +927,7 @@
                     <th>{{ round($pilotData['fh12Last'] ?? 0) }}</th>
                     <th colspan="8"></th>
                 </tr>
-                
+
                 <!-- Column Headers with Period Information -->
                 <tr>
                     <th colspan="2" rowspan="2">ATA CHAPTER</th>
@@ -976,7 +977,7 @@
                         <td>{{ $formatNumber($report['marepAlertLevel'] ?? 0) }}</td>
                         <td>{{ $report['marepAlertStatus'] ?? '' }}</td>
                         <td>{{ $report['marepTrend'] ?? '' }}</td>
-                    </tr>  
+                    </tr>
                     @endforeach
                 @else
                     <tr>
@@ -985,7 +986,7 @@
                 @endif
             </tbody>
         </table>
-        
+
         <!-- Report Notes and Documentation -->
         <div class="notes-section">
             <h6>NOTE :</h6>
@@ -997,7 +998,7 @@
         <h6 class="issued">Issued by JKTMQGA and Compiled by GMF Reliability Engineering & Services</h6>
     </div>
 
-    {{-- =================================== 
+    {{-- ===================================
          TECHNICAL DELAY REPORT SECTION
          Technical Delay > 15 Minutes and Cancellation Analysis
          =================================== --}}
@@ -1006,10 +1007,10 @@
             <thead>
                 <!-- Report Header -->
                 <tr>
-                    <th colspan="2">{{ $aircraftTypePilot }}</th>
+                    <th colspan="2">{{ $aircraftType ?? 'N/A' }}</th>
                     <th colspan="13">TECHNICAL DELAY > 15 MINUTES AND CANCELLATION</th>
                 </tr>
-                
+
                 <!-- Flight Cycles Summary -->
                 <tr>
                     <th colspan="2">Total Flight Cycles</th>
@@ -1020,7 +1021,7 @@
                     <th>{{ round($pilotData['fc12Last'] ?? 0) }}</th>
                     <th colspan="8"></th>
                 </tr>
-                
+
                 <!-- Column Headers with Period Information -->
                 <tr>
                     <th colspan="2" rowspan="2">ATA CHAPTER</th>
@@ -1079,7 +1080,7 @@
                 @endif
             </tbody>
         </table>
-        
+
         <!-- Report Notes and Documentation -->
         <div class="notes-section">
             <h6>NOTE :</h6>

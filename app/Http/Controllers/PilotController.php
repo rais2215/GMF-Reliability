@@ -20,15 +20,17 @@ class PilotController extends Controller
 {
     public function pilotIndex()
     {
-        $aircraftTypes = TblPirepSwift::select('ACTYPE')->distinct()
-            ->whereNotNull('ACTYPE')
-            ->where('ACTYPE', '!=', '')
-            ->where('ACTYPE', '!=', 'default')
+        // Ambil aircraft types dari TblMasterac, bukan TblPirepSwift
+        $aircraftTypes = TblMasterac::select('ACType')->distinct()
+            ->whereNotNull('ACType')
+            ->where('ACType', '!=', '')
+            ->orderBy('ACType')
             ->get();
 
         $operators = TblMasterac::select('Operator')->distinct()
             ->whereNotNull('Operator')
             ->where('Operator', '!=', '')
+            ->orderBy('Operator')
             ->get();
 
         $periods = TblMonthlyfhfc::select('MonthEval')->distinct()
@@ -78,7 +80,7 @@ class PilotController extends Controller
         $flyingCyclesTotal = $getFlyingCycles($aircraftType, $period);
         $flyingCyclesBefore = $getFlyingCycles($aircraftType, \Carbon\Carbon::parse($period)->subMonth(1)->format('Y-m-01'));
         $flyingCycles2Before = $getFlyingCycles($aircraftType, \Carbon\Carbon::parse($period)->subMonth(2)->format('Y-m-01'));
-        
+
         //Hitung Totals
         $fh3Last = $flyingHoursTotal + $flyingHoursBefore + $flyingHours2Before;
         $fc3Last = $flyingCyclesTotal + $flyingCyclesBefore + $flyingCycles2Before;
@@ -99,7 +101,7 @@ class PilotController extends Controller
         for ($i = 0; $i < 12; $i++) {
             $loopMonth = \Carbon\Carbon::parse($period)->subMonths($i)->month;
             $loopYear = \Carbon\Carbon::parse($period)->subMonths($i)->year;
-            
+
             $pirepCounts = TblPirepSwift::where('ACTYPE', $aircraftType)
                 ->whereMonth('DATE', $loopMonth)
                 ->whereYear('DATE', $loopYear)
@@ -118,7 +120,7 @@ class PilotController extends Controller
         for ($i = 0; $i < 12; $i++) {
             $loopMonth = \Carbon\Carbon::parse($period)->subMonths($i)->month;
             $loopYear = \Carbon\Carbon::parse($period)->subMonths($i)->year;
-            
+
             $marepCounts = TblPirepSwift::where('ACTYPE', $aircraftType)
                 ->whereMonth('DATE', $loopMonth)
                 ->whereYear('DATE', $loopYear)
@@ -137,7 +139,7 @@ class PilotController extends Controller
         for ($i = 0; $i < 12; $i++) {
             $loopMonth = \Carbon\Carbon::parse($period)->subMonths($i)->month;
             $loopYear = \Carbon\Carbon::parse($period)->subMonths($i)->year;
-            
+
             $delayCounts = Mcdrnew::where('ACtype', $aircraftType)
                 ->whereMonth('DateEvent', $loopMonth)
                 ->whereYear('DateEvent', $loopYear)
@@ -165,12 +167,12 @@ class PilotController extends Controller
             })
             ->get()
             ->groupBy(['ata', 'type']);
-        
+
         // Helper function untuk menghilangkan trailing zero
         $formatRate = function($value) {
             return (float) number_format($value, 10, '.', '');
         };
-        
+
         $reportPerAta = [];
 
         foreach ($tblAta as $ataRow) {
@@ -182,7 +184,7 @@ class PilotController extends Controller
             $pirepCountBefore = $pirepData[1][$ata]->count ?? 0;
             $pirepCountTwoMonthsAgo = $pirepData[2][$ata]->count ?? 0;
             $pirep3Month = $pirepCount + $pirepCountBefore + $pirepCountTwoMonthsAgo;
-            
+
             $pirep12Month = 0;
             for ($i = 0; $i < 12; $i++) {
                 $pirep12Month += $pirepData[$i][$ata]->count ?? 0;
@@ -194,7 +196,7 @@ class PilotController extends Controller
             $pirep2Rate = $formatRate($pirepCountTwoMonthsAgo * 1000 / ($flyingHours2Before ?: 1));
             $pirepRate3Month = $formatRate(($pirepRate + $pirep1Rate + $pirep2Rate) / 3);
             $pirepRate12Month = $formatRate($pirep12Month * 1000 / ($fh12Last ?: 1));
-            
+
             // PIREP ALERT LEVEL
             $pirepAlertLevel = $alertLevels[$ata]['ALP'][0]->alertlevel ?? null;
 
@@ -211,9 +213,9 @@ class PilotController extends Controller
                         $count = $pirepData[$i][$ata]->count ?? 0;
                         $rate = $count * 1000 / ($fh ?: 1);
                         $pirepRates[] = $rate;
-                    }   
+                    }
                 }
-                
+
                 // Gunakan metode yang sama seperti MAREP untuk konsistensi
                 $mean = array_sum($pirepRates) / count($pirepRates);
                 $variance = array_sum(array_map(function($rate) use ($mean) {
@@ -232,7 +234,7 @@ class PilotController extends Controller
             } elseif ($pirepRate > $pirepAlertLevel){
                 $pirepAlertStatus = 'RED-1';
             }
-            
+
             // ~~~ PIREP TREND ~~~
             $pirepTrend = '';
             if ($pirepRate < $pirep1Rate && $pirep1Rate < $pirep2Rate) {
@@ -248,19 +250,19 @@ class PilotController extends Controller
             $marepCountBefore = $marepData[1][$ata]->count ?? 0;
             $marepCountTwoMonthsAgo = $marepData[2][$ata]->count ?? 0;
             $marep3Month = $marepCount + $marepCountBefore + $marepCountTwoMonthsAgo;
-            
+
             $marep12Month = 0;
             for ($i = 0; $i < 12; $i++) {
                 $marep12Month += $marepData[$i][$ata]->count ?? 0;
             }
 
-            // ~~~ MAREP RATE PERIOD ~~~  
+            // ~~~ MAREP RATE PERIOD ~~~
             $marepRate = $formatRate($marepCount * 1000 / ($flyingHoursTotal ?: 1));
             $marep1Rate = $formatRate($marepCountBefore * 1000 / ($flyingHoursBefore ?: 1));
             $marep2Rate = $formatRate($marepCountTwoMonthsAgo * 1000 / ($flyingHours2Before ?: 1));
             $marepRate3Month = $formatRate(($marepRate + $marep1Rate + $marep2Rate) / 3);
             $marepRate12Month = $formatRate($marep12Month * 1000 / ($fh12Last ?: 1));
-            
+
             // ~~~ MAREP ALERT LEVEL ~~~
             $marepAlertLevel = $alertLevels[$ata]['ALM'][0]->alertlevel ?? null;
 
@@ -277,9 +279,9 @@ class PilotController extends Controller
                         $count = $marepData[$i][$ata]->count ?? 0;
                         $rate = $count * 1000 / ($fh ?: 1);
                         $marepRates[] = $rate;
-                    }   
+                    }
                 }
-                
+
                 // Gunakan metode yang sama seperti PIREP untuk konsistensi
                 $mean = array_sum($marepRates) / count($marepRates);
                 $variance = array_sum(array_map(function($rate) use ($mean) {
@@ -303,7 +305,7 @@ class PilotController extends Controller
             elseif ($marepRate > $marepAlertLevel) {
                 $marepAlertStatus = 'RED-1';
             }
-            
+
             // ~~~ MAREP TREND ~~~
             $marepTrend = '';
             if ($marepRate < $marep1Rate && $marep1Rate < $marep2Rate) {
@@ -347,9 +349,9 @@ class PilotController extends Controller
                         $count = $delayData[$i][$ata]->count ?? 0;
                         $rate = $count * 1000 / ($fc ?: 1);
                         $delayRates[] = $rate;
-                    }   
+                    }
                 }
-                
+
                 // Gunakan metode yang sama seperti PIREP untuk konsistensi
                 $mean = array_sum($delayRates) / count($delayRates);
                 $variance = array_sum(array_map(function($rate) use ($mean) {
@@ -368,7 +370,7 @@ class PilotController extends Controller
             } elseif ($delayRate > $delayAlertLevel){
                 $delayAlertStatus = 'RED-1';
             }
-            
+
             // ~~~ TECHNICAL DELAY TREND ~~~
             $delayTrend = '';
             if ($delay1Rate > $delay2Rate && $delay1Rate < $delayRate) {
@@ -441,11 +443,11 @@ class PilotController extends Controller
         ]);
 
         $aircraftType = $request->aircraft_type;
-        $period = $request->period; // Format: YYYY-MM
+        $period = $request->period;
         $month = date('m', strtotime($period));
         $year = date('Y', strtotime($period));
 
-        // Fungsi untuk menghitung total flying hours
+        // Reuse calculation logic dari pilotStore
         $getFlyingHours = function($aircraftType, $period) {
             return TblMonthlyfhfc::where('Actype', $aircraftType)
                 ->where('MonthEval', $period)
@@ -460,7 +462,6 @@ class PilotController extends Controller
                 ->first()->total ?? 0;
         };
 
-         // Hitung flying hours untuk periode sekarang dan sebelumnya
         $flyingHoursTotal = $getFlyingHours($aircraftType, $period);
         $flyingHoursBefore = $getFlyingHours($aircraftType, \Carbon\Carbon::parse($period)->subMonth(1)->format('Y-m-01'));
         $flyingHours2Before = $getFlyingHours($aircraftType, \Carbon\Carbon::parse($period)->subMonth(2)->format('Y-m-01'));
@@ -468,8 +469,7 @@ class PilotController extends Controller
         $flyingCyclesTotal = $getFlyingCycles($aircraftType, $period);
         $flyingCyclesBefore = $getFlyingCycles($aircraftType, \Carbon\Carbon::parse($period)->subMonth(1)->format('Y-m-01'));
         $flyingCycles2Before = $getFlyingCycles($aircraftType, \Carbon\Carbon::parse($period)->subMonth(2)->format('Y-m-01'));
-        
-        //Hitung Totals
+
         $fh3Last = $flyingHoursTotal + $flyingHoursBefore + $flyingHours2Before;
         $fc3Last = $flyingCyclesTotal + $flyingCyclesBefore + $flyingCycles2Before;
 
@@ -484,12 +484,12 @@ class PilotController extends Controller
         $excludedIds = [5, 11, 12, 58, 70];
         $tblAta = TblMasterAta::whereNotIn('ATA', $excludedIds)->get();
 
-        // ===== OPTIMIZED: Single Query untuk semua data PIREP =====
+        // ===== Copy semua logika perhitungan dari pilotStore =====
         $pirepData = [];
         for ($i = 0; $i < 12; $i++) {
             $loopMonth = \Carbon\Carbon::parse($period)->subMonths($i)->month;
             $loopYear = \Carbon\Carbon::parse($period)->subMonths($i)->year;
-            
+
             $pirepCounts = TblPirepSwift::where('ACTYPE', $aircraftType)
                 ->whereMonth('DATE', $loopMonth)
                 ->whereYear('DATE', $loopYear)
@@ -503,12 +503,11 @@ class PilotController extends Controller
             $pirepData[$i] = $pirepCounts;
         }
 
-        // ===== OPTIMIZED: Single Query untuk semua data MAREP =====
         $marepData = [];
         for ($i = 0; $i < 12; $i++) {
             $loopMonth = \Carbon\Carbon::parse($period)->subMonths($i)->month;
             $loopYear = \Carbon\Carbon::parse($period)->subMonths($i)->year;
-            
+
             $marepCounts = TblPirepSwift::where('ACTYPE', $aircraftType)
                 ->whereMonth('DATE', $loopMonth)
                 ->whereYear('DATE', $loopYear)
@@ -522,12 +521,11 @@ class PilotController extends Controller
             $marepData[$i] = $marepCounts;
         }
 
-        // ===== OPTIMIZED: Single Query untuk semua data DELAY =====
         $delayData = [];
         for ($i = 0; $i < 12; $i++) {
             $loopMonth = \Carbon\Carbon::parse($period)->subMonths($i)->month;
             $loopYear = \Carbon\Carbon::parse($period)->subMonths($i)->year;
-            
+
             $delayCounts = Mcdrnew::where('ACtype', $aircraftType)
                 ->whereMonth('DateEvent', $loopMonth)
                 ->whereYear('DateEvent', $loopYear)
@@ -541,7 +539,6 @@ class PilotController extends Controller
             $delayData[$i] = $delayCounts;
         }
 
-        // ===== OPTIMIZED: Single Query untuk semua Alert Levels =====
         $alertLevels = TblAlertLevel::where('actype', $aircraftType)
             ->whereIn('ata', $tblAta->pluck('ATA'))
             ->whereIn('type', ['ALP', 'ALM', 'ALD'])
@@ -556,11 +553,10 @@ class PilotController extends Controller
             ->get()
             ->groupBy(['ata', 'type']);
 
-        // Helper function untuk menghilangkan trailing zero
         $formatRate = function($value) {
             return (float) number_format($value, 10, '.', '');
         };
-    
+
         $reportPerAta = [];
 
         foreach ($tblAta as $ataRow) {
@@ -572,39 +568,30 @@ class PilotController extends Controller
             $pirepCountBefore = $pirepData[1][$ata]->count ?? 0;
             $pirepCountTwoMonthsAgo = $pirepData[2][$ata]->count ?? 0;
             $pirep3Month = $pirepCount + $pirepCountBefore + $pirepCountTwoMonthsAgo;
-            
+
             $pirep12Month = 0;
             for ($i = 0; $i < 12; $i++) {
                 $pirep12Month += $pirepData[$i][$ata]->count ?? 0;
             }
 
-            // ~~~ PIREP RATE PERIOD ~~~
             $pirepRate = $formatRate($pirepCount * 1000 / ($flyingHoursTotal ?: 1));
             $pirep1Rate = $formatRate($pirepCountBefore * 1000 / ($flyingHoursBefore ?: 1));
             $pirep2Rate = $formatRate($pirepCountTwoMonthsAgo * 1000 / ($flyingHours2Before ?: 1));
             $pirepRate3Month = $formatRate(($pirepRate + $pirep1Rate + $pirep2Rate) / 3);
             $pirepRate12Month = $formatRate($pirep12Month * 1000 / ($fh12Last ?: 1));
-            
-            // PIREP ALERT LEVEL
+
             $pirepAlertLevel = $alertLevels[$ata]['ALP'][0]->alertlevel ?? null;
 
             if (is_null($pirepAlertLevel)) {
-                $pirepRates = $request->input('rates', []);
-                if (count($pirepRates) > 12) {
-                    $pirepRates = array_slice($pirepRates, -12);
+                $pirepRates = [$pirepRate, $pirep1Rate, $pirep2Rate];
+                for ($i = 3; $i < 12; $i++) {
+                    $periodForFH = \Carbon\Carbon::parse($period)->subMonths($i)->format('Y-m-01');
+                    $fh = $getFlyingHours($aircraftType, $periodForFH);
+                    $count = $pirepData[$i][$ata]->count ?? 0;
+                    $rate = $count * 1000 / ($fh ?: 1);
+                    $pirepRates[] = $rate;
                 }
-                if (empty($pirepRates) || count($pirepRates) < 12) {
-                    $pirepRates = [$pirepRate, $pirep1Rate, $pirep2Rate];
-                    for ($i = 3; $i < 12; $i++) {
-                        $periodForFH = \Carbon\Carbon::parse($period)->subMonths($i)->format('Y-m-01');
-                        $fh = $getFlyingHours($aircraftType, $periodForFH);
-                        $count = $pirepData[$i][$ata]->count ?? 0;
-                        $rate = $count * 1000 / ($fh ?: 1);
-                        $pirepRates[] = $rate;
-                    }   
-                }
-                
-                // Gunakan metode yang sama seperti MAREP untuk konsistensi
+
                 $mean = array_sum($pirepRates) / count($pirepRates);
                 $variance = array_sum(array_map(function($rate) use ($mean) {
                     return pow($rate - $mean, 2);
@@ -613,7 +600,6 @@ class PilotController extends Controller
                 $pirepAlertLevel = $mean + 2 * $stddev;
             }
 
-             // ~~~ PIREP ALERT STATUS ~~~
             $pirepAlertStatus = '';
             if ($pirepRate > $pirepAlertLevel && $pirep1Rate > $pirepAlertLevel && $pirep2Rate > $pirepAlertLevel){
                 $pirepAlertStatus = 'RED-3';
@@ -622,8 +608,7 @@ class PilotController extends Controller
             } elseif ($pirepRate > $pirepAlertLevel){
                 $pirepAlertStatus = 'RED-1';
             }
-            
-            // ~~~ PIREP TREND ~~~
+
             $pirepTrend = '';
             if ($pirepRate < $pirep1Rate && $pirep1Rate < $pirep2Rate) {
                 $pirepTrend = 'DOWN';
@@ -638,39 +623,30 @@ class PilotController extends Controller
             $marepCountBefore = $marepData[1][$ata]->count ?? 0;
             $marepCountTwoMonthsAgo = $marepData[2][$ata]->count ?? 0;
             $marep3Month = $marepCount + $marepCountBefore + $marepCountTwoMonthsAgo;
-            
+
             $marep12Month = 0;
             for ($i = 0; $i < 12; $i++) {
                 $marep12Month += $marepData[$i][$ata]->count ?? 0;
             }
 
-            // ~~~ MAREP RATE PERIOD ~~~  
             $marepRate = $formatRate($marepCount * 1000 / ($flyingHoursTotal ?: 1));
             $marep1Rate = $formatRate($marepCountBefore * 1000 / ($flyingHoursBefore ?: 1));
             $marep2Rate = $formatRate($marepCountTwoMonthsAgo * 1000 / ($flyingHours2Before ?: 1));
             $marepRate3Month = $formatRate(($marepRate + $marep1Rate + $marep2Rate) / 3);
             $marepRate12Month = $formatRate($marep12Month * 1000 / ($fh12Last ?: 1));
-            
-            // ~~~ MAREP ALERT LEVEL ~~~
+
             $marepAlertLevel = $alertLevels[$ata]['ALM'][0]->alertlevel ?? null;
 
             if (is_null($marepAlertLevel)) {
-                $marepRates = $request->input('rates', []);
-                if (count($marepRates) > 12) {
-                    $marepRates = array_slice($marepRates, -12);
+                $marepRates = [$marepRate, $marep1Rate, $marep2Rate];
+                for ($i = 3; $i < 12; $i++) {
+                    $periodForFH = \Carbon\Carbon::parse($period)->subMonths($i)->format('Y-m-01');
+                    $fh = $getFlyingHours($aircraftType, $periodForFH);
+                    $count = $marepData[$i][$ata]->count ?? 0;
+                    $rate = $count * 1000 / ($fh ?: 1);
+                    $marepRates[] = $rate;
                 }
-                if (empty($marepRates) || count($marepRates) < 12) {
-                    $marepRates = [$marepRate, $marep1Rate, $marep2Rate];
-                    for ($i = 3; $i < 12; $i++) {
-                        $periodForFH = \Carbon\Carbon::parse($period)->subMonths($i)->format('Y-m-01');
-                        $fh = $getFlyingHours($aircraftType, $periodForFH);
-                        $count = $marepData[$i][$ata]->count ?? 0;
-                        $rate = $count * 1000 / ($fh ?: 1);
-                        $marepRates[] = $rate;
-                    }   
-                }
-                
-                // Gunakan metode yang sama seperti PIREP untuk konsistensi
+
                 $mean = array_sum($marepRates) / count($marepRates);
                 $variance = array_sum(array_map(function($rate) use ($mean) {
                     return pow($rate - $mean, 2);
@@ -679,22 +655,15 @@ class PilotController extends Controller
                 $marepAlertLevel = $mean + 2 * $stddev;
             }
 
-           // ~~~ MAREP ALERT STATUS ~~~
             $marepAlertStatus = '';
-            // RED-3: 3 bulan berturut-turut melebihi alert level
             if ($marepRate > $marepAlertLevel && $marep1Rate > $marepAlertLevel && $marep2Rate > $marepAlertLevel) {
                 $marepAlertStatus = 'RED-3';
-            }
-            // RED-2: 2 bulan terakhir berturut-turut melebihi alert level
-            elseif ($marepRate > $marepAlertLevel && $marep1Rate > $marepAlertLevel) {
+            } elseif ($marepRate > $marepAlertLevel && $marep1Rate > $marepAlertLevel) {
                 $marepAlertStatus = 'RED-2';
-            }
-            // RED-1: hanya bulan terakhir melebihi alert level
-            elseif ($marepRate > $marepAlertLevel) {
+            } elseif ($marepRate > $marepAlertLevel) {
                 $marepAlertStatus = 'RED-1';
             }
-            
-            // ~~~ MAREP TREND ~~~
+
             $marepTrend = '';
             if ($marepRate < $marep1Rate && $marep1Rate < $marep2Rate) {
                 $marepTrend = 'DOWN';
@@ -714,34 +683,24 @@ class PilotController extends Controller
                 $delay12Month += $delayData[$i][$ata]->count ?? 0;
             }
 
-            // ~~~ TECHNICAL DELAY RATE ~~~
             $delayRate = $formatRate($delayCount * 1000 / ($flyingCyclesTotal ?: 1));
             $delay1Rate = $formatRate($delayCountBefore * 1000 / ($flyingCyclesBefore ?: 1));
             $delay2Rate = $formatRate($delayCountTwoMonthsAgo * 1000 / ($flyingCycles2Before ?: 1));
             $delayRate3Month = $formatRate(($delayRate + $delay1Rate + $delay2Rate) / 3);
             $delayRate12Month = $formatRate($delay12Month * 1000 / ($fc12Last ?: 1));
 
-
-            // ~~~ TECHNICAL DELAY ALERT LEVEL ~~~
             $delayAlertLevel = $alertLevels[$ata]['ALD'][0]->alertlevel ?? null;
 
             if (is_null($delayAlertLevel)) {
-                $delayRates = $request->input('rates', []);
-                if (count($delayRates) > 12) {
-                    $delayRates = array_slice($delayRates, -12);
+                $delayRates = [$delayRate, $delay1Rate, $delay2Rate];
+                for ($i = 3; $i < 12; $i++) {
+                    $periodForFC = \Carbon\Carbon::parse($period)->subMonths($i)->format('Y-m-01');
+                    $fc = $getFlyingCycles($aircraftType, $periodForFC);
+                    $count = $delayData[$i][$ata]->count ?? 0;
+                    $rate = $count * 1000 / ($fc ?: 1);
+                    $delayRates[] = $rate;
                 }
-                if (empty($delayRates) || count($delayRates) < 12) {
-                    $delayRates = [$delayRate, $delay1Rate, $delay2Rate];
-                    for ($i = 3; $i < 12; $i++) {
-                        $periodForFC = \Carbon\Carbon::parse($period)->subMonths($i)->format('Y-m-01');
-                        $fc = $getFlyingCycles($aircraftType, $periodForFC);
-                        $count = $delayData[$i][$ata]->count ?? 0;
-                        $rate = $count * 1000 / ($fc ?: 1);
-                        $delayRates[] = $rate;
-                    }   
-                }
-                
-                // Gunakan metode yang sama seperti PIREP untuk konsistensi
+
                 $mean = array_sum($delayRates) / count($delayRates);
                 $variance = array_sum(array_map(function($rate) use ($mean) {
                     return pow($rate - $mean, 2);
@@ -750,7 +709,6 @@ class PilotController extends Controller
                 $delayAlertLevel = $mean + 2 * $stddev;
             }
 
-             // ~~~ TECHNICAL DELAY ALERT STATUS ~~~
             $delayAlertStatus = '';
             if ($delayRate > $delayAlertLevel && $delay1Rate > $delayAlertLevel && $delay2Rate > $delayAlertLevel){
                 $delayAlertStatus = 'RED-3';
@@ -759,22 +717,17 @@ class PilotController extends Controller
             } elseif ($delayRate > $delayAlertLevel){
                 $delayAlertStatus = 'RED-1';
             }
-            
-            // ~~~ TECHNICAL DELAY TREND ~~~
+
             $delayTrend = '';
-            if ($delayRate < $delay1Rate && $delay1Rate < $delay2Rate) {
-                $delayTrend = 'DOWN';
-            } elseif ($delayRate > $delay1Rate && $delay1Rate < $delay2Rate) {
-                $delayTrend = '';
-            } elseif ($delayRate > $delay1Rate && $delay1Rate > $delay2Rate) {
+            if ($delay1Rate > $delay2Rate && $delay1Rate < $delayRate) {
                 $delayTrend = 'UP';
+            } elseif ($delay1Rate < $delay2Rate && $delay1Rate > $delayRate) {
+                $delayTrend = 'DOWN';
             }
 
-            // Simpan hasil per ATA
             $reportPerAta[] = [
                 'ata' => $ata,
                 'ata_name' => $ata_name,
-                //PIREP DATA
                 'pirepCount' => $pirepCount,
                 'pirepCountBefore' => $pirepCountBefore,
                 'pirepCountTwoMonthsAgo' => $pirepCountTwoMonthsAgo,
@@ -788,8 +741,6 @@ class PilotController extends Controller
                 'pirepAlertLevel' => $pirepAlertLevel,
                 'pirepAlertStatus' => $pirepAlertStatus,
                 'pirepTrend' => $pirepTrend,
-
-                //MAREP DATA
                 'marepCount' => $marepCount,
                 'marepCountBefore' => $marepCountBefore,
                 'marepCountTwoMonthsAgo' => $marepCountTwoMonthsAgo,
@@ -803,8 +754,6 @@ class PilotController extends Controller
                 'marepAlertLevel' => $marepAlertLevel,
                 'marepAlertStatus' => $marepAlertStatus,
                 'marepTrend' => $marepTrend,
-                
-                //DELAY DATA
                 'delayCount' => $delayCount,
                 'delayCountBefore' => $delayCountBefore,
                 'delayCountTwoMonthsAgo' => $delayCountTwoMonthsAgo,
@@ -821,79 +770,32 @@ class PilotController extends Controller
             ];
         }
 
-        // Data untuk PDF - ambil dari report pertama untuk nilai global
-        $firstReport = $reportPerAta[0] ?? [];
-        
-        $data = [
+        // Menggunakan view yang sudah ada di pdf.pilot-pdf
+        $pdf = Pdf::loadView('pdf.pilot-pdf', [
             'reportPerAta' => $reportPerAta,
-            // Flying Hours data
-            'flyingHoursTotal' => $flyingHoursTotal,
-            'flyingHoursBefore' => $flyingHoursBefore,
-            'flyingHours2Before' => $flyingHours2Before,
-            'fh3Last' => $fh3Last,
-            'fh12Last' => $fh12Last,
-            // Flying Cycles data
-            'flyingCyclesTotal' => $flyingCyclesTotal,
-            'flyingCyclesBefore' => $flyingCyclesBefore,
-            'flyingCycles2Before' => $flyingCycles2Before,
-            'fc3Last' => $fc3Last,
-            'fc12Last' => $fc12Last,
             'aircraftType' => $aircraftType,
-            'tblAta' => $tblAta,
-            'month' => $month,
             'period' => $period,
-            // Data untuk PIREP
-            'pirepCount' => $firstReport['pirepCount'] ?? 0,
-            'pirepCountBefore' => $firstReport['pirepCountBefore'] ?? 0,
-            'pirepCountTwoMonthsAgo' => $firstReport['pirepCountTwoMonthsAgo'] ?? 0,
-            'pirep3Month' => $firstReport['pirep3Month'] ?? 0,
-            'pirep12Month' => $firstReport['pirep12Month'] ?? 0,
-            'pirepRate' => $firstReport['pirepRate'] ?? 0,
-            'pirep1Rate' => $firstReport['pirep1Rate'] ?? 0,
-            'pirep2Rate' => $firstReport['pirep2Rate'] ?? 0,
-            'pirepRate3Month' => $firstReport['pirepRate3Month'] ?? 0,
-            'pirepRate12Month' => $firstReport['pirepRate12Month'] ?? 0,
-            'pirepAlertLevel' => $firstReport['pirepAlertLevel'] ?? 0,
-            'pirepAlertStatus' => $firstReport['pirepAlertStatus'] ?? '',
-            'pirepTrend' => $firstReport['pirepTrend'] ?? '',
-            // Data untuk MAREP
-            'marepCount' => $firstReport['marepCount'] ?? 0,
-            'marepCountBefore' => $firstReport['marepCountBefore'] ?? 0,
-            'marepCountTwoMonthsAgo' => $firstReport['marepCountTwoMonthsAgo'] ?? 0,
-            'marep3Month' => $firstReport['marep3Month'] ?? 0,
-            'marep12Month' => $firstReport['marep12Month'] ?? 0,
-            'marepRate' => $firstReport['marepRate'] ?? 0,
-            'marep1Rate' => $firstReport['marep1Rate'] ?? 0,
-            'marep2Rate' => $firstReport['marep2Rate'] ?? 0,
-            'marepRate3Month' => $firstReport['marepRate3Month'] ?? 0,
-            'marepRate12Month' => $firstReport['marepRate12Month'] ?? 0,
-            'marepAlertLevel' => $firstReport['marepAlertLevel'] ?? 0,
-            'marepAlertStatus' => $firstReport['marepAlertStatus'] ?? '',
-            'marepTrend' => $firstReport['marepTrend'] ?? '',
-            // Data untuk DELAY
-            'delayCount' => $firstReport['delayCount'] ?? 0,
-            'delayCountBefore' => $firstReport['delayCountBefore'] ?? 0,
-            'delayCountTwoMonthsAgo' => $firstReport['delayCountTwoMonthsAgo'] ?? 0,
-            'delay3Month' => $firstReport['delay3Month'] ?? 0,
-            'delay12Month' => $firstReport['delay12Month'] ?? 0,
-            'delayRate' => $firstReport['delayRate'] ?? 0,
-            'delay1Rate' => $firstReport['delay1Rate'] ?? 0,
-            'delay2Rate' => $firstReport['delay2Rate'] ?? 0,
-            'delayRate3Month' => $firstReport['delayRate3Month'] ?? 0,
-            'delayRate12Month' => $firstReport['delayRate12Month'] ?? 0,
-            'delayAlertLevel' => $firstReport['delayAlertLevel'] ?? 0,
-            'delayAlertStatus' => $firstReport['delayAlertStatus'] ?? '',
-            'delayTrend' => $firstReport['delayTrend'] ?? ''
-        ];
+            'flyingHoursTotal' => $flyingHoursTotal,
+            'flyingCyclesTotal' => $flyingCyclesTotal,
+            'flyingHours2Before' => $flyingHours2Before,
+            'flyingHoursBefore' => $flyingHoursBefore,
+            'flyingCycles2Before' => $flyingCycles2Before,
+            'flyingCyclesBefore' => $flyingCyclesBefore,
+            'fh3Last' => $fh3Last,
+            'fc3Last' => $fc3Last,
+            'fh12Last' => $fh12Last,
+            'fc12Last' => $fc12Last
+        ]);
 
-        // Generate PDF
-        $pdf = Pdf::loadView('pdf.pilot-pdf', $data);
-        $pdf->setPaper('A4', 'landscape');
-        
-        // Download PDF dengan nama file yang sesuai
-        $periodOnlyDate = date('Y-m', strtotime($period));
-        $filename = "Pilot_Report_{$aircraftType}_{$periodOnlyDate}.pdf";
-        
+        // Generate filename
+        $startYear = date('Y', strtotime($period));
+        $endYear = date('Y', strtotime(\Carbon\Carbon::parse($period)->subMonths(11)));
+        if ($startYear == $endYear) {
+            $periodLabel = $startYear;
+        } else {
+            $periodLabel = $endYear . '-' . $startYear;
+        }
+        $filename = 'pilot-report-' . $aircraftType . '-' . $periodLabel . '.pdf';
         return $pdf->download($filename);
     }
 
@@ -905,11 +807,11 @@ class PilotController extends Controller
         ]);
 
         $aircraftType = $request->aircraft_type;
-        $period = $request->period; // Format: YYYY-MM
+        $period = $request->period;
         $month = date('m', strtotime($period));
         $year = date('Y', strtotime($period));
 
-        // Fungsi untuk menghitung total flying hours
+        // Reuse calculation logic dari pilotStore (sama persis seperti pilotPdf)
         $getFlyingHours = function($aircraftType, $period) {
             return TblMonthlyfhfc::where('Actype', $aircraftType)
                 ->where('MonthEval', $period)
@@ -924,7 +826,6 @@ class PilotController extends Controller
                 ->first()->total ?? 0;
         };
 
-        // Hitung flying hours untuk periode sekarang dan sebelumnya
         $flyingHoursTotal = $getFlyingHours($aircraftType, $period);
         $flyingHoursBefore = $getFlyingHours($aircraftType, \Carbon\Carbon::parse($period)->subMonth(1)->format('Y-m-01'));
         $flyingHours2Before = $getFlyingHours($aircraftType, \Carbon\Carbon::parse($period)->subMonth(2)->format('Y-m-01'));
@@ -932,8 +833,7 @@ class PilotController extends Controller
         $flyingCyclesTotal = $getFlyingCycles($aircraftType, $period);
         $flyingCyclesBefore = $getFlyingCycles($aircraftType, \Carbon\Carbon::parse($period)->subMonth(1)->format('Y-m-01'));
         $flyingCycles2Before = $getFlyingCycles($aircraftType, \Carbon\Carbon::parse($period)->subMonth(2)->format('Y-m-01'));
-        
-        //Hitung Totals
+
         $fh3Last = $flyingHoursTotal + $flyingHoursBefore + $flyingHours2Before;
         $fc3Last = $flyingCyclesTotal + $flyingCyclesBefore + $flyingCycles2Before;
 
@@ -948,12 +848,12 @@ class PilotController extends Controller
         $excludedIds = [5, 11, 12, 58, 70];
         $tblAta = TblMasterAta::whereNotIn('ATA', $excludedIds)->get();
 
-        // ===== OPTIMIZED: Single Query untuk semua data PIREP =====
+        // ===== Copy semua logika perhitungan dari pilotPdf =====
         $pirepData = [];
         for ($i = 0; $i < 12; $i++) {
             $loopMonth = \Carbon\Carbon::parse($period)->subMonths($i)->month;
             $loopYear = \Carbon\Carbon::parse($period)->subMonths($i)->year;
-            
+
             $pirepCounts = TblPirepSwift::where('ACTYPE', $aircraftType)
                 ->whereMonth('DATE', $loopMonth)
                 ->whereYear('DATE', $loopYear)
@@ -967,12 +867,11 @@ class PilotController extends Controller
             $pirepData[$i] = $pirepCounts;
         }
 
-        // ===== OPTIMIZED: Single Query untuk semua data MAREP =====
         $marepData = [];
         for ($i = 0; $i < 12; $i++) {
             $loopMonth = \Carbon\Carbon::parse($period)->subMonths($i)->month;
             $loopYear = \Carbon\Carbon::parse($period)->subMonths($i)->year;
-            
+
             $marepCounts = TblPirepSwift::where('ACTYPE', $aircraftType)
                 ->whereMonth('DATE', $loopMonth)
                 ->whereYear('DATE', $loopYear)
@@ -986,12 +885,11 @@ class PilotController extends Controller
             $marepData[$i] = $marepCounts;
         }
 
-        // ===== OPTIMIZED: Single Query untuk semua data DELAY =====
         $delayData = [];
         for ($i = 0; $i < 12; $i++) {
             $loopMonth = \Carbon\Carbon::parse($period)->subMonths($i)->month;
             $loopYear = \Carbon\Carbon::parse($period)->subMonths($i)->year;
-            
+
             $delayCounts = Mcdrnew::where('ACtype', $aircraftType)
                 ->whereMonth('DateEvent', $loopMonth)
                 ->whereYear('DateEvent', $loopYear)
@@ -1005,7 +903,6 @@ class PilotController extends Controller
             $delayData[$i] = $delayCounts;
         }
 
-        // ===== OPTIMIZED: Single Query untuk semua Alert Levels =====
         $alertLevels = TblAlertLevel::where('actype', $aircraftType)
             ->whereIn('ata', $tblAta->pluck('ATA'))
             ->whereIn('type', ['ALP', 'ALM', 'ALD'])
@@ -1020,7 +917,6 @@ class PilotController extends Controller
             ->get()
             ->groupBy(['ata', 'type']);
 
-        // Helper function untuk menghilangkan trailing zero
         $formatRate = function($value) {
             return (float) number_format($value, 10, '.', '');
         };
@@ -1036,38 +932,30 @@ class PilotController extends Controller
             $pirepCountBefore = $pirepData[1][$ata]->count ?? 0;
             $pirepCountTwoMonthsAgo = $pirepData[2][$ata]->count ?? 0;
             $pirep3Month = $pirepCount + $pirepCountBefore + $pirepCountTwoMonthsAgo;
-            
+
             $pirep12Month = 0;
             for ($i = 0; $i < 12; $i++) {
                 $pirep12Month += $pirepData[$i][$ata]->count ?? 0;
             }
 
-            // ~~~ PIREP RATE PERIOD ~~~
             $pirepRate = $formatRate($pirepCount * 1000 / ($flyingHoursTotal ?: 1));
             $pirep1Rate = $formatRate($pirepCountBefore * 1000 / ($flyingHoursBefore ?: 1));
             $pirep2Rate = $formatRate($pirepCountTwoMonthsAgo * 1000 / ($flyingHours2Before ?: 1));
             $pirepRate3Month = $formatRate(($pirepRate + $pirep1Rate + $pirep2Rate) / 3);
             $pirepRate12Month = $formatRate($pirep12Month * 1000 / ($fh12Last ?: 1));
-            
-            // PIREP ALERT LEVEL
+
             $pirepAlertLevel = $alertLevels[$ata]['ALP'][0]->alertlevel ?? null;
 
             if (is_null($pirepAlertLevel)) {
-                $pirepRates = $request->input('rates', []);
-                if (count($pirepRates) > 12) {
-                    $pirepRates = array_slice($pirepRates, -12);
+                $pirepRates = [$pirepRate, $pirep1Rate, $pirep2Rate];
+                for ($i = 3; $i < 12; $i++) {
+                    $periodForFH = \Carbon\Carbon::parse($period)->subMonths($i)->format('Y-m-01');
+                    $fh = $getFlyingHours($aircraftType, $periodForFH);
+                    $count = $pirepData[$i][$ata]->count ?? 0;
+                    $rate = $count * 1000 / ($fh ?: 1);
+                    $pirepRates[] = $rate;
                 }
-                if (empty($pirepRates) || count($pirepRates) < 12) {
-                    $pirepRates = [$pirepRate, $pirep1Rate, $pirep2Rate];
-                    for ($i = 3; $i < 12; $i++) {
-                        $periodForFH = \Carbon\Carbon::parse($period)->subMonths($i)->format('Y-m-01');
-                        $fh = $getFlyingHours($aircraftType, $periodForFH);
-                        $count = $pirepData[$i][$ata]->count ?? 0;
-                        $rate = $count * 1000 / ($fh ?: 1);
-                        $pirepRates[] = $rate;
-                    }   
-                }
-                
+
                 $mean = array_sum($pirepRates) / count($pirepRates);
                 $variance = array_sum(array_map(function($rate) use ($mean) {
                     return pow($rate - $mean, 2);
@@ -1076,7 +964,6 @@ class PilotController extends Controller
                 $pirepAlertLevel = $mean + 2 * $stddev;
             }
 
-            // ~~~ PIREP ALERT STATUS ~~~
             $pirepAlertStatus = '';
             if ($pirepRate > $pirepAlertLevel && $pirep1Rate > $pirepAlertLevel && $pirep2Rate > $pirepAlertLevel){
                 $pirepAlertStatus = 'RED-3';
@@ -1085,8 +972,7 @@ class PilotController extends Controller
             } elseif ($pirepRate > $pirepAlertLevel){
                 $pirepAlertStatus = 'RED-1';
             }
-            
-            // ~~~ PIREP TREND ~~~
+
             $pirepTrend = '';
             if ($pirepRate < $pirep1Rate && $pirep1Rate < $pirep2Rate) {
                 $pirepTrend = 'DOWN';
@@ -1101,38 +987,30 @@ class PilotController extends Controller
             $marepCountBefore = $marepData[1][$ata]->count ?? 0;
             $marepCountTwoMonthsAgo = $marepData[2][$ata]->count ?? 0;
             $marep3Month = $marepCount + $marepCountBefore + $marepCountTwoMonthsAgo;
-            
+
             $marep12Month = 0;
             for ($i = 0; $i < 12; $i++) {
                 $marep12Month += $marepData[$i][$ata]->count ?? 0;
             }
 
-            // ~~~ MAREP RATE PERIOD ~~~  
             $marepRate = $formatRate($marepCount * 1000 / ($flyingHoursTotal ?: 1));
             $marep1Rate = $formatRate($marepCountBefore * 1000 / ($flyingHoursBefore ?: 1));
             $marep2Rate = $formatRate($marepCountTwoMonthsAgo * 1000 / ($flyingHours2Before ?: 1));
             $marepRate3Month = $formatRate(($marepRate + $marep1Rate + $marep2Rate) / 3);
             $marepRate12Month = $formatRate($marep12Month * 1000 / ($fh12Last ?: 1));
-            
-            // ~~~ MAREP ALERT LEVEL ~~~
+
             $marepAlertLevel = $alertLevels[$ata]['ALM'][0]->alertlevel ?? null;
 
             if (is_null($marepAlertLevel)) {
-                $marepRates = $request->input('rates', []);
-                if (count($marepRates) > 12) {
-                    $marepRates = array_slice($marepRates, -12);
+                $marepRates = [$marepRate, $marep1Rate, $marep2Rate];
+                for ($i = 3; $i < 12; $i++) {
+                    $periodForFH = \Carbon\Carbon::parse($period)->subMonths($i)->format('Y-m-01');
+                    $fh = $getFlyingHours($aircraftType, $periodForFH);
+                    $count = $marepData[$i][$ata]->count ?? 0;
+                    $rate = $count * 1000 / ($fh ?: 1);
+                    $marepRates[] = $rate;
                 }
-                if (empty($marepRates) || count($marepRates) < 12) {
-                    $marepRates = [$marepRate, $marep1Rate, $marep2Rate];
-                    for ($i = 3; $i < 12; $i++) {
-                        $periodForFH = \Carbon\Carbon::parse($period)->subMonths($i)->format('Y-m-01');
-                        $fh = $getFlyingHours($aircraftType, $periodForFH);
-                        $count = $marepData[$i][$ata]->count ?? 0;
-                        $rate = $count * 1000 / ($fh ?: 1);
-                        $marepRates[] = $rate;
-                    }   
-                }
-                
+
                 $mean = array_sum($marepRates) / count($marepRates);
                 $variance = array_sum(array_map(function($rate) use ($mean) {
                     return pow($rate - $mean, 2);
@@ -1141,7 +1019,6 @@ class PilotController extends Controller
                 $marepAlertLevel = $mean + 2 * $stddev;
             }
 
-            // ~~~ MAREP ALERT STATUS ~~~
             $marepAlertStatus = '';
             if ($marepRate > $marepAlertLevel && $marep1Rate > $marepAlertLevel && $marep2Rate > $marepAlertLevel) {
                 $marepAlertStatus = 'RED-3';
@@ -1150,8 +1027,7 @@ class PilotController extends Controller
             } elseif ($marepRate > $marepAlertLevel) {
                 $marepAlertStatus = 'RED-1';
             }
-            
-            // ~~~ MAREP TREND ~~~
+
             $marepTrend = '';
             if ($marepRate < $marep1Rate && $marep1Rate < $marep2Rate) {
                 $marepTrend = 'DOWN';
@@ -1171,32 +1047,24 @@ class PilotController extends Controller
                 $delay12Month += $delayData[$i][$ata]->count ?? 0;
             }
 
-            // ~~~ TECHNICAL DELAY RATE ~~~
             $delayRate = $formatRate($delayCount * 1000 / ($flyingCyclesTotal ?: 1));
             $delay1Rate = $formatRate($delayCountBefore * 1000 / ($flyingCyclesBefore ?: 1));
             $delay2Rate = $formatRate($delayCountTwoMonthsAgo * 1000 / ($flyingCycles2Before ?: 1));
             $delayRate3Month = $formatRate(($delayRate + $delay1Rate + $delay2Rate) / 3);
             $delayRate12Month = $formatRate($delay12Month * 1000 / ($fc12Last ?: 1));
 
-            // ~~~ TECHNICAL DELAY ALERT LEVEL ~~~
             $delayAlertLevel = $alertLevels[$ata]['ALD'][0]->alertlevel ?? null;
 
             if (is_null($delayAlertLevel)) {
-                $delayRates = $request->input('rates', []);
-                if (count($delayRates) > 12) {
-                    $delayRates = array_slice($delayRates, -12);
+                $delayRates = [$delayRate, $delay1Rate, $delay2Rate];
+                for ($i = 3; $i < 12; $i++) {
+                    $periodForFC = \Carbon\Carbon::parse($period)->subMonths($i)->format('Y-m-01');
+                    $fc = $getFlyingCycles($aircraftType, $periodForFC);
+                    $count = $delayData[$i][$ata]->count ?? 0;
+                    $rate = $count * 1000 / ($fc ?: 1);
+                    $delayRates[] = $rate;
                 }
-                if (empty($delayRates) || count($delayRates) < 12) {
-                    $delayRates = [$delayRate, $delay1Rate, $delay2Rate];
-                    for ($i = 3; $i < 12; $i++) {
-                        $periodForFC = \Carbon\Carbon::parse($period)->subMonths($i)->format('Y-m-01');
-                        $fc = $getFlyingCycles($aircraftType, $periodForFC);
-                        $count = $delayData[$i][$ata]->count ?? 0;
-                        $rate = $count * 1000 / ($fc ?: 1);
-                        $delayRates[] = $rate;
-                    }   
-                }
-                
+
                 $mean = array_sum($delayRates) / count($delayRates);
                 $variance = array_sum(array_map(function($rate) use ($mean) {
                     return pow($rate - $mean, 2);
@@ -1205,7 +1073,6 @@ class PilotController extends Controller
                 $delayAlertLevel = $mean + 2 * $stddev;
             }
 
-            // ~~~ TECHNICAL DELAY ALERT STATUS ~~~
             $delayAlertStatus = '';
             if ($delayRate > $delayAlertLevel && $delay1Rate > $delayAlertLevel && $delay2Rate > $delayAlertLevel){
                 $delayAlertStatus = 'RED-3';
@@ -1214,18 +1081,14 @@ class PilotController extends Controller
             } elseif ($delayRate > $delayAlertLevel){
                 $delayAlertStatus = 'RED-1';
             }
-            
-            // ~~~ TECHNICAL DELAY TREND ~~~
+
             $delayTrend = '';
-            if ($delayRate < $delay1Rate && $delay1Rate < $delay2Rate) {
-                $delayTrend = 'DOWN';
-            } elseif ($delayRate > $delay1Rate && $delay1Rate < $delay2Rate) {
-                $delayTrend = '';
-            } elseif ($delayRate > $delay1Rate && $delay1Rate > $delay2Rate) {
+            if ($delay1Rate > $delay2Rate && $delay1Rate < $delayRate) {
                 $delayTrend = 'UP';
+            } elseif ($delay1Rate < $delay2Rate && $delay1Rate > $delayRate) {
+                $delayTrend = 'DOWN';
             }
 
-            // Simpan hasil per ATA
             $reportPerAta[] = [
                 'ata' => $ata,
                 'ata_name' => $ata_name,
@@ -1271,30 +1134,31 @@ class PilotController extends Controller
             ];
         }
 
-        // Prepare data untuk export
-        $data = [
+        // Generate filename
+        $startYear = date('Y', strtotime($period));
+        $endYear = date('Y', strtotime(\Carbon\Carbon::parse($period)->subMonths(11)));
+        if ($startYear == $endYear) {
+            $periodLabel = $startYear;
+        } else {
+            $periodLabel = $endYear . '-' . $startYear;
+        }
+        $filename = 'pilot-report-' . $aircraftType . '-' . $periodLabel . '.xlsx';
+
+        // Return Excel export menggunakan view yang sudah ada
+        return Excel::download(new PilotReportExport([
             'reportPerAta' => $reportPerAta,
-            'flyingHoursTotal' => $flyingHoursTotal,
-            'flyingHoursBefore' => $flyingHoursBefore,
-            'flyingHours2Before' => $flyingHours2Before,
-            'fh3Last' => $fh3Last,
-            'fh12Last' => $fh12Last,
-            'flyingCyclesTotal' => $flyingCyclesTotal,
-            'flyingCyclesBefore' => $flyingCyclesBefore,
-            'flyingCycles2Before' => $flyingCycles2Before,
-            'fc3Last' => $fc3Last,
-            'fc12Last' => $fc12Last,
             'aircraftType' => $aircraftType,
             'period' => $period,
-            'month' => $month,
-            'year' => $year
-        ];
-
-        // Generate filename
-        $periodOnlyDate = date('Y-m', strtotime($period));
-        $filename = "Pilot_Report_{$aircraftType}_{$periodOnlyDate}.xlsx";
-
-        // Export to Excel
-        return Excel::download(new PilotReportExport($data), $filename);
+            'flyingHoursTotal' => $flyingHoursTotal,
+            'flyingCyclesTotal' => $flyingCyclesTotal,
+            'flyingHours2Before' => $flyingHours2Before,
+            'flyingHoursBefore' => $flyingHoursBefore,
+            'flyingCycles2Before' => $flyingCycles2Before,
+            'flyingCyclesBefore' => $flyingCyclesBefore,
+            'fh3Last' => $fh3Last,
+            'fc3Last' => $fc3Last,
+            'fh12Last' => $fh12Last,
+            'fc12Last' => $fc12Last
+        ]), $filename);
     }
 }
