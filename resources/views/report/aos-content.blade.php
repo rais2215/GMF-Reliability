@@ -8,10 +8,10 @@
         <div class="w-full md:w-1/3 animate-fade-in-up delay-300">
             <label for="period" class="block text-base font-bold mb-2 tracking-wide text-[#0572a6]">Periode</label>
             <select name="period" id="period" class="w-full border border-[#0572a6] rounded-xl px-4 py-2 bg-[#e6f4fa] text-[#0572a6] font-semibold focus:ring-2 focus:ring-[#0572a6] focus:outline-none transition-all duration-200 shadow-sm">
-                <option value="">Select Periode</option>
-                @foreach(collect($periods)->sortBy('formatted') as $period)
-                    <option value="{{ $period['original'] }}">{{ $period['formatted'] }}</option>
-                @endforeach
+            <option value="">Select Periode</option>
+            @foreach(collect($periods)->sortByDesc('original') as $period)
+                <option value="{{ $period['original'] }}">{{ $period['formatted'] }}</option>
+            @endforeach
             </select>
         </div>
 

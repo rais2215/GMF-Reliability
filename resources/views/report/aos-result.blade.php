@@ -14,7 +14,7 @@
                     </button>
 
                     <!-- Export Buttons -->
-                    <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full lg:w-auto fade-in-right">
+                    <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full lg:w-auto fade-in-right sm:ml-auto sm:justify-end">
                         <form action="{{ route('report.aos.export.pdf') }}" method="POST" class="inline w-full sm:w-auto" onsubmit="showExportLoading('PDF')">
                             @csrf
                             <input type="hidden" name="period" value="{{ $period }}">

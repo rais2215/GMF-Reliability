@@ -14,7 +14,7 @@
                     </button>
 
                     <!-- Export Buttons -->
-                    <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full lg:w-auto fade-in-right">
+                    <div class="flex flex-col sm:flex-row sm:justify-end space-y-2 sm:space-y-0 sm:space-x-3 w-full lg:w-auto fade-in-right">
                         <form action="{{ route('report.pilot.export.pdf') }}" method="POST" class="inline w-full sm:w-auto" onsubmit="showExportLoading('PDF')">
                             @csrf
                             <input type="hidden" name="period" value="{{ $period }}">
