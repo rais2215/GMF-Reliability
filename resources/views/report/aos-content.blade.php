@@ -9,7 +9,7 @@
             <label for="period" class="block text-base font-bold mb-2 tracking-wide text-[#0572a6]">Periode</label>
             <select name="period" id="period" class="w-full border border-[#0572a6] rounded-xl px-4 py-2 bg-[#e6f4fa] text-[#0572a6] font-semibold focus:ring-2 focus:ring-[#0572a6] focus:outline-none transition-all duration-200 shadow-sm">
                 <option value="">Select Periode</option>
-                @foreach($periods as $period)
+                @foreach(collect($periods)->sortBy('formatted') as $period)
                     <option value="{{ $period['original'] }}">{{ $period['formatted'] }}</option>
                 @endforeach
             </select>
@@ -20,10 +20,8 @@
             <label for="operator-dropdown" class="block text-base font-bold mb-2 tracking-wide text-[#0572a6]">Operator</label>
             <select name="operator" id="operator-dropdown" class="w-full border border-[#0572a6] rounded-xl px-4 py-2 bg-[#e6f4fa] text-[#0572a6] font-semibold focus:ring-2 focus:ring-[#0572a6] focus:outline-none transition-all duration-200 shadow-sm">
                 <option value="">Select Operator</option>
-                @foreach($operators as $operator)
-                    @if(!empty($operator->Operator))
-                        <option value="{{ $operator->Operator }}">{{ $operator->Operator }}</option>
-                    @endif
+                @foreach(collect($operators)->filter(fn($o) => !empty($o->Operator))->sortBy('Operator') as $operator)
+                    <option value="{{ $operator->Operator }}">{{ $operator->Operator }}</option>
                 @endforeach
             </select>
         </div>
@@ -33,7 +31,7 @@
             <label for="aircraft-type-dropdown" class="block text-base font-bold mb-2 tracking-wide text-[#0572a6]">AC Type</label>
             <select name="aircraft_type" id="aircraft-type-dropdown" class="w-full border border-[#0572a6] rounded-xl px-4 py-2 bg-[#e6f4fa] text-[#0572a6] font-semibold focus:ring-2 focus:ring-[#0572a6] focus:outline-none transition-all duration-200 shadow-sm">
                 <option value="">Select Aircraft Type</option>
-                @foreach($aircraftTypes as $type)
+                @foreach(collect($aircraftTypes)->sortBy('ACType') as $type)
                     <option value="{{ $type->ACType }}">{{ $type->ACType }}</option>
                 @endforeach
             </select>
