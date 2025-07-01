@@ -402,17 +402,16 @@
             <thead>
                 <!-- Report Title Headers -->
                 <tr>
-                    <th colspan="15" class="style2">AIRCRAFT OPERATION SUMMARY</th>
+                    <th colspan="15" class="style2" style="text-align: center;">AIRCRAFT OPERATION SUMMARY</th>
                 </tr>
                 <tr>
-                    <th colspan="15" class="style2">{{ $aircraftType ?? 'N/A' }}</th>
+                    <th colspan="15" class="style2" style="text-align: center;">{{ $aircraftType ?? 'N/A' }}</th>
                 </tr>
-
                 <!-- Period Range Header -->
                 <tr>
-                    <th></th>
-                    <th></th>
-                    <th colspan="13">{{ \Carbon\Carbon::parse($period)->subYear(1)->year }}-{{ \Carbon\Carbon::parse($period)->year }}</th>
+                    <th colspan="15" style="text-align: center;">
+                        {{ \Carbon\Carbon::parse($period)->subYear(1)->year }} - {{ \Carbon\Carbon::parse($period)->year }}
+                    </th>
                 </tr>
             </thead>
             <tbody>
