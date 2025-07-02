@@ -63,6 +63,18 @@
             }
             return number_format((float)$value, 0, '.', '');
         }
+
+        // 5. TAMBAHAN: Fungsi untuk mendapatkan nilai kumulatif
+        function getCumulativeValue($reg, $type, $cumulativeData) {
+            if (!isset($cumulativeData[$reg])) {
+                return '-';
+            }
+
+            $key = $type === 'fh' ? 'cumulative_fh' : 'cumulative_fc';
+            $value = $cumulativeData[$reg][$key] ?? 0;
+
+            return $value > 0 ? formatTableNumber($value) : '-';
+        }
     @endphp
 
     <div class="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 py-4 sm:py-8">
@@ -171,11 +183,11 @@
                                                 </th>
                                             @endforeach
                                         </tr>
-                                        <!-- Baris ketiga-->
+                                        <!-- Baris ketiga: Header kumulatif -->
                                         <tr>
                                             <th class="px-4 py-2 bg-gradient-to-r from-gray-50 to-gray-100"></th>
-                                            <th class="px-4 py-2 text-center text-sm font-semibold text-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 border-l-2 border-r-2 border-t border-b border-gray-300">
-                                                {{ $startYearForDisplay }}
+                                            <th class="px-4 py-2 text-center text-sm font-semibold text-gray-700 bg-gradient-to-r from-sky-100 to-sky-200 border-l-2 border-r-2 border-t border-b border-sky-300">
+                                                <span class="text-sky-800 font-bold">{{ $startYearForDisplay }}</span>
                                             </th>
                                             @foreach ($months as $month)
                                                 <th class="px-3 py-2 text-sm"></th>
@@ -188,8 +200,11 @@
                                                 <td class="px-4 py-3 whitespace-nowrap text-sm font-bold text-gray-900 bg-gradient-to-r from-gray-50 to-gray-100 border-r border-gray-300">
                                                     {{ $registration }}
                                                 </td>
-                                                <td class="px-4 py-3 whitespace-nowrap text-sm text-center font-semibold text-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 border-r border-gray-300">
-                                                    {{ $startYearForDisplay }}
+                                                <!-- KOLOM KUMULATIF FLIGHT HOURS -->
+                                                <td class="px-4 py-3 whitespace-nowrap text-sm text-center font-bold text-sky-800 bg-gradient-to-r from-sky-50 to-sky-100 border-r border-gray-300">
+                                                    <span class="px-2 py-1 rounded-lg bg-sky-100 shadow-sm border border-sky-200 font-bold text-sky-900">
+                                                        {{ getCumulativeValue($registration, 'fh', $cumulativeData ?? []) }}
+                                                    </span>
                                                 </td>
                                                 @foreach ($months as $month)
                                                     <td class="px-3 py-3 whitespace-nowrap text-sm text-center font-semibold hover:bg-sky-100 transition-colors {{ !$loop->last ? 'border-r border-gray-200' : '' }}">
@@ -255,11 +270,11 @@
                                                 </th>
                                             @endforeach
                                         </tr>
-                                        <!-- Baris ketiga-->
+                                        <!-- Baris ketiga: Header kumulatif -->
                                         <tr>
                                             <th class="px-4 py-2 bg-gradient-to-r from-gray-50 to-gray-100"></th>
-                                            <th class="px-4 py-2 text-center text-sm font-semibold text-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 border-l-2 border-r-2 border-t border-b border-gray-300">
-                                                {{ $startYearForDisplay }}
+                                            <th class="px-4 py-2 text-center text-sm font-semibold text-gray-700 bg-gradient-to-r from-lime-100 to-lime-200 border-l-2 border-r-2 border-t border-b border-lime-300">
+                                                <span class="text-lime-800 font-bold">{{ $startYearForDisplay }}</span>
                                             </th>
                                             @foreach ($months as $month)
                                                 <th class="px-3 py-2 text-sm"></th>
@@ -272,8 +287,11 @@
                                                 <td class="px-4 py-3 whitespace-nowrap text-sm font-bold text-gray-900 bg-gradient-to-r from-gray-50 to-gray-100 border-r border-gray-300">
                                                     {{ $registration }}
                                                 </td>
-                                                <td class="px-4 py-3 whitespace-nowrap text-sm text-center font-semibold text-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 border-r border-gray-300">
-                                                    {{ $startYearForDisplay }}
+                                                <!-- KOLOM KUMULATIF FLIGHT CYCLE -->
+                                                <td class="px-4 py-3 whitespace-nowrap text-sm text-center font-bold text-lime-800 bg-gradient-to-r from-lime-50 to-lime-100 border-r border-gray-300">
+                                                    <span class="px-2 py-1 rounded-lg bg-lime-100 shadow-sm border border-lime-200 font-bold text-lime-900">
+                                                        {{ getCumulativeValue($registration, 'fc', $cumulativeData ?? []) }}
+                                                    </span>
                                                 </td>
                                                 @foreach ($months as $month)
                                                     <td class="px-3 py-3 whitespace-nowrap text-sm text-center font-semibold hover:bg-lime-100 transition-colors {{ !$loop->last ? 'border-r border-gray-200' : '' }}">
@@ -321,7 +339,7 @@
         </div>
     </div>
 
-    <!-- Simple CSS Animations -->
+    <!-- CSS dan JavaScript tetap sama... -->
     <style>
     /* Simple fade animations */
     .fade-in {
