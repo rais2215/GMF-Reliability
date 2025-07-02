@@ -15,16 +15,18 @@ class CumulativeController extends Controller
 {
     public function cumulativeIndex()
     {
-        // Ambil aircraft types dari TblMasterac, bukan TblPirepSwift
+        // Ambil aircraft types dari TblMasterac yang active = 1
         $aircraftTypes = TblMasterac::select('ACType')->distinct()
             ->whereNotNull('ACType')
             ->where('ACType', '!=', '')
+            ->where('active', 1) // Filter hanya yang active
             ->orderBy('ACType')
             ->get();
 
         $operators = TblMasterac::select('Operator')->distinct()
             ->whereNotNull('Operator')
             ->where('Operator', '!=', '')
+            ->where('active', 1) // Filter hanya yang active
             ->orderBy('Operator')
             ->get();
 
@@ -58,8 +60,9 @@ class CumulativeController extends Controller
             'tbl_monthlyfhfc.CSN'
         );
 
+        // Filter berdasarkan operator atau aircraft_type yang active = 1
         if ($request->filled('operator') || $request->filled('aircraft_type')) {
-            $masteracQuery = TblMasterac::query();
+            $masteracQuery = TblMasterac::where('active', 1); // Filter hanya yang active
 
             if ($request->filled('operator')) {
                 $masteracQuery->where('Operator', $request->operator);
@@ -72,10 +75,43 @@ class CumulativeController extends Controller
             $registrations = $masteracQuery->pluck('ACReg');
 
             $query->whereIn('tbl_monthlyfhfc.Reg', $registrations);
+        } else {
+            // Jika tidak ada filter operator/aircraft_type, tetap filter berdasarkan active = 1
+            $activeRegistrations = TblMasterac::where('active', 1)->pluck('ACReg');
+            $query->whereIn('tbl_monthlyfhfc.Reg', $activeRegistrations);
         }
 
         if ($request->filled('reg')) {
-            $query->where('tbl_monthlyfhfc.Reg', $request->reg);
+            // Pastikan reg yang dipilih juga active = 1
+            $regIsActive = TblMasterac::where('ACReg', $request->reg)
+                                    ->where('active', 1)
+                                    ->exists();
+
+            if ($regIsActive) {
+                $query->where('tbl_monthlyfhfc.Reg', $request->reg);
+            } else {
+                // Jika reg tidak active, return dengan data kosong
+                $data = [];
+                $summary = [
+                    'total_records' => 0,
+                    'total_aircraft' => 0,
+                    'date_range' => [
+                        'from' => null,
+                        'to' => null
+                    ]
+                ];
+
+                return view('report.cumulative-result', compact(
+                    'data',
+                    'summary'
+                ))->with([
+                    'operator' => $request->operator,
+                    'aircraft_type' => $request->aircraft_type,
+                    'reg' => $request->reg,
+                    'period' => $request->period,
+                    'formatted_period' => null
+                ]);
+            }
         }
 
         // --- Logika pengambilan data selama 12 bulan ---
