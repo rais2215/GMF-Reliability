@@ -1,18 +1,19 @@
 <x-app-layout>
     {{-- Page Loader --}}
-    <div id="page-loader" class="fixed inset-0 z-50 flex-col items-center justify-center bg-gradient-to-br from-white via-gray-50 to-gray-100 bg-opacity-95 hidden transition-all duration-500 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 border border-gray-200">
-            <div class="flex space-x-3 mb-6 justify-center">
-                <div class="w-4 h-16 bg-gradient-to-t from-blue-800 to-blue-500 rounded-full animate-loader-bar"></div>
-                <div class="w-4 h-16 bg-gradient-to-t from-blue-700 to-blue-400 rounded-full animate-loader-bar delay-150"></div>
-                <div class="w-4 h-16 bg-gradient-to-t from-green-600 to-green-400 rounded-full animate-loader-bar delay-300"></div>
+    <div id="page-loader" class="fixed inset-0 z-50 hidden flex-col items-center justify-center bg-[#112955]/90 backdrop-blur-lg transition-all duration-500">
+        <div class="glass-card rounded-3xl shadow-2xl p-12 border border-white/20 max-w-sm w-full mx-4 bg-white/10 backdrop-blur-xl">
+            <div class="text-center space-y-4">
+                <span id="loader-text" class="text-xl font-semibold text-white block">Loading Dashboard...</span>
+                <p class="text-sm text-gray-300">Please wait while we prepare your data</p>
             </div>
-            <span id="loader-text" class="text-lg font-semibold text-gray-700 block text-center">Loading Dashboard...</span>
-            <div class="mt-4 w-48 h-1 bg-gray-200 rounded-full overflow-hidden">
-                <div class="h-full bg-gradient-to-r from-blue-600 to-green-500 rounded-full animate-pulse"></div>
+
+            <div class="mt-6 w-full h-2 bg-white/20 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-[#7EBB1A] to-[#8DC63F] rounded-full progress-bar"></div>
             </div>
         </div>
     </div>
+
+    {{-- Main Content --}}
 
     {{-- Sidebar --}}
     <aside class="fixed top-0 left-0 h-full w-72 bg-gradient-to-b from-white via-blue-50 to-gray-100 shadow-2xl z-40 flex flex-col justify-between transition-all duration-300 border-r border-gray-200 transform-gpu" id="sidebar" style="transition: box-shadow 0.3s, transform 0.4s cubic-bezier(.4,2,.6,1);">
@@ -398,39 +399,89 @@
 
     {{-- Styles --}}
     <style>
-        /* Loader Animation */
-        @keyframes bar-bounce {
+        /* ==============================================
+        LOADER ANIMATIONS - Fixed to match edit.blade.php
+        ============================================== */
+        @keyframes loader-bounce {
             0%, 100% {
-                transform: scaleY(0.4) translateY(0);
-                opacity: 0.6;
-            }
-            25% {
-                transform: scaleY(0.8) translateY(-8px);
-                opacity: 0.8;
+                transform: scaleY(0.3);
+                opacity: 0.5;
             }
             50% {
-                transform: scaleY(1.2) translateY(-16px);
+                transform: scaleY(1.2);
                 opacity: 1;
             }
-            75% {
-                transform: scaleY(0.8) translateY(-8px);
-                opacity: 0.8;
+        }
+
+        @keyframes progress-fill {
+            0% {
+                width: 0%;
+            }
+            100% {
+                width: 100%;
             }
         }
 
-        .animate-loader-bar {
-            animation: bar-bounce 1.4s infinite ease-in-out;
+        @keyframes slide-up {
+            from {
+                opacity: 0;
+                transform: translateY(60px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .delay-150 {
-            animation-delay: 0.2s;
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
-        .delay-300 {
-            animation-delay: 0.4s;
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
         }
 
-        /* Custom Scrollbar */
+        /* ==============================================
+        LOADER CLASSES
+        ============================================== */
+        .loader-bar {
+            animation: loader-bounce 1.4s infinite ease-in-out;
+        }
+
+        .loader-delay-1 {
+            animation-delay: 0.16s;
+        }
+
+        .loader-delay-2 {
+            animation-delay: 0.32s;
+        }
+
+        .progress-bar {
+            animation: progress-fill 3s ease-in-out infinite;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ==============================================
+        CUSTOM SCROLLBAR
+        ============================================== */
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
         }
@@ -445,7 +496,9 @@
             border-radius: 10px;
         }
 
-        /* Responsive Design */
+        /* ==============================================
+        RESPONSIVE DESIGN
+        ============================================== */
         @media (max-width: 1024px) {
             #main-content {
                 margin-left: 0;
@@ -461,43 +514,315 @@
             }
         }
 
-        /* Sidebar Slide In Animation */
+        /* ==============================================
+        SIDEBAR ANIMATIONS
+        ============================================== */
         #sidebar {
             will-change: transform, box-shadow, opacity;
             opacity: 0;
             transform: translateX(-40px) scale(0.98);
             transition: opacity 0.5s cubic-bezier(.4,2,.6,1), transform 0.5s cubic-bezier(.4,2,.6,1);
         }
+
         #sidebar.animated {
             opacity: 1;
             transform: translateX(0) scale(1);
             transition-delay: 0.05s;
         }
 
-        /* Dashboard Fade Animation */
+        /* Sidebar Slide In Animation */
+        #sidebar.open {
+            animation: sidebar-slide-in 0.5s cubic-bezier(.4,2,.6,1);
+        }
+
+        @keyframes sidebar-slide-in {
+            0% {
+                transform: translateX(-100%) scale(0.95) skewY(2deg);
+                box-shadow: 0 0 0 rgba(0,0,0,0);
+                opacity: 0.7;
+            }
+            60% {
+                transform: translateX(10px) scale(1.02) skewY(-1deg);
+                box-shadow: 0 8px 32px 0 rgba(16, 112, 202, 0.12);
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(0) scale(1) skewY(0deg);
+                box-shadow: 0 8px 32px 0 rgba(16, 112, 202, 0.16);
+                opacity: 1;
+            }
+        }
+
+        /* ==============================================
+        SIDEBAR CONTENT ANIMATIONS
+        ============================================== */
         .sidebar-logo-fade {
             opacity: 0;
             transform: translateY(30px) scale(0.98);
             transition: opacity 0.5s, transform 0.5s;
         }
+
         #sidebar.animated .sidebar-logo-fade {
             opacity: 1;
             transform: translateY(0) scale(1);
             transition-delay: 0.05s;
         }
+
+        /* Sidebar Content Fade In */
+        #sidebar-profile, #sidebar-info, #sidebar-links {
+            opacity: 0;
+            transform: translateY(30px) scale(0.98);
+            transition: opacity 0.5s, transform 0.5s;
+        }
+
+        #sidebar.animated #sidebar-profile {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            transition-delay: 0.15s;
+        }
+
+        #sidebar.animated #sidebar-info {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            transition-delay: 0.3s;
+        }
+
+        #sidebar.animated #sidebar-links {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            transition-delay: 0.45s;
+        }
+
+        /* ==============================================
+        SIDEBAR LINK ANIMATIONS
+        ============================================== */
+        .sidebar-link {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, rgba(59,130,246,0.08), rgba(16,185,129,0.06));
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 0;
+        }
+
+        .sidebar-link:hover::before {
+            opacity: 1;
+        }
+
+        .sidebar-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+        }
+
+        /* ==============================================
+        DASHBOARD CONTENT ANIMATIONS
+        ============================================== */
         .dashboard-fade {
             opacity: 0;
             transform: translateY(40px) scale(0.98);
             transition: opacity 0.7s cubic-bezier(.4,2,.6,1), transform 0.7s cubic-bezier(.4,2,.6,1);
         }
+
         .dashboard-fade.animated {
             opacity: 1;
             transform: translateY(0) scale(1);
         }
+
         .dashboard-delay-1 { transition-delay: 0.1s; }
         .dashboard-delay-2 { transition-delay: 0.25s; }
         .dashboard-delay-3 { transition-delay: 0.4s; }
         .dashboard-delay-4 { transition-delay: 0.55s; }
+
+        /* ==============================================
+        CARD HOVER EFFECTS
+        ============================================== */
+        .card-enhanced {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .card-enhanced::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(126, 187, 26, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .card-enhanced:hover::before {
+            left: 100%;
+        }
+
+        .card-enhanced:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 107, 161, 0.15);
+        }
+
+        /* ==============================================
+        NAVIGATION CARD ANIMATIONS
+        ============================================== */
+        .nav-card {
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.8s ease;
+        }
+
+        .nav-card:hover::before {
+            left: 100%;
+        }
+
+        .nav-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        /* ==============================================
+        BUTTON ENHANCEMENTS
+        ============================================== */
+        .btn-enhanced {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .btn-enhanced::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-enhanced:hover::before {
+            left: 100%;
+        }
+
+        .btn-enhanced:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 107, 161, 0.3);
+        }
+
+        /* ==============================================
+        WELCOME CARD ANIMATIONS
+        ============================================== */
+        .welcome-card {
+            position: relative;
+            overflow: hidden;
+            background-attachment: fixed;
+            transition: all 0.5s ease;
+        }
+
+        .welcome-card:hover {
+            transform: scale(1.01);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        /* ==============================================
+        POWER BI CARD ENHANCEMENTS
+        ============================================== */
+        .powerbi-card {
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .powerbi-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 25px 50px rgba(29, 78, 216, 0.15);
+        }
+
+        /* ==============================================
+        LOADING STATES
+        ============================================== */
+        .loading-shimmer {
+            background: linear-gradient(90deg,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.4) 50%,
+                rgba(255, 255, 255, 0) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+
+        /* ==============================================
+        MOBILE OPTIMIZATIONS
+        ============================================== */
+        @media (max-width: 768px) {
+            .dashboard-fade {
+                transform: translateY(20px) scale(0.98);
+            }
+
+            .card-enhanced:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 15px 30px rgba(0, 107, 161, 0.1);
+            }
+
+            .nav-card:hover {
+                transform: translateY(-4px) scale(1.01);
+            }
+
+            .sidebar-link:hover {
+                transform: translateY(-1px);
+            }
+        }
+
+        /* ==============================================
+        ACCESSIBILITY ENHANCEMENTS
+        ============================================== */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* ==============================================
+        FOCUS STATES
+        ============================================== */
+        .sidebar-link:focus,
+        .btn-enhanced:focus,
+        .nav-card:focus {
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+
+        /* ==============================================
+        HIGH CONTRAST MODE
+        ============================================== */
+        @media (prefers-contrast: high) {
+            .glass-card {
+                background: rgba(255, 255, 255, 0.95);
+                border: 2px solid #000;
+            }
+        }
     </style>
 
     {{-- Scripts --}}
