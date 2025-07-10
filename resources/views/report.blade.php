@@ -1,28 +1,78 @@
 <x-app-layout>
-    <!-- Page Loader: 3 Bar Loader -->
-    <div id="page-loader" class="fixed inset-0 z-50 flex-col items-center justify-center bg-gradient-to-br from-white via-blue-50 to-blue-100 bg-opacity-95 hidden transition-all duration-500 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 border border-gray-200">
-            <div class="flex space-x-3 mb-6 justify-center">
-                <div class="w-4 h-16 bg-gradient-to-t from-blue-800 to-blue-500 rounded-full animate-loader-bar"></div>
-                <div class="w-4 h-16 bg-gradient-to-t from-blue-700 to-blue-400 rounded-full animate-loader-bar delay-150"></div>
-                <div class="w-4 h-16 bg-gradient-to-t from-green-600 to-green-400 rounded-full animate-loader-bar delay-300"></div>
+    <!-- Page Loader: 3 Bar Loader - Fixed to match register.blade.php -->
+    <div id="page-loader" class="fixed inset-0 z-50 hidden flex-col items-center justify-center bg-[#112955]/90 backdrop-blur-lg transition-all duration-500">
+        <div class="glass-card rounded-3xl shadow-2xl p-12 border border-white/20 max-w-sm w-full mx-4 bg-white/10 backdrop-blur-xl">
+
+            <div class="text-center space-y-4">
+                <span id="loader-text" class="text-xl font-semibold text-white block">Redirecting page...</span>
+                <p class="text-sm text-gray-300">Please wait while we load the content</p>
             </div>
-            <span id="loader-text" class="text-lg font-semibold text-gray-700 block text-center">Redirecting page...</span>
-            <div class="mt-4 w-48 h-1 bg-gray-200 rounded-full overflow-hidden">
-                <div class="h-full bg-gradient-to-r from-blue-600 to-green-500 rounded-full animate-pulse"></div>
+
+            <div class="mt-6 w-full h-2 bg-white/20 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-[#7EBB1A] to-[#8DC63F] rounded-full progress-bar"></div>
             </div>
         </div>
     </div>
 
     <!-- Loader Animation Style & Responsive Header -->
     <style>
+        /* ==============================================
+           LOADER ANIMATIONS - Fixed to match register.blade.php
+        ============================================== */
+        @keyframes loader-bounce {
+            0%, 100% {
+                transform: scaleY(0.3);
+                opacity: 0.5;
+            }
+            50% {
+                transform: scaleY(1.2);
+                opacity: 1;
+            }
+        }
+
+        @keyframes progress-fill {
+            0% {
+                width: 0%;
+            }
+            100% {
+                width: 100%;
+            }
+        }
+
+        /* ==============================================
+           LOADER CLASSES
+        ============================================== */
+        .loader-bar {
+            animation: loader-bounce 1.4s infinite ease-in-out;
+        }
+
+        .loader-delay-1 {
+            animation-delay: 0.16s;
+        }
+
+        .loader-delay-2 {
+            animation-delay: 0.32s;
+        }
+
+        .progress-bar {
+            animation: progress-fill 3s ease-in-out infinite;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Legacy loader bar animation for backward compatibility */
         @keyframes bar-bounce {
             0%, 100% { transform: scaleY(0.4) translateY(0); opacity: 0.6; }
             25% { transform: scaleY(0.8) translateY(-8px); opacity: 0.8; }
             50% { transform: scaleY(1.2) translateY(-16px); opacity: 1; }
             75% { transform: scaleY(0.8) translateY(-8px); opacity: 0.8; }
         }
-        .animate-loader-bar { animation: bar-bounce 1.4s infinite ease-in-out; }
+        .animate-loader-bar { animation: loader-bounce 1.4s infinite ease-in-out; }
         .delay-150 { animation-delay: 0.2s; }
         .delay-300 { animation-delay: 0.4s; }
 
@@ -233,4 +283,3 @@
         });
     </script>
 </x-app-layout>
-

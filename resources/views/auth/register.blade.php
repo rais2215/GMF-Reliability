@@ -468,11 +468,6 @@
     ============================================== -->
     <div id="page-loader" class="fixed inset-0 z-50 hidden flex-col items-center justify-center bg-[#112955]/90 backdrop-blur-lg transition-all duration-500">
         <div class="glass-card rounded-3xl shadow-2xl p-12 border border-white/20 max-w-sm w-full mx-4 bg-white/10 backdrop-blur-xl">
-            <div class="flex space-x-4 mb-8 justify-center">
-                <div class="w-3 h-20 bg-gradient-to-t from-blue-800 to-blue-500 rounded-full loader-bar"></div>
-                <div class="w-3 h-20 bg-gradient-to-t from-blue-700 to-blue-400 rounded-full loader-bar loader-delay-1"></div>
-                <div class="w-3 h-20 bg-gradient-to-t from-[#7EBB1A] to-[#8DC63F] rounded-full loader-bar loader-delay-2"></div>
-            </div>
 
             <div class="text-center space-y-4">
                 <span id="loader-text" class="text-xl font-semibold text-white block">Creating your account...</span>
