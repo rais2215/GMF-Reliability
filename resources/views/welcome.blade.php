@@ -305,7 +305,7 @@
     </style>
 </head>
 
-<body class="bg-[#112955] text-white font-sans h-screen overflow-hidden relative" x-data="{
+<body class="bg-[#112955] text-white font-sans h-screen overflow-hidden relative flex" x-data="{
     showLogin: false,
     currentSlide: 0,
     isTransitioning: false,
@@ -344,17 +344,10 @@
     ============================================== -->
     <div id="page-loader" class="fixed inset-0 z-50 hidden flex-col items-center justify-center bg-[#112955]/90 backdrop-blur-lg transition-all duration-500">
         <div class="glass-card rounded-3xl shadow-2xl p-12 border border-white/20 max-w-sm w-full mx-4 bg-white/10 backdrop-blur-xl">
-            <div class="flex space-x-4 mb-8 justify-center">
-                <div class="w-3 h-20 bg-gradient-to-t from-blue-800 to-blue-500 rounded-full loader-bar"></div>
-                <div class="w-3 h-20 bg-gradient-to-t from-blue-700 to-blue-400 rounded-full loader-bar loader-delay-1"></div>
-                <div class="w-3 h-20 bg-gradient-to-t from-[#7EBB1A] to-[#8DC63F] rounded-full loader-bar loader-delay-2"></div>
-            </div>
-
             <div class="text-center space-y-4">
                 <span id="loader-text" class="text-xl font-semibold text-white block">Logging in...</span>
                 <p class="text-sm text-gray-300">Please wait while we authenticate your credentials</p>
             </div>
-
             <div class="mt-6 w-full h-2 bg-white/20 rounded-full overflow-hidden">
                 <div class="h-full bg-gradient-to-r from-[#7EBB1A] to-[#8DC63F] rounded-full progress-bar"></div>
             </div>
@@ -377,386 +370,380 @@
     </nav>
 
     <!-- ==============================================
-         MAIN CONTAINER
+     LEFT CONTENT SECTION
     ============================================== -->
-    <div class="flex flex-col lg:flex-row items-center justify-between h-screen relative z-10 container mx-auto px-4 lg:px-8 pt-12 lg:pt-16">
+    <div class="w-full lg:w-1/2 flex flex-col justify-center h-full p-4 lg:p-8" style="min-height: 100vh;">
+        <div class="relative h-full flex items-center justify-center content-container" style="min-height: 700px; padding: 2rem 0;">
 
-        <!-- ==============================================
-             LEFT CONTENT SECTION
-        ============================================== -->
-        <div class="w-full lg:w-1/2 flex flex-col justify-center h-full p-4 lg:p-8">
-            <div class="relative h-full flex items-center justify-center content-container">
-
-                <!-- Welcome Section -->
-                <div
-                    x-show="!showLogin"
-                    x-transition:enter="transition-all transform duration-[900ms] ease-out"
-                    x-transition:enter-start="opacity-0 translate-x-24 scale-90 blur-sm"
-                    x-transition:enter-end="opacity-100 translate-x-0 scale-100 blur-none"
-                    x-transition:leave="transition-all transform duration-[900ms] ease-in"
-                    x-transition:leave-start="opacity-100 translate-x-0 scale-100 blur-none"
-                    x-transition:leave-end="opacity-0 translate-x-24 scale-90 blur-sm"
-                    class="section-wrapper"
-                >
-                    <div class="space-y-6 lg:space-y-8 max-w-2xl w-full flex flex-col justify-center" style="margin-top: -40px;">
-                        <div class="space-y-6 lg:space-y-8 page-element delay-200">
-                            <!-- Badge -->
-                            <div class="inline-flex items-center space-x-2 bg-[#7EBB1A]/20 backdrop-blur-sm border border-[#7EBB1A]/30 rounded-full px-4 py-2 transform transition-all duration-500 hover:scale-105">
-                                <div class="w-2 h-2 bg-[#7EBB1A] rounded-full animate-pulse"></div>
-                                <span class="text-sm font-medium text-[#7EBB1A]">GMF Reliability Report</span>
-                            </div>
-
-                            <!-- Hero Title -->
-                            <div class="space-y-4">
-                                <h4 class="text-sm uppercase tracking-wider text-gray-300 font-semibold transform transition-all duration-500">Welcome to</h4>
-                                <h1 class="hero-title text-5xl lg:text-6xl xl:text-7xl font-light leading-tight bg-gradient-to-r from-white via-gray-100 to-gray-200 bg-clip-text text-transparent transform transition-all duration-500">
-                                    Reliability<br>
-                                    <span class="text-[#7EBB1A] font-bold">Report</span>
-                                </h1>
-                            </div>
-
-                            <!-- Description -->
-                            <p class="text-gray-300 max-w-lg text-lg lg:text-xl leading-relaxed transform transition-all duration-500">
-                                Aircraft reliability reporting platform that helps monitor operational performance and supports data-driven decision making in real-time.
-                            </p>
-
-                            <!-- CTA Button -->
-                            <div class="flex flex-col sm:flex-row gap-3 lg:gap-4">
-                                <button
-                                    @click="smoothTransition(true)"
-                                    class="btn-primary group relative text-white font-semibold px-6 lg:px-8 py-3 lg:py-4 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-600 hover:-translate-y-2 transform overflow-hidden animate-pulse-glow"
-                                >
-                                    <span class="relative z-10 flex items-center justify-center space-x-3">
-                                        <i class="fas fa-sign-in-alt transition-transform duration-300 group-hover:rotate-12"></i>
-                                        <span>LOGIN NOW</span>
-                                        <svg class="w-4 h-4 lg:w-5 lg:h-5 group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                                        </svg>
-                                    </span>
-                                </button>
-                            </div>
-
-                            <!-- Copyright -->
-                            <p class="text-xs text-gray-500 font-medium transform transition-all duration-500">
-                                © {{ date('Y') }} PT Garuda Maintenance Facility AeroAsia Tbk.
-                            </p>
+            <!-- Welcome Section -->
+            <div
+                x-show="!showLogin"
+                x-transition:enter="transition-all transform duration-[900ms] ease-out"
+                x-transition:enter-start="opacity-0 translate-x-24 scale-90 blur-sm"
+                x-transition:enter-end="opacity-100 translate-x-0 scale-100 blur-none"
+                x-transition:leave="transition-all transform duration-[700ms] ease-in"
+                x-transition:leave-start="opacity-100 translate-x-0 scale-100 blur-none"
+                x-transition:leave-end="opacity-0 translate-x-24 scale-90 blur-sm"
+                class="section-wrapper"
+            >
+                <div class="w-full max-w-lg flex flex-col justify-center" style="margin-top: -20px; margin-left: -60px; min-height: 500px;">
+                    <div class="space-y-6 lg:space-y-8 page-element delay-200">
+                        <!-- Badge -->
+                        <div class="inline-flex items-center space-x-2 bg-[#7EBB1A]/20 backdrop-blur-sm border border-[#7EBB1A]/30 rounded-full px-4 py-2 transform transition-all duration-500 hover:scale-105">
+                            <div class="w-2 h-2 bg-[#7EBB1A] rounded-full animate-pulse"></div>
+                            <span class="text-sm font-medium text-[#7EBB1A]">GMF Reliability Report</span>
                         </div>
+
+                        <!-- Hero Title -->
+                        <div class="space-y-4">
+                            <h4 class="text-sm uppercase tracking-wider text-gray-300 font-semibold transform transition-all duration-500">Welcome to</h4>
+                            <h1 class="hero-title text-5xl lg:text-6xl xl:text-7xl font-light leading-tight bg-gradient-to-r from-white via-gray-100 to-gray-200 bg-clip-text text-transparent transform transition-all duration-500">
+                                Reliability<br>
+                                <span class="text-[#7EBB1A] font-bold">Report</span>
+                            </h1>
+                        </div>
+
+                        <!-- Description -->
+                        <p class="text-gray-300 max-w-lg text-lg lg:text-xl leading-relaxed transform transition-all duration-500">
+                            Aircraft reliability reporting platform that helps monitor operational performance and supports data-driven decision making in real-time.
+                        </p>
+
+                        <!-- CTA Button -->
+                        <div class="flex flex-col sm:flex-row gap-3 lg:gap-4">
+                            <button
+                                @click="smoothTransition(true)"
+                                class="btn-primary group relative text-white font-semibold px-6 lg:px-8 py-3 lg:py-4 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-600 hover:-translate-y-2 transform overflow-hidden animate-pulse-glow"
+                            >
+                                <span class="relative z-10 flex items-center justify-center space-x-3">
+                                    <i class="fas fa-sign-in-alt transition-transform duration-300 group-hover:rotate-12"></i>
+                                    <span>LOGIN NOW</span>
+                                    <svg class="w-4 h-4 lg:w-5 lg:h-5 group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                                    </svg>
+                                </span>
+                            </button>
+                        </div>
+
+                        <!-- Copyright -->
+                        <p class="text-xs text-gray-500 font-medium transform transition-all duration-500">
+                            © {{ date('Y') }} PT Garuda Maintenance Facility AeroAsia Tbk.
+                        </p>
                     </div>
                 </div>
+            </div>
 
-                <!-- Login Section -->
-                <div
-                    x-show="showLogin"
-                    x-transition:enter="transition-all transform duration-[900ms] ease-out"
-                    x-transition:enter-start="opacity-0 translate-x-24 scale-90 blur-sm"
-                    x-transition:enter-end="opacity-100 translate-x-0 scale-100 blur-none"
-                    x-transition:leave="transition-all transform duration-[700ms] ease-in"
-                    x-transition:leave-start="opacity-100 translate-x-0 scale-100 blur-none"
-                    x-transition:leave-end="opacity-0 translate-x-24 scale-90 blur-sm"
-                    class="section-wrapper"
-                >
-                    <div class="w-full max-w-lg flex flex-col justify-center" style="margin-top: -40px; margin-left: -60px;">
-                        <div class="space-y-6 lg:space-y-8">
-                            <!-- Login Header -->
-                            <div class="text-left space-y-4">
-                                <div class="inline-flex items-center space-x-2 bg-[#7EBB1A]/20 backdrop-blur-sm border border-[#7EBB1A]/30 rounded-full px-4 py-2 transform transition-all duration-500 hover:scale-105">
-                                    <i class="fas fa-lock text-[#7EBB1A]"></i>
-                                    <span class="text-sm font-medium text-[#7EBB1A]">LOGIN</span>
-                                </div>
-                                <h2 class="text-3xl lg:text-4xl xl:text-5xl font-light leading-tight bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent transform transition-all duration-500">
-                                    Welcome Back
-                                </h2>
-                                <p class="text-gray-400 transform transition-all duration-500">Sign in to access your reliability dashboard</p>
+            <!-- Login Section -->
+            <div
+                x-show="showLogin"
+                x-transition:enter="transition-all transform duration-[900ms] ease-out"
+                x-transition:enter-start="opacity-0 translate-x-24 scale-90 blur-sm"
+                x-transition:enter-end="opacity-100 translate-x-0 scale-100 blur-none"
+                x-transition:leave="transition-all transform duration-[700ms] ease-in"
+                x-transition:leave-start="opacity-100 translate-x-0 scale-100 blur-none"
+                x-transition:leave-end="opacity-0 translate-x-24 scale-90 blur-sm"
+                class="section-wrapper"
+            >
+                <div class="w-full max-w-lg flex flex-col justify-center" style="margin-top: -40px; margin-left: -60px; min-height: 650px;">
+                    <div class="space-y-6 lg:space-y-8">
+                        <!-- Login Header -->
+                        <div class="text-left space-y-4">
+                            <div class="inline-flex items-center space-x-2 bg-[#7EBB1A]/20 backdrop-blur-sm border border-[#7EBB1A]/30 rounded-full px-4 py-2 transform transition-all duration-500 hover:scale-105">
+                                <i class="fas fa-lock text-[#7EBB1A]"></i>
+                                <span class="text-sm font-medium text-[#7EBB1A]">LOGIN</span>
                             </div>
+                            <h2 class="text-3xl lg:text-4xl xl:text-5xl font-light leading-tight bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent transform transition-all duration-500">
+                                Welcome Back
+                            </h2>
+                            <p class="text-gray-400 transform transition-all duration-500">Sign in to access your reliability dashboard</p>
+                        </div>
 
-                            <!-- Login Form -->
-                            <div class="w-full">
-                                <form method="POST" action="{{ route('login') }}" class="space-y-5 lg:space-y-6" id="login-form">
-                                    @csrf
+                        <!-- Login Form -->
+                        <div class="w-full">
+                            <form method="POST" action="{{ route('login') }}" class="space-y-5 lg:space-y-6" id="login-form">
+                                @csrf
 
-                                    <!-- Email Field -->
-                                    <div class="space-y-2">
-                                        <label for="email" class="block text-sm text-white font-medium">Email Address</label>
-                                        <div class="relative transform transition-all duration-300 hover:scale-[1.02]">
-                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <i class="fas fa-envelope text-gray-500"></i>
-                                            </div>
-                                            <input
-                                                id="email"
-                                                class="input-field w-full pl-10 pr-4 py-3 lg:py-4 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none transition-all duration-400 hover:shadow-lg focus:shadow-xl"
-                                                type="email"
-                                                name="email"
-                                                value="{{ old('email') }}"
-                                                placeholder="Enter your email address"
-                                                required
-                                                autofocus
-                                                autocomplete="username"
-                                            />
+                                <!-- Email Field -->
+                                <div class="space-y-2">
+                                    <label for="email" class="block text-sm text-white font-medium">Email Address</label>
+                                    <div class="relative transform transition-all duration-300 hover:scale-[1.02]">
+                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <i class="fas fa-envelope text-gray-500"></i>
                                         </div>
-                                        @error('email')
-                                            <p class="text-red-400 text-xs mt-1 font-medium flex items-center space-x-1">
-                                                <i class="fas fa-exclamation-circle"></i>
-                                                <span>{{ $message }}</span>
-                                            </p>
-                                        @enderror
+                                        <input
+                                            id="email"
+                                            class="input-field w-full pl-10 pr-4 py-3 lg:py-4 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none transition-all duration-400 hover:shadow-lg focus:shadow-xl"
+                                            type="email"
+                                            name="email"
+                                            value="{{ old('email') }}"
+                                            placeholder="Enter your email address"
+                                            required
+                                            autofocus
+                                            autocomplete="username"
+                                        />
                                     </div>
-
-                                    <!-- Password Field -->
-                                    <div class="space-y-2">
-                                        <label for="password" class="block text-sm text-white font-medium">Password</label>
-                                        <div class="relative transform transition-all duration-300 hover:scale-[1.02]">
-                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <i class="fas fa-lock text-gray-500"></i>
-                                            </div>
-                                            <input
-                                                id="password"
-                                                class="input-field w-full pl-10 pr-4 py-3 lg:py-4 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none transition-all duration-400 hover:shadow-lg focus:shadow-xl"
-                                                type="password"
-                                                name="password"
-                                                placeholder="Enter your password"
-                                                required
-                                                autocomplete="current-password"
-                                            />
-                                        </div>
-                                        @error('password')
-                                            <p class="text-red-400 text-xs mt-1 font-medium flex items-center space-x-1">
-                                                <i class="fas fa-exclamation-circle"></i>
-                                                <span>{{ $message }}</span>
-                                            </p>
-                                        @enderror
-                                    </div>
-
-                                    <!-- Remember Me & Forgot Password -->
-                                    <div class="flex items-center justify-between text-sm">
-                                        <div class="flex items-center space-x-3">
-                                            <input
-                                                id="remember_me"
-                                                type="checkbox"
-                                                class="w-4 h-4 rounded border-gray-300 text-[#7EBB1A] shadow-sm focus:ring-[#7EBB1A] focus:ring-2 transition-all duration-300"
-                                                name="remember"
-                                            >
-                                            <label for="remember_me" class="text-gray-300 font-medium">Remember me</label>
-                                        </div>
-                                        @if (Route::has('password.request'))
-                                            <a class="text-[#7EBB1A] hover:text-[#8DC63F] font-medium underline transition-colors duration-300" href="{{ route('password.request') }}">
-                                                Forgot password?
-                                            </a>
-                                        @endif
-                                    </div>
-
-                                    <!-- Login Button -->
-                                    <div>
-                                        <button
-                                            type="submit"
-                                            class="btn-primary group w-full text-white font-semibold px-6 py-3 lg:py-4 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-400 hover:-translate-y-2 transform relative overflow-hidden min-h-[48px] lg:min-h-[56px] flex items-center justify-center"
-                                            id="login-btn"
-                                        >
-                                            <span class="relative z-10 flex items-center space-x-3">
-                                                <i class="fas fa-sign-in-alt transition-transform duration-300 group-hover:rotate-12"></i>
-                                                <span>SIGN IN</span>
-                                            </span>
-                                        </button>
-                                    </div>
-
-                                    <!-- Divider -->
-                                    <div class="relative my-5 lg:my-6">
-                                        <div class="absolute inset-0 flex items-center">
-                                            <div class="w-full border-t border-gray-600"></div>
-                                        </div>
-                                        <div class="relative flex justify-center text-sm">
-                                            <span class="px-2 bg-[#112955] text-gray-400">-</span>
-                                        </div>
-                                    </div>
-
-                                    <!-- Register Link -->
-                                    <div class="text-left">
-                                        <p class="text-gray-300 text-sm">
-                                            Don't have an account?
-                                            <a
-                                                href="{{ route('register') }}"
-                                                class="text-[#7EBB1A] hover:text-[#8DC63F] font-semibold hover:underline transition-all duration-300 ml-1"
-                                            >
-                                                Register here
-                                            </a>
+                                    @error('email')
+                                        <p class="text-red-400 text-xs mt-1 font-medium flex items-center space-x-1">
+                                            <i class="fas fa-exclamation-circle"></i>
+                                            <span>{{ $message }}</span>
                                         </p>
-                                    </div>
+                                    @enderror
+                                </div>
 
-                                    <!-- Back Button -->
-                                    <div class="mt-6 lg:mt-8">
-                                        <button
-                                            @click="smoothTransition(false)"
-                                            type="button"
-                                            class="group text-[#7EBB1A] hover:text-[#8DC63F] font-semibold transition-all duration-500 flex items-center space-x-2 text-sm hover:translate-x-2"
-                                        >
-                                            <svg class="w-4 h-4 group-hover:-translate-x-3 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                                            </svg>
-                                            <span>Back to homepage</span>
-                                        </button>
+                                <!-- Password Field -->
+                                <div class="space-y-2">
+                                    <label for="password" class="block text-sm text-white font-medium">Password</label>
+                                    <div class="relative transform transition-all duration-300 hover:scale-[1.02]">
+                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <i class="fas fa-lock text-gray-500"></i>
+                                        </div>
+                                        <input
+                                            id="password"
+                                            class="input-field w-full pl-10 pr-4 py-3 lg:py-4 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none transition-all duration-400 hover:shadow-lg focus:shadow-xl"
+                                            type="password"
+                                            name="password"
+                                            placeholder="Enter your password"
+                                            required
+                                            autocomplete="current-password"
+                                        />
                                     </div>
-                                </form>
-                            </div>
+                                    @error('password')
+                                        <p class="text-red-400 text-xs mt-1 font-medium flex items-center space-x-1">
+                                            <i class="fas fa-exclamation-circle"></i>
+                                            <span>{{ $message }}</span>
+                                        </p>
+                                    @enderror
+                                </div>
+
+                                <!-- Remember Me & Forgot Password -->
+                                <div class="flex items-center justify-between text-sm">
+                                    <div class="flex items-center space-x-3">
+                                        <input
+                                            id="remember_me"
+                                            type="checkbox"
+                                            class="w-4 h-4 rounded border-gray-300 text-[#7EBB1A] shadow-sm focus:ring-[#7EBB1A] focus:ring-2 transition-all duration-300"
+                                            name="remember"
+                                        >
+                                        <label for="remember_me" class="text-gray-300 font-medium">Remember me</label>
+                                    </div>
+                                    @if (Route::has('password.request'))
+                                        <a class="text-[#7EBB1A] hover:text-[#8DC63F] font-medium underline transition-colors duration-300" href="{{ route('password.request') }}">
+                                            Forgot password?
+                                        </a>
+                                    @endif
+                                </div>
+
+                                <!-- Login Button -->
+                                <div>
+                                    <button
+                                        type="submit"
+                                        class="btn-primary group w-full text-white font-semibold px-6 py-3 lg:py-4 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-400 hover:-translate-y-2 transform relative overflow-hidden min-h-[48px] lg:min-h-[56px] flex items-center justify-center"
+                                        id="login-btn"
+                                    >
+                                        <span class="relative z-10 flex items-center space-x-3">
+                                            <i class="fas fa-sign-in-alt transition-transform duration-300 group-hover:rotate-12"></i>
+                                            <span>SIGN IN</span>
+                                        </span>
+                                    </button>
+                                </div>
+
+                                <!-- Divider -->
+                                <div class="relative my-5 lg:my-6">
+                                    <div class="absolute inset-0 flex items-center">
+                                        <div class="w-full border-t border-gray-600"></div>
+                                    </div>
+                                    <div class="relative flex justify-center text-sm">
+                                        <span class="px-2 bg-[#112955] text-gray-400">-</span>
+                                    </div>
+                                </div>
+
+                                <!-- Register Link -->
+                                <div class="text-left">
+                                    <p class="text-gray-300 text-sm">
+                                        Don't have an account?
+                                        <a
+                                            href="{{ route('register') }}"
+                                            class="text-[#7EBB1A] hover:text-[#8DC63F] font-semibold hover:underline transition-all duration-300 ml-1"
+                                        >
+                                            Register here
+                                        </a>
+                                    </p>
+                                </div>
+
+                                <!-- Back Button -->
+                                <div class="mt-6 lg:mt-8">
+                                    <button
+                                        @click="smoothTransition(false)"
+                                        type="button"
+                                        class="group text-[#7EBB1A] hover:text-[#8DC63F] font-semibold transition-all duration-500 flex items-center space-x-2 text-sm hover:translate-x-2"
+                                    >
+                                        <svg class="w-4 h-4 group-hover:-translate-x-3 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                        </svg>
+                                        <span>Back to homepage</span>
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- ==============================================
-             RIGHT CAROUSEL SECTION
-        ============================================== -->
-        <div class="hidden lg:flex lg:w-1/2 h-full px-4 lg:px-8 py-8 items-center justify-center flex-col page-element delay-400">
-
-            <!-- Swiper Container -->
-            <div class="swiper mySwiper w-full max-w-2xl relative flex-shrink-0 ml-8" style="height: 520px;">
-                <div class="swiper-wrapper">
-                    <!-- Slide 1 - Reliability Report System -->
-                    <div class="swiper-slide flex items-center justify-center text-center px-4">
-                        <div class="feature-card w-full max-w-lg space-y-6 bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10 hover:border-[#7EBB1A]/30 transition-all duration-500 mx-auto">
-                            <div class="relative group mx-auto">
-                                <div class="absolute inset-0 bg-[#7EBB1A]/20 rounded-2xl blur-xl animate-pulse group-hover:bg-[#7EBB1A]/30 transition-all duration-500"></div>
-                                <div class="relative h-48 lg:h-56 flex items-center justify-center mb-6 overflow-hidden rounded-2xl bg-white/5">
-                                    <img
-                                        src="{{ asset('images/hangar.png') }}"
-                                        alt="Airplane Maintenance"
-                                        class="max-w-full max-h-full object-contain rounded-xl shadow-xl transform group-hover:scale-105 transition-transform duration-500"
-                                    >
-                                </div>
-                            </div>
-                            <div class="space-y-5 text-center">
-                                <div class="flex items-center justify-center space-x-3">
-                                    <div class="w-12 h-12 bg-gradient-to-br from-[#7EBB1A] to-[#8DC63F] rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
-                                        <i class="fas fa-file-alt text-white text-xl"></i>
-                                    </div>
-                                    <h2 class="text-xl lg:text-2xl font-bold text-[#7EBB1A] leading-tight">
-                                        Reliability Report System
-                                    </h2>
-                                </div>
-                                <p class="text-base text-gray-300 leading-relaxed max-w-md mx-auto">
-                                    Integrated system for managing and monitoring aircraft reliability reports efficiently, supporting technical evaluation and strategic decision-making.
-                                </p>
-                                <div class="flex flex-wrap justify-center gap-2 mt-5">
-                                    <span class="px-4 py-2 bg-[#7EBB1A]/20 text-[#7EBB1A] text-sm rounded-full border border-[#7EBB1A]/30">Report Management</span>
-                                    <span class="px-4 py-2 bg-[#7EBB1A]/20 text-[#7EBB1A] text-sm rounded-full border border-[#7EBB1A]/30">Data Analysis</span>
-                                </div>
+    <!-- ==============================================
+         RIGHT CAROUSEL SECTION
+    ============================================== -->
+    <div class="w-full lg:w-1/2 h-full px-4 lg:px-8 py-8 items-center justify-center flex-col page-element delay-400 flex">
+        <!-- Swiper Container -->
+        <div class="swiper mySwiper w-full max-w-2xl relative flex-shrink-0 ml-8" style="height: 520px;">
+            <div class="swiper-wrapper">
+                <!-- Slide 1 - Reliability Report System -->
+                <div class="swiper-slide flex items-center justify-center text-center px-4">
+                    <div class="feature-card w-full max-w-lg space-y-6 bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10 hover:border-[#7EBB1A]/30 transition-all duration-500 mx-auto">
+                        <div class="relative group mx-auto">
+                            <div class="absolute inset-0 bg-[#7EBB1A]/20 rounded-2xl blur-xl animate-pulse group-hover:bg-[#7EBB1A]/30 transition-all duration-500"></div>
+                            <div class="relative h-48 lg:h-56 flex items-center justify-center mb-6 overflow-hidden rounded-2xl bg-white/5">
+                                <img
+                                    src="{{ asset('images/hangar.png') }}"
+                                    alt="Airplane Maintenance"
+                                    class="max-w-full max-h-full object-contain rounded-xl shadow-xl transform group-hover:scale-105 transition-transform duration-500"
+                                >
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Slide 2 - Maintenance Insight -->
-                    <div class="swiper-slide flex items-center justify-center text-center px-4">
-                        <div class="feature-card w-full max-w-lg space-y-6 bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10 hover:border-[#7EBB1A]/30 transition-all duration-500 mx-auto">
-                            <div class="relative group mx-auto">
-                                <div class="absolute inset-0 bg-[#7EBB1A]/20 rounded-2xl blur-xl animate-pulse group-hover:bg-[#7EBB1A]/30 transition-all duration-500"></div>
-                                <div class="relative h-48 lg:h-56 flex items-center justify-center mb-6 overflow-hidden rounded-2xl bg-white/5">
-                                    <img
-                                        src="{{ asset('images/hangar1.png') }}"
-                                        alt="Data Analytics"
-                                        class="max-w-full max-h-full object-contain rounded-xl shadow-xl transform group-hover:scale-105 transition-transform duration-500"
-                                    >
+                        <div class="space-y-5 text-center">
+                            <div class="flex items-center justify-center space-x-3">
+                                <div class="w-12 h-12 bg-gradient-to-br from-[#7EBB1A] to-[#8DC63F] rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
+                                    <i class="fas fa-file-alt text-white text-xl"></i>
                                 </div>
+                                <h2 class="text-xl lg:text-2xl font-bold text-[#7EBB1A] leading-tight">
+                                    Reliability Report System
+                                </h2>
                             </div>
-                            <div class="space-y-5 text-center">
-                                <div class="flex items-center justify-center space-x-3">
-                                    <div class="w-12 h-12 bg-gradient-to-br from-[#7EBB1A] to-[#8DC63F] rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
-                                        <i class="fas fa-lightbulb text-white text-xl"></i>
-                                    </div>
-                                    <h2 class="text-xl lg:text-2xl font-bold text-[#7EBB1A] leading-tight">
-                                        Maintenance Insight
-                                    </h2>
-                                </div>
-                                <p class="text-base text-gray-300 leading-relaxed max-w-md mx-auto">
-                                    Presenting statistical data and operational trends to assess aircraft maintenance effectiveness and support accurate technical decision-making.
-                                </p>
-                                <div class="flex flex-wrap justify-center gap-2 mt-5">
-                                    <span class="px-4 py-2 bg-[#7EBB1A]/20 text-[#7EBB1A] text-sm rounded-full border border-[#7EBB1A]/30">Statistics</span>
-                                    <span class="px-4 py-2 bg-[#7EBB1A]/20 text-[#7EBB1A] text-sm rounded-full border border-[#7EBB1A]/30">Trends</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Slide 3 - Progress & Corrective Actions -->
-                    <div class="swiper-slide flex items-center justify-center text-center px-4">
-                        <div class="feature-card w-full max-w-lg space-y-6 bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10 hover:border-[#7EBB1A]/30 transition-all duration-500 mx-auto">
-                            <div class="relative group mx-auto">
-                                <div class="absolute inset-0 bg-[#7EBB1A]/20 rounded-2xl blur-xl animate-pulse group-hover:bg-[#7EBB1A]/30 transition-all duration-500"></div>
-                                <div class="relative h-48 lg:h-56 flex items-center justify-center mb-6 overflow-hidden rounded-2xl bg-white/5">
-                                    <img
-                                        src="{{ asset('images/hangar2.png') }}"
-                                        alt="Collaboration"
-                                        class="max-w-full max-h-full object-contain rounded-xl shadow-xl transform group-hover:scale-105 transition-transform duration-500"
-                                    >
-                                </div>
-                            </div>
-                            <div class="space-y-5 text-center">
-                                <div class="flex items-center justify-center space-x-3">
-                                    <div class="w-12 h-12 bg-gradient-to-br from-[#7EBB1A] to-[#8DC63F] rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
-                                        <i class="fas fa-tasks text-white text-xl"></i>
-                                    </div>
-                                    <h2 class="text-xl lg:text-2xl font-bold text-[#7EBB1A] leading-tight">
-                                        Progress & Corrective Actions
-                                    </h2>
-                                </div>
-                                <p class="text-base text-gray-300 leading-relaxed max-w-md mx-auto">
-                                    Structured monitoring of investigation progress and implementation of corrective actions until all findings are effectively resolved.
-                                </p>
-                                <div class="flex flex-wrap justify-center gap-2 mt-5">
-                                    <span class="px-4 py-2 bg-[#7EBB1A]/20 text-[#7EBB1A] text-sm rounded-full border border-[#7EBB1A]/30">Monitoring</span>
-                                    <span class="px-4 py-2 bg-[#7EBB1A]/20 text-[#7EBB1A] text-sm rounded-full border border-[#7EBB1A]/30">Investigation</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Slide 4 - Trends & Risk Analysis -->
-                    <div class="swiper-slide flex items-center justify-center text-center px-4">
-                        <div class="feature-card w-full max-w-lg space-y-6 bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10 hover:border-[#7EBB1A]/30 transition-all duration-500 mx-auto">
-                            <div class="relative group mx-auto">
-                                <div class="absolute inset-0 bg-[#7EBB1A]/20 rounded-2xl blur-xl animate-pulse group-hover:bg-[#7EBB1A]/30 transition-all duration-500"></div>
-                                <div class="relative h-48 lg:h-56 flex items-center justify-center mb-6 overflow-hidden rounded-2xl bg-white/5">
-                                    <img
-                                        src="{{ asset('images/hangar3.png') }}"
-                                        alt="Risk Analysis"
-                                        class="max-w-full max-h-full object-contain rounded-xl shadow-xl transform group-hover:scale-105 transition-transform duration-500"
-                                    >
-                                </div>
-                            </div>
-                            <div class="space-y-5 text-center">
-                                <div class="flex items-center justify-center space-x-3">
-                                    <div class="w-12 h-12 bg-gradient-to-br from-[#7EBB1A] to-[#8DC63F] rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
-                                        <i class="fas fa-chart-line text-white text-xl"></i>
-                                    </div>
-                                    <h2 class="text-xl lg:text-2xl font-bold text-[#7EBB1A] leading-tight">
-                                        Trends & Risk Analysis
-                                    </h2>
-                                </div>
-                                <p class="text-base text-gray-300 leading-relaxed max-w-md mx-auto">
-                                    Early detection of failure patterns and potential risks through technical trend analysis and warning thresholds based on MTBF data and alert levels.
-                                </p>
-                                <div class="flex flex-wrap justify-center gap-2 mt-5">
-                                    <span class="px-4 py-2 bg-[#7EBB1A]/20 text-[#7EBB1A] text-sm rounded-full border border-[#7EBB1A]/30">Risk Assessment</span>
-                                    <span class="px-4 py-2 bg-[#7EBB1A]/20 text-[#7EBB1A] text-sm rounded-full border border-[#7EBB1A]/30">MTBF Analysis</span>
-                                </div>
+                            <p class="text-base text-gray-300 leading-relaxed max-w-md mx-auto">
+                                Integrated system for managing and monitoring aircraft reliability reports efficiently, supporting technical evaluation and strategic decision-making.
+                            </p>
+                            <div class="flex flex-wrap justify-center gap-2 mt-5">
+                                <span class="px-4 py-2 bg-[#7EBB1A]/20 text-[#7EBB1A] text-sm rounded-full border border-[#7EBB1A]/30">Report Management</span>
+                                <span class="px-4 py-2 bg-[#7EBB1A]/20 text-[#7EBB1A] text-sm rounded-full border border-[#7EBB1A]/30">Data Analysis</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Swiper Navigation Arrows -->
-                <div class="swiper-button-next !text-[#7EBB1A] !w-11 !h-11 !bg-white/10 !backdrop-blur-sm !rounded-full !border !border-white/20 hover:!bg-[#7EBB1A]/20 !transition-all !duration-300 after:!text-lg after:!font-bold !top-1/2 !right-2"></div>
-                <div class="swiper-button-prev !text-[#7EBB1A] !w-11 !h-11 !bg-white/10 !backdrop-blur-sm !rounded-full !border !border-white/20 hover:!bg-[#7EBB1A]/20 !transition-all !duration-300 after:!text-lg after:!font-bold !top-1/2 !left-2"></div>
-            </div>
-
-            <!-- Custom Pagination -->
-            <div class="flex flex-col items-center space-y-4 mt-8">
-                <div class="w-28 h-1.5 bg-white/20 rounded-full overflow-hidden">
-                    <div class="swiper-progress h-full bg-gradient-to-r from-[#7EBB1A] to-[#8DC63F] rounded-full transition-all duration-500 w-1/4"></div>
+                <!-- Slide 2 - Maintenance Insight -->
+                <div class="swiper-slide flex items-center justify-center text-center px-4">
+                    <div class="feature-card w-full max-w-lg space-y-6 bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10 hover:border-[#7EBB1A]/30 transition-all duration-500 mx-auto">
+                        <div class="relative group mx-auto">
+                            <div class="absolute inset-0 bg-[#7EBB1A]/20 rounded-2xl blur-xl animate-pulse group-hover:bg-[#7EBB1A]/30 transition-all duration-500"></div>
+                            <div class="relative h-48 lg:h-56 flex items-center justify-center mb-6 overflow-hidden rounded-2xl bg-white/5">
+                                <img
+                                    src="{{ asset('images/hangar1.png') }}"
+                                    alt="Data Analytics"
+                                    class="max-w-full max-h-full object-contain rounded-xl shadow-xl transform group-hover:scale-105 transition-transform duration-500"
+                                >
+                            </div>
+                        </div>
+                        <div class="space-y-5 text-center">
+                            <div class="flex items-center justify-center space-x-3">
+                                <div class="w-12 h-12 bg-gradient-to-br from-[#7EBB1A] to-[#8DC63F] rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
+                                    <i class="fas fa-lightbulb text-white text-xl"></i>
+                                </div>
+                                <h2 class="text-xl lg:text-2xl font-bold text-[#7EBB1A] leading-tight">
+                                    Maintenance Insight
+                                </h2>
+                            </div>
+                            <p class="text-base text-gray-300 leading-relaxed max-w-md mx-auto">
+                                Presenting statistical data and operational trends to assess aircraft maintenance effectiveness and support accurate technical decision-making.
+                            </p>
+                            <div class="flex flex-wrap justify-center gap-2 mt-5">
+                                <span class="px-4 py-2 bg-[#7EBB1A]/20 text-[#7EBB1A] text-sm rounded-full border border-[#7EBB1A]/30">Statistics</span>
+                                <span class="px-4 py-2 bg-[#7EBB1A]/20 text-[#7EBB1A] text-sm rounded-full border border-[#7EBB1A]/30">Trends</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="text-sm text-gray-400 font-medium">
-                    <span class="current-slide">1</span> / <span class="total-slides">4</span>
+
+                <!-- Slide 3 - Progress & Corrective Actions -->
+                <div class="swiper-slide flex items-center justify-center text-center px-4">
+                    <div class="feature-card w-full max-w-lg space-y-6 bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10 hover:border-[#7EBB1A]/30 transition-all duration-500 mx-auto">
+                        <div class="relative group mx-auto">
+                            <div class="absolute inset-0 bg-[#7EBB1A]/20 rounded-2xl blur-xl animate-pulse group-hover:bg-[#7EBB1A]/30 transition-all duration-500"></div>
+                            <div class="relative h-48 lg:h-56 flex items-center justify-center mb-6 overflow-hidden rounded-2xl bg-white/5">
+                                <img
+                                    src="{{ asset('images/hangar2.png') }}"
+                                    alt="Collaboration"
+                                    class="max-w-full max-h-full object-contain rounded-xl shadow-xl transform group-hover:scale-105 transition-transform duration-500"
+                                >
+                            </div>
+                        </div>
+                        <div class="space-y-5 text-center">
+                            <div class="flex items-center justify-center space-x-3">
+                                <div class="w-12 h-12 bg-gradient-to-br from-[#7EBB1A] to-[#8DC63F] rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
+                                    <i class="fas fa-tasks text-white text-xl"></i>
+                                </div>
+                                <h2 class="text-xl lg:text-2xl font-bold text-[#7EBB1A] leading-tight">
+                                    Progress & Corrective Actions
+                                </h2>
+                            </div>
+                            <p class="text-base text-gray-300 leading-relaxed max-w-md mx-auto">
+                                Structured monitoring of investigation progress and implementation of corrective actions until all findings are effectively resolved.
+                            </p>
+                            <div class="flex flex-wrap justify-center gap-2 mt-5">
+                                <span class="px-4 py-2 bg-[#7EBB1A]/20 text-[#7EBB1A] text-sm rounded-full border border-[#7EBB1A]/30">Monitoring</span>
+                                <span class="px-4 py-2 bg-[#7EBB1A]/20 text-[#7EBB1A] text-sm rounded-full border border-[#7EBB1A]/30">Investigation</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 4 - Trends & Risk Analysis -->
+                <div class="swiper-slide flex items-center justify-center text-center px-4">
+                    <div class="feature-card w-full max-w-lg space-y-6 bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10 hover:border-[#7EBB1A]/30 transition-all duration-500 mx-auto">
+                        <div class="relative group mx-auto">
+                            <div class="absolute inset-0 bg-[#7EBB1A]/20 rounded-2xl blur-xl animate-pulse group-hover:bg-[#7EBB1A]/30 transition-all duration-500"></div>
+                            <div class="relative h-48 lg:h-56 flex items-center justify-center mb-6 overflow-hidden rounded-2xl bg-white/5">
+                                <img
+                                    src="{{ asset('images/hangar3.png') }}"
+                                    alt="Risk Analysis"
+                                    class="max-w-full max-h-full object-contain rounded-xl shadow-xl transform group-hover:scale-105 transition-transform duration-500"
+                                >
+                            </div>
+                        </div>
+                        <div class="space-y-5 text-center">
+                            <div class="flex items-center justify-center space-x-3">
+                                <div class="w-12 h-12 bg-gradient-to-br from-[#7EBB1A] to-[#8DC63F] rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
+                                    <i class="fas fa-chart-line text-white text-xl"></i>
+                                </div>
+                                <h2 class="text-xl lg:text-2xl font-bold text-[#7EBB1A] leading-tight">
+                                    Trends & Risk Analysis
+                                </h2>
+                            </div>
+                            <p class="text-base text-gray-300 leading-relaxed max-w-md mx-auto">
+                                Early detection of failure patterns and potential risks through technical trend analysis and warning thresholds based on MTBF data and alert levels.
+                            </p>
+                            <div class="flex flex-wrap justify-center gap-2 mt-5">
+                                <span class="px-4 py-2 bg-[#7EBB1A]/20 text-[#7EBB1A] text-sm rounded-full border border-[#7EBB1A]/30">Risk Assessment</span>
+                                <span class="px-4 py-2 bg-[#7EBB1A]/20 text-[#7EBB1A] text-sm rounded-full border border-[#7EBB1A]/30">MTBF Analysis</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <!-- Swiper Navigation Arrows -->
+            <div class="swiper-button-next !text-[#7EBB1A] !w-11 !h-11 !bg-white/10 !backdrop-blur-sm !rounded-full !border !border-white/20 hover:!bg-[#7EBB1A]/20 !transition-all !duration-300 after:!text-lg after:!font-bold !top-1/2 !right-2"></div>
+            <div class="swiper-button-prev !text-[#7EBB1A] !w-11 !h-11 !bg-white/10 !backdrop-blur-sm !rounded-full !border !border-white/20 hover:!bg-[#7EBB1A]/20 !transition-all !duration-300 after:!text-lg after:!font-bold !top-1/2 !left-2"></div>
+        </div>
+
+        <!-- Custom Pagination -->
+        <div class="flex flex-col items-center space-y-4 mt-8">
+            <div class="w-28 h-1.5 bg-white/20 rounded-full overflow-hidden">
+                <div class="swiper-progress h-full bg-gradient-to-r from-[#7EBB1A] to-[#8DC63F] rounded-full transition-all duration-500 w-1/4"></div>
+            </div>
+            <div class="text-sm text-gray-400 font-medium">
+                <span class="current-slide">1</span> / <span class="total-slides">4</span>
+            </div>
+        </div>
     </div>
 
     <!-- ==============================================

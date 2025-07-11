@@ -6,449 +6,220 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>AOS PDF</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
         table {
             border-collapse: collapse;
             width: 100%;
-            font-family: Arial, sans-serif;
-            font-size: 10px;
+            font-size: 12px; /* Adjusted to fill page */
         }
         th, td {
             border: 1px solid #000;
-            padding: 5px;
+            padding: 5px; /* Adjusted for larger font */
+            text-align: center;
+            vertical-align: middle;
+        }
+        .header-title {
+            font-size: 18px;
+            font-weight: bold;
             text-align: center;
         }
-        .style1 {
+        .header-subtitle {
+            font-size: 16px;
+            font-weight: bold;
             text-align: center;
         }
-        .style2 {
-            font-size: 20px;
+        .header-period {
+            font-size: 14px;
             text-align: center;
         }
         .aos-label {
-            font-weight: bold !important;
-            text-align: left !important;
+            font-weight: bold;
+            text-align: left;
+            white-space: nowrap; /* Prevent label wrapping */
+        }
+        .column-header {
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
     @php
-        // Helper functions - PERSIS sama seperti di aos-result.blade.php
+        // Helper functions
         $safeNumber = function($value, $default = 0) {
-            if (is_null($value) || !is_numeric($value)) {
-                return $default;
-            }
-            return floatval($value);
+            return is_numeric($value) ? floatval($value) : $default;
         };
-        
+
         $formatNumber = function($value, $decimals = 2) {
-            if (is_null($value) || !is_numeric($value)) {
+            if (!is_numeric($value)) {
                 return '0';
             }
-            $numValue = floatval($value);
-            return rtrim(rtrim(number_format($numValue, $decimals, '.', ''), '0'), '.');
+            return rtrim(rtrim(number_format(floatval($value), $decimals, '.', ''), '0'), '.');
         };
 
-        // Helper function for time formatting - SAMA dengan aos-result
         $formatTime = function($value) {
-            if (is_null($value) || $value === '' || $value === 0) {
-                return '00:00';
+            if (is_string($value) && str_contains($value, ':')) {
+                 // Already formatted as H : i
+                $parts = explode(':', str_replace(' ', '', $value));
+                return sprintf('%d:%02d', $parts[0], $parts[1]);
             }
-            // If it's already in H:i format, return as is
-            if (is_string($value) && strpos($value, ':') !== false) {
-                return $value;
+            if (!is_numeric($value) || $value == 0) {
+                return '0:00';
             }
-            // If it's a number, convert to H:i format
-            if (is_numeric($value)) {
-                $hours = floor($value);
-                $minutes = round(($value - $hours) * 60);
-                return sprintf('%d:%02d', $hours, $minutes);
-            }
-            return $value ?: '00:00';
+            $decimalHours = floatval($value);
+            $hours = floor($decimalHours);
+            $minutes = round(($decimalHours - $hours) * 60);
+            return sprintf('%d:%02d', $hours, $minutes);
         };
 
-        // Convert time string to decimal hours for calculation
-        $timeToDecimal = function($timeString) {
-            if (is_null($timeString) || $timeString === '' || $timeString === 0) {
-                return 0;
-            }
-            if (is_numeric($timeString)) {
-                return floatval($timeString);
-            }
-            if (is_string($timeString) && strpos($timeString, ':') !== false) {
-                $parts = explode(':', $timeString);
-                $hours = intval($parts[0]);
-                $minutes = isset($parts[1]) ? intval($parts[1]) : 0;
-                return $hours + ($minutes / 60);
-            }
-            return 0;
-        };
+        // Year variables
+        $startYear = \Carbon\Carbon::parse($period)->subMonths(11)->format('Y');
+        $endYear = \Carbon\Carbon::parse($period)->format('Y');
 
-        // Calculate average time values for totals
-        $calculateAvgTime = function($totalDecimal) use ($formatTime) {
-            $avg = $totalDecimal / 12;
-            return $formatTime($avg);
-        };
-
-        // Calculate total time 
-        $calculateTotalTime = function($totalDecimal) use ($formatTime) {
-            return $formatTime($totalDecimal);
-        };
-
-        $startYear = \Carbon\Carbon::parse($period)->subMonth(11)->format('Y');
-
-        // Initialize totals - SAMA seperti di aos-result.blade.php
-        $totalAcInFleet = 0;
-        $totalAcInService = 0;
-        $totalDaysInService = 0;
-        $totalFlyingHoursTotal = 0;
-        $totalRevenueFlyingHours = 0;
-        $totalTakeOffTotal = 0;
-        $totalRevenueTakeOff = 0;
-        $totalFlightHoursPerTakeOffTotal = 0;
-        $totalRevenueFlightHoursPerTakeOff = 0;
-        $totalDailyUtilizationFlyingHoursTotal = 0;
-        $totalRevenueDailyUtilizationFlyingHoursTotal = 0;
-        $totalDailyUtilizationTakeOffTotal = 0;
-        $totalRevenueDailyUtilizationTakeOffTotal = 0;
-        $totalTechnicalDelayTotal = 0;
-        $totalTotalDuration = 0;
-        $totalAverageDuration = 0;
-        $totalRatePer100TakeOff = 0;
-        $totalTechnicalIncidentTotal = 0;
-        $totalTechnicalIncidentRate = 0;
-        $totalTechnicalCancellationTotal = 0;
-        $totalDispatchReliability = 0;
-
-        // Calculate totals for 12 months - SAMA seperti di aos-result.blade.php
-        for ($j = 11; $j >= 0; $j--) {
-            $monthKey = \Carbon\Carbon::parse($period)->subMonth($j)->format('Y-m');
-            $monthData = $reportData[$monthKey] ?? [];
-            
-            $totalAcInFleet += $safeNumber($monthData['acInFleet'] ?? 0);
-            $totalAcInService += $safeNumber($monthData['acInService'] ?? 0);
-            $totalDaysInService += $safeNumber($monthData['daysInService'] ?? 0);
-            $totalFlyingHoursTotal += $safeNumber($monthData['flyingHoursTotal'] ?? 0);
-            $totalRevenueFlyingHours += $safeNumber($monthData['revenueFlyingHours'] ?? 0);
-            $totalTakeOffTotal += $safeNumber($monthData['takeOffTotal'] ?? 0);
-            $totalRevenueTakeOff += $safeNumber($monthData['revenueTakeOff'] ?? 0);
-            
-            // Convert time values to decimal for proper calculation
-            $totalFlightHoursPerTakeOffTotal += $timeToDecimal($monthData['flightHoursPerTakeOffTotal'] ?? 0);
-            $totalRevenueFlightHoursPerTakeOff += $timeToDecimal($monthData['revenueFlightHoursPerTakeOff'] ?? 0);
-            $totalDailyUtilizationFlyingHoursTotal += $timeToDecimal($monthData['dailyUtilizationFlyingHoursTotal'] ?? 0);
-            $totalRevenueDailyUtilizationFlyingHoursTotal += $timeToDecimal($monthData['revenueDailyUtilizationFlyingHoursTotal'] ?? 0);
-            
-            $totalDailyUtilizationTakeOffTotal += $safeNumber($monthData['dailyUtilizationTakeOffTotal'] ?? 0);
-            $totalRevenueDailyUtilizationTakeOffTotal += $safeNumber($monthData['revenueDailyUtilizationTakeOffTotal'] ?? 0);
-            $totalTechnicalDelayTotal += $safeNumber($monthData['technicalDelayTotal'] ?? 0);
-            
-            // Convert time values to decimal for proper calculation
-            $totalTotalDuration += $timeToDecimal($monthData['totalDuration'] ?? 0);
-            $totalAverageDuration += $timeToDecimal($monthData['averageDuration'] ?? 0);
-            
-            $totalRatePer100TakeOff += $safeNumber($monthData['ratePer100TakeOff'] ?? 0);
-            $totalTechnicalIncidentTotal += $safeNumber($monthData['technicalIncidentTotal'] ?? 0);
-            $totalTechnicalIncidentRate += $safeNumber($monthData['technicalIncidentRate'] ?? 0);
-            $totalTechnicalCancellationTotal += $safeNumber($monthData['technicalCancellationTotal'] ?? 0);
-            $totalDispatchReliability += $safeNumber($monthData['dispatchReliability'] ?? 0);
+        // Select the correct year's data based on the start year of the report
+        $yearColumnData = [];
+        if (isset($data2016) && $startYear == '2016') {
+            $yearColumnData = $data2016;
+        } elseif (isset($data2017) && $startYear == '2017') {
+            $yearColumnData = $data2017;
         }
+        // Add more years here if needed
+
+        // Function to get value from nested array safely for YEAR data
+        $getYearValue = function($data, $key, $source) {
+            if (empty($data)) return null;
+            if ($source === 'averages') {
+                return $data['averages'][$key]['value'] ?? null;
+            }
+            if ($source === 'direct') {
+                $avgKey = 'avg' . ucfirst($key);
+                return $data[$avgKey] ?? null;
+            }
+            return null;
+        };
+
+        // Define metrics to iterate through
+        $metrics = [
+            'acInFleet' => ['label' => 'A/C in Fleet', 'format' => 'number', 'decimals' => 2, 'source' => 'averages', 'last12' => $averages['acInFleet']['value'] ?? 0],
+            'acInService' => ['label' => 'A/C in Service (Revenue)', 'format' => 'number', 'decimals' => 2, 'source' => 'averages', 'last12' => $averages['acInService']['value'] ?? 0],
+            'daysInService' => ['label' => 'A/C Days in Service (Revenue)', 'format' => 'integer', 'source' => 'averages', 'last12' => $averages['daysInService']['value'] ?? 0],
+            'flyingHoursTotal' => ['label' => 'Flying Hours - Total', 'format' => 'integer', 'source' => 'averages', 'last12' => $averages['flyingHoursTotal']['value'] ?? 0],
+            'revenueFlyingHours' => ['label' => '- Revenue', 'format' => 'integer', 'source' => 'averages', 'last12' => $averages['revenueFlyingHours']['value'] ?? 0],
+            'takeOffTotal' => ['label' => 'Take Off - Total', 'format' => 'integer', 'source' => 'averages', 'last12' => $averages['takeOffTotal']['value'] ?? 0],
+            'revenueTakeOff' => ['label' => '- Revenue', 'format' => 'integer', 'source' => 'averages', 'last12' => $averages['revenueTakeOff']['value'] ?? 0],
+            'flightHoursPerTakeOffTotal' => ['label' => 'Flight Hours per Take Off - Total', 'format' => 'time', 'source' => 'direct', 'last12' => $avgFlightHoursPerTakeOffTotal ?? '0:00'],
+            'revenueFlightHoursPerTakeOff' => ['label' => '- Revenue', 'format' => 'time', 'source' => 'direct', 'last12' => $avgRevenueFlightHoursPerTakeOff ?? '0:00'],
+            'dailyUtilizationFlyingHoursTotal' => ['label' => 'Daily Utilization Flying Hours - Total', 'format' => 'time', 'source' => 'direct', 'last12' => $avgDailyUtilizationFlyingHoursTotal ?? '0:00'],
+            'revenueDailyUtilizationFlyingHoursTotal' => ['label' => '- Revenue', 'format' => 'time', 'source' => 'direct', 'last12' => $avgRevenueDailyUtilizationFlyingHoursTotal ?? '0:00'],
+            'dailyUtilizationTakeOffTotal' => ['label' => 'Daily Utilization Take Off - Total', 'format' => 'number', 'decimals' => 2, 'source' => 'averages', 'last12' => $averages['dailyUtilizationTakeOffTotal']['value'] ?? 0],
+            'revenueDailyUtilizationTakeOffTotal' => ['label' => '- Revenue', 'format' => 'number', 'decimals' => 2, 'source' => 'averages', 'last12' => $averages['revenueDailyUtilizationTakeOffTotal']['value'] ?? 0],
+            'technicalDelayTotal' => ['label' => 'Technical Delay - Total', 'format' => 'integer', 'source' => 'averages', 'last12' => $averages['technicalDelayTotal']['value'] ?? 0],
+            'totalDuration' => ['label' => '- Total Duration', 'format' => 'time', 'source' => 'direct', 'last12' => $avgTotalDuration ?? '0:00'],
+            'averageDuration' => ['label' => '- Average Duration', 'format' => 'time', 'source' => 'direct', 'last12' => $avgAverageDuration ?? '0:00'],
+            'ratePer100TakeOff' => ['label' => '- Rate per 100 Take Off', 'format' => 'number', 'decimals' => 2, 'source' => 'averages', 'last12' => $averages['ratePer100TakeOff']['value'] ?? 0],
+            'technicalIncidentTotal' => ['label' => 'Technical Incident - Total', 'format' => 'integer', 'source' => 'averages', 'last12' => $averages['technicalIncidentTotal']['value'] ?? 0],
+            'technicalIncidentRate' => ['label' => '- Rate per 100 Take Off', 'format' => 'number', 'decimals' => 2, 'source' => 'averages', 'last12' => $averages['technicalIncidentRate']['value'] ?? 0],
+            'technicalCancellationTotal' => ['label' => 'Technical Cancellation - Total', 'format' => 'integer', 'source' => 'averages', 'last12' => $averages['technicalCancellationTotal']['value'] ?? 0],
+        ];
+
+        $dispatchReliabilityMetric = [
+            'dispatchReliability' => ['label' => 'Dispatch Reliability (%)', 'format' => 'percent', 'source' => 'averages', 'last12' => $averages['dispatchReliability']['value'] ?? 0],
+        ];
+
     @endphp
     <div>
         <table>
             <thead>
                 <tr>
-                    <th colspan="15" class="style2">AIRCRAFT OPERATION SUMMARY</th>
+                    <th colspan="15" class="header-title">AIRCRAFT OPERATION SUMMARY</th>
                 </tr>
                 <tr>
-                    <th colspan="15" class="style2">{{ $aircraftType }}</th>
+                    <th colspan="15" class="header-subtitle">{{ $aircraftType }}</th>
                 </tr>
                 <tr>
-                    <th colspan="15">{{ $startYear }} - {{ $year }}</th>
+                    <th colspan="15" class="header-period">{{ $startYear }} - {{ $endYear }}</th>
+                </tr>
+                <tr>
+                    <td class="aos-label column-header"></td>
+                    <td class="column-header"><b>{{ $startYear }}</b></td>
+                    @for ($i = 11; $i >= 0; $i--)
+                        <td class="column-header"><b>{{ substr(\Carbon\Carbon::parse($period)->subMonth($i)->format('F'), 0, 3) }}</b></td>
+                    @endfor
+                    <td class="column-header"><b>LAST 12 MTHS</b></td>
                 </tr>
             </thead>
             <tbody>
+                @foreach($metrics as $key => $metric)
                 <tr>
-                    <td class="aos-label"></td>
-                    <td><b>{{ $startYear }}</b></td>
-                    @for ($i = 11; $i >= 0; $i--)
-                        <td><b>{{ substr(\Carbon\Carbon::parse($period)->subMonth($i)->format('F'), 0, 3) }}</b></td>
-                    @endfor
-                    <td><b>LAST 12 MTHS</b></td>
-                </tr>
-                
-                <!-- A/C In Fleet Row - SAMA seperti aos-result -->
-                <tr>
-                    <td class="aos-label">A/C in Fleet</td>
-                    <td>{{ $formatNumber($totalAcInFleet / 12) }}</td>
-                    @for ($i = 11; $i >= 0; $i--)
-                        @php
-                            $acInFleet = $safeNumber($reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['acInFleet'] ?? 0);
-                        @endphp
-                        <td>{{ round($acInFleet) }}</td>
-                    @endfor
-                    <td>{{ $formatNumber($totalAcInFleet / 12) }}</td>
-                </tr>
+                    <td class="aos-label">{{ $metric['label'] }}</td>
 
-                <!-- A/C In Service Row - SAMA seperti aos-result -->
-                <tr>
-                    <td class="aos-label">A/C in Service (Revenue)</td>
-                    <td>{{ $formatNumber($totalAcInService / 12) }}</td>
-                    @for ($i = 11; $i >= 0; $i--)
-                        @php
-                            $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['acInService'] ?? 0;
-                        @endphp
-                        <td>{{ $formatNumber($safeNumber($value)) }}</td>
-                    @endfor
-                    <td>{{ $formatNumber($totalAcInService / 12) }}</td>
-                </tr>
+                    {{-- Year Column --}}
+                    <td>
+                        @php $yearValue = $getYearValue($yearColumnData, $key, $metric['source']); @endphp
+                        @if($metric['format'] === 'time')
+                            {{ $formatTime($yearValue) }}
+                        @elseif($metric['format'] === 'integer')
+                            {{ round($safeNumber($yearValue)) }}
+                        @else
+                            {{ $formatNumber($yearValue, $metric['decimals']) }}
+                        @endif
+                    </td>
 
-                <!-- A/C Days In Service Row - SAMA seperti aos-result -->
-                <tr>
-                    <td class="aos-label">A/C Days in Service (Revenue)</td>
-                    <td>{{ round($safeNumber($totalDaysInService)) }}</td>
+                    {{-- Monthly Columns --}}
                     @for ($i = 11; $i >= 0; $i--)
-                        @php
-                            $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['daysInService'] ?? 0;
-                        @endphp
-                        <td>{{ round($safeNumber($value)) }}</td>
+                        <td>
+                            @php $monthValue = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')][$key] ?? null; @endphp
+                            @if($metric['format'] === 'time')
+                                {{ $formatTime($monthValue) }}
+                            @elseif($metric['format'] === 'integer')
+                                {{ round($safeNumber($monthValue)) }}
+                            @else
+                                {{ $formatNumber($monthValue, $metric['decimals']) }}
+                            @endif
+                        </td>
                     @endfor
-                    <td>{{ round($safeNumber($totalDaysInService)) }}</td>
-                </tr>
 
-                <!-- Flying Hours - Total Row - SAMA seperti aos-result -->
+                    {{-- Last 12 Months Column --}}
+                    <td>
+                        @php $last12MthsValue = $metric['last12']; @endphp
+                        @if($metric['format'] === 'time')
+                            {{ $formatTime($last12MthsValue) }}
+                        @elseif($metric['format'] === 'integer')
+                            {{ round($safeNumber($last12MthsValue)) }}
+                        @else
+                            {{ $formatNumber($last12MthsValue, $metric['decimals']) }}
+                        @endif
+                    </td>
+                </tr>
+                @endforeach
+
+                {{-- Special Row for Dispatch Reliability --}}
+                @foreach($dispatchReliabilityMetric as $key => $metric)
                 <tr>
-                    <td class="aos-label">Flying Hours - Total</td>
-                    <td>{{ round($safeNumber($totalFlyingHoursTotal)) }}</td>
-                    @for ($i = 11; $i >= 0; $i--)
-                        @php
-                            $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['flyingHoursTotal'] ?? 0;
-                        @endphp
-                        <td>{{ round($safeNumber($value)) }}</td>
-                    @endfor
-                    <td>{{ round($safeNumber($totalFlyingHoursTotal)) }}</td>
-                </tr>
+                    <td class="aos-label">{{ $metric['label'] }}</td>
 
-                <!-- Flying Hours - Revenue Row - SAMA seperti aos-result -->
-                <tr>
-                    <td class="aos-label">- Revenue</td>
-                    <td>{{ round($safeNumber($totalRevenueFlyingHours)) }}</td>
-                    @for ($i = 11; $i >= 0; $i--)
-                        @php
-                            $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['revenueFlyingHours'] ?? 0;
-                        @endphp
-                        <td>{{ round($safeNumber($value)) }}</td>
-                    @endfor
-                    <td>{{ round($safeNumber($totalRevenueFlyingHours)) }}</td>
-                </tr>
+                    {{-- Year Column --}}
+                    <td>
+                        @php $yearValue = $getYearValue($yearColumnData, $key, $metric['source']); @endphp
+                        {{ $formatNumber($yearValue, 2) }}%
+                    </td>
 
-                <!-- Take Off - Total Row - SAMA seperti aos-result -->
-                <tr>
-                    <td class="aos-label">Take Off - Total</td>
-                    <td>{{ round($safeNumber($totalTakeOffTotal)) }}</td>
+                   {{-- Monthly Columns --}}
                     @for ($i = 11; $i >= 0; $i--)
-                        @php
-                            $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['takeOffTotal'] ?? 0;
-                        @endphp
-                        <td>{{ round($safeNumber($value)) }}</td>
+                        <td>
+                            @php $monthValue = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')][$key] ?? null; @endphp
+                            {{ $formatNumber($monthValue, 2) }}%
+                        </td>
                     @endfor
-                    <td>{{ round($safeNumber($totalTakeOffTotal)) }}</td>
-                </tr>
 
-                <!-- Take Off - Revenue Row - SAMA seperti aos-result -->
-                <tr>
-                    <td class="aos-label">- Revenue</td>
-                    <td>{{ round($safeNumber($totalRevenueTakeOff)) }}</td>
-                    @for ($i = 11; $i >= 0; $i--)
-                        @php
-                            $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['revenueTakeOff'] ?? 0;
-                        @endphp
-                        <td>{{ round($safeNumber($value)) }}</td>
-                    @endfor
-                    <td>{{ round($safeNumber($totalRevenueTakeOff)) }}</td>
+                    {{-- Last 12 Months Column --}}
+                    <td>
+                        @php $last12MthsValue = $metric['last12']; @endphp
+                        {{ $formatNumber($last12MthsValue, 2) }}%
+                    </td>
                 </tr>
-
-                <!-- Flight Hours per Take Off - Total Row - SAMA seperti aos-result -->
-                <tr>
-                    <td class="aos-label">Flight Hours per Take Off - Total</td>
-                    <td>{{ $calculateAvgTime($totalFlightHoursPerTakeOffTotal) }}</td>
-                    @for ($i = 11; $i >= 0; $i--)
-                        @php
-                            $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['flightHoursPerTakeOffTotal'] ?? 0;
-                        @endphp
-                        <td>{{ $formatTime($value) }}</td>
-                    @endfor
-                    <td>{{ $calculateAvgTime($totalFlightHoursPerTakeOffTotal) }}</td>
-                </tr>
-
-                <!-- Flight Hours per Take Off - Revenue Row - SAMA seperti aos-result -->
-                <tr>
-                    <td class="aos-label">- Revenue</td>
-                    <td>{{ $calculateAvgTime($totalRevenueFlightHoursPerTakeOff) }}</td>
-                    @for ($i = 11; $i >= 0; $i--)
-                        @php
-                            $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['revenueFlightHoursPerTakeOff'] ?? 0;
-                        @endphp
-                        <td>{{ $formatTime($value) }}</td>
-                    @endfor
-                    <td>{{ $calculateAvgTime($totalRevenueFlightHoursPerTakeOff) }}</td>
-                </tr>
-
-                <!-- Daily Utilization Flying Hours - Total Row - SAMA seperti aos-result -->
-                <tr>
-                    <td class="aos-label">Daily Utilization Flying Hours - Total</td>
-                    <td>{{ $calculateAvgTime($totalDailyUtilizationFlyingHoursTotal) }}</td>
-                    @for ($i = 11; $i >= 0; $i--)
-                        @php
-                            $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['dailyUtilizationFlyingHoursTotal'] ?? 0;
-                        @endphp
-                        <td>{{ $formatTime($value) }}</td>
-                    @endfor
-                    <td>{{ $calculateAvgTime($totalDailyUtilizationFlyingHoursTotal) }}</td>
-                </tr>
-
-                <!-- Daily Utilization Flying Hours - Revenue Row - SAMA seperti aos-result -->
-                <tr>
-                    <td class="aos-label">- Revenue</td>
-                    <td>{{ $calculateAvgTime($totalRevenueDailyUtilizationFlyingHoursTotal) }}</td>
-                    @for ($i = 11; $i >= 0; $i--)
-                        @php
-                            $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['revenueDailyUtilizationFlyingHoursTotal'] ?? 0;
-                        @endphp
-                        <td>{{ $formatTime($value) }}</td>
-                    @endfor
-                    <td>{{ $calculateAvgTime($totalRevenueDailyUtilizationFlyingHoursTotal) }}</td>
-                </tr>
-
-                <!-- Daily Utilization Take Off - Total Row - SAMA seperti aos-result -->
-                <tr>
-                    <td class="aos-label">Daily Utilization Take Off - Total</td>
-                    <td>{{ $formatNumber($totalDailyUtilizationTakeOffTotal / 12) }}</td>
-                    @for ($i = 11; $i >= 0; $i--)
-                        @php
-                            $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['dailyUtilizationTakeOffTotal'] ?? 0;
-                        @endphp
-                        <td>{{ $formatNumber($safeNumber($value)) }}</td>
-                    @endfor
-                    <td>{{ $formatNumber($totalDailyUtilizationTakeOffTotal / 12) }}</td>
-                </tr>
-
-                <!-- Daily Utilization Take Off - Revenue Row - SAMA seperti aos-result -->
-                <tr>
-                    <td class="aos-label">- Revenue</td>
-                    <td>{{ $formatNumber($totalRevenueDailyUtilizationTakeOffTotal / 12) }}</td>
-                    @for ($i = 11; $i >= 0; $i--)
-                        @php
-                            $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['revenueDailyUtilizationTakeOffTotal'] ?? 0;
-                        @endphp
-                        <td>{{ $formatNumber($safeNumber($value)) }}</td>
-                    @endfor
-                    <td>{{ $formatNumber($totalRevenueDailyUtilizationTakeOffTotal / 12) }}</td>
-                </tr>
-
-                <!-- Technical Delay - Total Row - SAMA seperti aos-result -->
-                <tr>
-                    <td class="aos-label">Technical Delay - Total</td>
-                    <td>{{ round($safeNumber($totalTechnicalDelayTotal)) }}</td>
-                    @for ($i = 11; $i >= 0; $i--)
-                        @php
-                            $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['technicalDelayTotal'] ?? 0;
-                        @endphp
-                        <td>{{ round($safeNumber($value)) }}</td>
-                    @endfor
-                    <td>{{ round($safeNumber($totalTechnicalDelayTotal)) }}</td>
-                </tr>
-
-                <!-- Technical Delay - Total Duration Row - SAMA seperti aos-result -->
-                <tr>
-                    <td class="aos-label">- Total Duration</td>
-                    <td>{{ $calculateAvgTime($totalTotalDuration) }}</td>
-                    @for ($i = 11; $i >= 0; $i--)
-                        @php
-                            $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['totalDuration'] ?? 0;
-                        @endphp
-                        <td>{{ $formatTime($value) }}</td>
-                    @endfor
-                    <td>{{ $calculateAvgTime($totalTotalDuration) }}</td>
-                </tr>
-
-                <!-- Technical Delay - Average Duration Row - SAMA seperti aos-result -->
-                <tr>
-                    <td class="aos-label">- Average Duration</td>
-                    <td>{{ $calculateAvgTime($totalAverageDuration) }}</td>
-                    @for ($i = 11; $i >= 0; $i--)
-                        @php
-                            $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['averageDuration'] ?? 0;
-                        @endphp
-                        <td>{{ $formatTime($value) }}</td>
-                    @endfor
-                    <td>{{ $calculateAvgTime($totalAverageDuration) }}</td>
-                </tr>
-
-                <!-- Technical Delay - Rate per 100 Take Off Row - SAMA seperti aos-result -->
-                <tr>
-                    <td class="aos-label">- Rate per 100 Take Off</td>
-                    <td>{{ $formatNumber($totalRatePer100TakeOff / 12) }}</td>
-                    @for ($i = 11; $i >= 0; $i--)
-                        @php
-                            $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['ratePer100TakeOff'] ?? 0;
-                        @endphp
-                        <td>{{ $formatNumber($safeNumber($value)) }}</td>
-                    @endfor
-                    <td>{{ $formatNumber($totalRatePer100TakeOff / 12) }}</td>
-                </tr>
-
-                <!-- Technical Incident - Total Row - SAMA seperti aos-result -->
-                <tr>
-                    <td class="aos-label">Technical Incident - Total</td>
-                    <td>{{ round($safeNumber($totalTechnicalIncidentTotal)) }}</td>
-                    @for ($i = 11; $i >= 0; $i--)
-                        @php
-                            $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['technicalIncidentTotal'] ?? 0;
-                        @endphp
-                        <td>{{ round($safeNumber($value)) }}</td>
-                    @endfor
-                    <td>{{ round($safeNumber($totalTechnicalIncidentTotal)) }}</td>
-                </tr>
-
-                <!-- Technical Incident - Rate per 100 Take Off Row - SAMA seperti aos-result -->
-                <tr>
-                    <td class="aos-label">- Rate per 100 Take Off</td>
-                    <td>{{ $formatNumber($totalTechnicalIncidentRate / 12) }}</td>
-                    @for ($i = 11; $i >= 0; $i--)
-                        @php
-                            $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['technicalIncidentRate'] ?? 0;
-                        @endphp
-                        <td>{{ $formatNumber($safeNumber($value)) }}</td>
-                    @endfor
-                    <td>{{ $formatNumber($totalTechnicalIncidentRate / 12) }}</td>
-                </tr>
-
-                <!-- Technical Cancellation - Total Row - SAMA seperti aos-result -->
-                <tr>
-                    <td class="aos-label">Technical Cancellation - Total</td>
-                    <td>{{ round($safeNumber($totalTechnicalCancellationTotal)) }}</td>
-                    @for ($i = 11; $i >= 0; $i--)
-                        @php
-                            $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['technicalCancellationTotal'] ?? 0;
-                        @endphp
-                        <td>{{ round($safeNumber($value)) }}</td>
-                    @endfor
-                    <td>{{ round($safeNumber($totalTechnicalCancellationTotal)) }}</td>
-                </tr>
-
-                <!-- Dispatch Reliability Row - SAMA seperti aos-result -->
-                <tr>
-                    <td class="aos-label">Dispatch Reliability (%)</td>
-                    <td>{{ $formatNumber($totalDispatchReliability / 12) }}%</td>
-                    @for ($i = 11; $i >= 0; $i--)
-                        @php
-                            $value = $reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['dispatchReliability'] ?? 0;
-                        @endphp
-                        <td>{{ $formatNumber($safeNumber($value)) }}%</td>
-                    @endfor
-                    <td>{{ $formatNumber($totalDispatchReliability / 12) }}%</td>
-                </tr>
-
+                @endforeach
             </tbody>
         </table>
     </div>

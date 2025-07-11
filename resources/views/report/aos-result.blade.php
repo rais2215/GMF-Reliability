@@ -1,3 +1,4 @@
+{{-- filepath: c:\Users\Noval Rais\Documents\Github Repository\GMF-Reliability\resources\views\report\aos-result.blade.php --}}
 <x-app-layout>
     <div class="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100 py-4 sm:py-8">
         <div class="max-w-full mx-auto px-2 sm:px-4 lg:px-6">
@@ -77,8 +78,30 @@
                                 </th>
 
                                 @php
-                                    $startYear = \Carbon\Carbon::parse($period)->subMonth(11)->format('Y');
-                                    // Helper functions
+                                    // Menggunakan baseYear dari controller, bukan hardcode
+                                    $displayYear = $baseYear ?? \Carbon\Carbon::parse($period)->subMonth(11)->format('Y');
+
+                                    // Menentukan data yang akan digunakan berdasarkan tahun yang sesuai
+                                    $currentYearData = null;
+                                    if (isset($yearData) && $yearData) {
+                                        $currentYearData = $yearData; // Data dari controller
+                                    } elseif (isset($data2016) && $data2016 && $displayYear == 2016) {
+                                        $currentYearData = $data2016;
+                                    } elseif (isset($data2017) && $data2017 && $displayYear == 2017) {
+                                        $currentYearData = $data2017;
+                                    } else {
+                                        // Fallback jika data tidak tersedia
+                                        $currentYearData = [
+                                            'averages' => [],
+                                            'avgFlightHoursPerTakeOffTotal' => '0 : 00',
+                                            'avgRevenueFlightHoursPerTakeOff' => '0 : 00',
+                                            'avgDailyUtilizationFlyingHoursTotal' => '0 : 00',
+                                            'avgRevenueDailyUtilizationFlyingHoursTotal' => '0 : 00',
+                                            'avgTotalDuration' => '0 : 00',
+                                            'avgAverageDuration' => '0 : 00'
+                                        ];
+                                    }
+
                                     $safeNumber = function($value, $default = 0) {
                                         if (is_null($value) || !is_numeric($value)) {
                                             return $default;
@@ -96,7 +119,7 @@
 
                                     $formatTime = function($value) {
                                         if (is_null($value) || $value === '' || $value === 0) {
-                                            return '00:00';
+                                            return '0 : 00';
                                         }
                                         if (is_string($value) && strpos($value, ':') !== false) {
                                             return $value;
@@ -104,35 +127,14 @@
                                         if (is_numeric($value)) {
                                             $hours = floor($value);
                                             $minutes = round(($value - $hours) * 60);
-                                            return sprintf('%d:%02d', $hours, $minutes);
+                                            return sprintf('%d : %02d', $hours, $minutes);
                                         }
-                                        return $value ?: '00:00';
-                                    };
-
-                                    $timeToDecimal = function($timeString) {
-                                        if (is_null($timeString) || $timeString === '' || $timeString === 0) {
-                                            return 0;
-                                        }
-                                        if (is_numeric($timeString)) {
-                                            return floatval($timeString);
-                                        }
-                                        if (is_string($timeString) && strpos($timeString, ':') !== false) {
-                                            $parts = explode(':', $timeString);
-                                            $hours = intval($parts[0]);
-                                            $minutes = isset($parts[1]) ? intval($parts[1]) : 0;
-                                            return $hours + ($minutes / 60);
-                                        }
-                                        return 0;
-                                    };
-
-                                    $calculateAvgTime = function($totalDecimal) use ($formatTime) {
-                                        $avg = $totalDecimal / 12;
-                                        return $formatTime($avg);
+                                        return $value ?: '0 : 00';
                                     };
                                 @endphp
 
                                 <th class="w-16 sm:w-18 lg:w-20 px-2 sm:px-3 py-4 sm:py-6 text-center text-sm font-bold text-white uppercase tracking-wider bg-gradient-to-r from-sky-700 to-sky-800">
-                                    {{ $startYear }}
+                                    {{ $displayYear }}
                                 </th>
 
                                 @for ($i = 11; $i >= 0; $i--)
@@ -151,108 +153,31 @@
                         <!-- Table Body -->
                         <tbody class="bg-white divide-y divide-gray-200">
                             @php
-                                // Initialize totals
-                                $totalAcInFleet = 0;
-                                $totalAcInService = 0;
-                                $totalDaysInService = 0;
-                                $totalFlyingHoursTotal = 0;
-                                $totalRevenueFlyingHours = 0;
-                                $totalTakeOffTotal = 0;
-                                $totalRevenueTakeOff = 0;
-                                $totalFlightHoursPerTakeOffTotal = 0;
-                                $totalRevenueFlightHoursPerTakeOff = 0;
-                                $totalDailyUtilizationFlyingHoursTotal = 0;
-                                $totalRevenueDailyUtilizationFlyingHoursTotal = 0;
-                                $totalDailyUtilizationTakeOffTotal = 0;
-                                $totalRevenueDailyUtilizationTakeOffTotal = 0;
-                                $totalTechnicalDelayTotal = 0;
-                                $totalTotalDuration = 0;
-                                $totalAverageDuration = 0;
-                                $totalRatePer100TakeOff = 0;
-                                $totalTechnicalIncidentTotal = 0;
-                                $totalTechnicalIncidentRate = 0;
-                                $totalTechnicalCancellationTotal = 0;
-                                $totalDispatchReliability = 0;
-
-                                // Calculate totals for 12 months
-                                for ($j = 11; $j >= 0; $j--) {
-                                    $monthKey = \Carbon\Carbon::parse($period)->subMonth($j)->format('Y-m');
-                                    $monthData = $reportData[$monthKey] ?? [];
-
-                                    $totalAcInFleet += $safeNumber($monthData['acInFleet'] ?? 0);
-                                    $totalAcInService += $safeNumber($monthData['acInService'] ?? 0);
-                                    $totalDaysInService += $safeNumber($monthData['daysInService'] ?? 0);
-                                    $totalFlyingHoursTotal += $safeNumber($monthData['flyingHoursTotal'] ?? 0);
-                                    $totalRevenueFlyingHours += $safeNumber($monthData['revenueFlyingHours'] ?? 0);
-                                    $totalTakeOffTotal += $safeNumber($monthData['takeOffTotal'] ?? 0);
-                                    $totalRevenueTakeOff += $safeNumber($monthData['revenueTakeOff'] ?? 0);
-
-                                    $totalFlightHoursPerTakeOffTotal += $timeToDecimal($monthData['flightHoursPerTakeOffTotal'] ?? 0);
-                                    $totalRevenueFlightHoursPerTakeOff += $timeToDecimal($monthData['revenueFlightHoursPerTakeOff'] ?? 0);
-                                    $totalDailyUtilizationFlyingHoursTotal += $timeToDecimal($monthData['dailyUtilizationFlyingHoursTotal'] ?? 0);
-                                    $totalRevenueDailyUtilizationFlyingHoursTotal += $timeToDecimal($monthData['revenueDailyUtilizationFlyingHoursTotal'] ?? 0);
-
-                                    $totalDailyUtilizationTakeOffTotal += $safeNumber($monthData['dailyUtilizationTakeOffTotal'] ?? 0);
-                                    $totalRevenueDailyUtilizationTakeOffTotal += $safeNumber($monthData['revenueDailyUtilizationTakeOffTotal'] ?? 0);
-                                    $totalTechnicalDelayTotal += $safeNumber($monthData['technicalDelayTotal'] ?? 0);
-
-                                    $totalTotalDuration += $timeToDecimal($monthData['totalDuration'] ?? 0);
-                                    $totalAverageDuration += $timeToDecimal($monthData['averageDuration'] ?? 0);
-
-                                    $totalRatePer100TakeOff += $safeNumber($monthData['ratePer100TakeOff'] ?? 0);
-                                    $totalTechnicalIncidentTotal += $safeNumber($monthData['technicalIncidentTotal'] ?? 0);
-                                    $totalTechnicalIncidentRate += $safeNumber($monthData['technicalIncidentRate'] ?? 0);
-                                    $totalTechnicalCancellationTotal += $safeNumber($monthData['technicalCancellationTotal'] ?? 0);
-                                    $totalDispatchReliability += $safeNumber($monthData['dispatchReliability'] ?? 0);
-                                }
+                                $metrics = [
+                                    ['label' => 'A/C In Fleet', 'key' => 'acInFleet', 'format' => 'number'],
+                                    ['label' => 'A/C In Service (Revenue)', 'key' => 'acInService', 'format' => 'number'],
+                                    ['label' => 'A/C Days In Service (Revenue)', 'key' => 'daysInService', 'format' => 'round'],
+                                    ['label' => 'Flying Hours - Total', 'key' => 'flyingHoursTotal', 'format' => 'round'],
+                                    ['label' => '- Revenue', 'key' => 'revenueFlyingHours', 'format' => 'round', 'indent' => true],
+                                    ['label' => 'Take Off - Total', 'key' => 'takeOffTotal', 'format' => 'round'],
+                                    ['label' => '- Revenue', 'key' => 'revenueTakeOff', 'format' => 'round', 'indent' => true],
+                                    ['label' => 'Flight Hours per Take Off - Total', 'key' => 'flightHoursPerTakeOffTotal', 'format' => 'time'],
+                                    ['label' => '- Revenue', 'key' => 'revenueFlightHoursPerTakeOff', 'format' => 'time', 'indent' => true],
+                                    ['label' => 'Daily Utilization Flying Hours - Total', 'key' => 'dailyUtilizationFlyingHoursTotal', 'format' => 'time'],
+                                    ['label' => '- Revenue', 'key' => 'revenueDailyUtilizationFlyingHoursTotal', 'format' => 'time', 'indent' => true],
+                                    ['label' => 'Daily Utilization Take Off - Total', 'key' => 'dailyUtilizationTakeOffTotal', 'format' => 'number'],
+                                    ['label' => '- Revenue', 'key' => 'revenueDailyUtilizationTakeOffTotal', 'format' => 'number', 'indent' => true],
+                                    ['label' => 'Technical Delay - Total', 'key' => 'technicalDelayTotal', 'format' => 'round'],
+                                    ['label' => '- Total Duration', 'key' => 'totalDuration', 'format' => 'time', 'indent' => true],
+                                    ['label' => '- Average Duration', 'key' => 'averageDuration', 'format' => 'time', 'indent' => true],
+                                    ['label' => '- Rate per 100 Take Off', 'key' => 'ratePer100TakeOff', 'format' => 'number', 'indent' => true],
+                                    ['label' => 'Technical Incident - Total', 'key' => 'technicalIncidentTotal', 'format' => 'round'],
+                                    ['label' => '- Rate per 100 Take Off', 'key' => 'technicalIncidentRate', 'format' => 'number', 'indent' => true],
+                                    ['label' => 'Technical Cancellation - Total', 'key' => 'technicalCancellationTotal', 'format' => 'round'],
+                                ];
                             @endphp
 
-                            <!-- A/C In Fleet Row -->
-                            <tr class="table-row bg-sky-50 hover:bg-sky-100 transition-colors duration-200 fade-in-row">
-                                <td class="w-48 sm:w-56 lg:w-60 px-4 sm:px-6 py-3 sm:py-6 whitespace-nowrap text-sm font-bold text-gray-900 sticky left-0 bg-sky-50 z-10 border-r-2 border-sky-200 shadow-lg">
-                                    <span class="inline-flex items-center">
-                                        <div class="w-3 h-3 sm:w-4 sm:h-4 bg-sky-700 rounded-full mr-2 sm:mr-3"></div>
-                                        <span class="text-gray-800">A/C In Fleet</span>
-                                    </span>
-                                </td>
-                                <td class="metric-cell w-16 sm:w-18 lg:w-20 px-2 sm:px-3 py-3 sm:py-6 whitespace-nowrap text-sm text-white text-center font-bold bg-sky-700">
-                                    {{ $formatNumber($totalAcInFleet / 12) }}
-                                </td>
-                                @for ($i = 11; $i >= 0; $i--)
-                                    @php
-                                        $acInFleet = $safeNumber($reportData[\Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m')]['acInFleet'] ?? 0);
-                                    @endphp
-                                    <td class="metric-cell w-14 sm:w-16 px-2 py-3 sm:py-6 whitespace-nowrap text-sm text-gray-900 text-center font-semibold {{ $i % 2 == 0 ? 'bg-gray-50' : 'bg-white' }} hover:bg-sky-50 transition-colors duration-200">
-                                        {{ round($acInFleet) }}
-                                    </td>
-                                @endfor
-                                <td class="metric-cell w-16 sm:w-18 lg:w-20 px-2 sm:px-3 py-3 sm:py-6 whitespace-nowrap text-sm text-white text-center font-bold bg-sky-800">
-                                    {{ $formatNumber($totalAcInFleet / 12) }}
-                                </td>
-                            </tr>
-
-                            <!-- All Other Metrics Rows -->
-                            @foreach([
-                                ['label' => 'A/C In Service (Revenue)', 'short' => 'A/C In Service', 'total' => $totalAcInService, 'key' => 'acInService', 'format' => 'number'],
-                                ['label' => 'A/C Days In Service (Revenue)', 'short' => 'Days In Service', 'total' => $totalDaysInService, 'key' => 'daysInService', 'format' => 'round'],
-                                ['label' => 'Flying Hours - Total', 'short' => 'Flying Hours - Total', 'total' => $totalFlyingHoursTotal, 'key' => 'flyingHoursTotal', 'format' => 'round'],
-                                ['label' => '- Revenue', 'short' => '- Revenue', 'total' => $totalRevenueFlyingHours, 'key' => 'revenueFlyingHours', 'format' => 'round', 'indent' => true],
-                                ['label' => 'Take Off - Total', 'short' => 'Take Off - Total', 'total' => $totalTakeOffTotal, 'key' => 'takeOffTotal', 'format' => 'round'],
-                                ['label' => '- Revenue', 'short' => '- Revenue', 'total' => $totalRevenueTakeOff, 'key' => 'revenueTakeOff', 'format' => 'round', 'indent' => true],
-                                ['label' => 'Flight Hours per Take Off - Total', 'short' => 'FH per TO - Total', 'total' => $totalFlightHoursPerTakeOffTotal, 'key' => 'flightHoursPerTakeOffTotal', 'format' => 'time'],
-                                ['label' => '- Revenue', 'short' => '- Revenue', 'total' => $totalRevenueFlightHoursPerTakeOff, 'key' => 'revenueFlightHoursPerTakeOff', 'format' => 'time', 'indent' => true],
-                                ['label' => 'Daily Utilization Flying Hours - Total', 'short' => 'Daily Util FH - Total', 'total' => $totalDailyUtilizationFlyingHoursTotal, 'key' => 'dailyUtilizationFlyingHoursTotal', 'format' => 'time'],
-                                ['label' => '- Revenue', 'short' => '- Revenue', 'total' => $totalRevenueDailyUtilizationFlyingHoursTotal, 'key' => 'revenueDailyUtilizationFlyingHoursTotal', 'format' => 'time', 'indent' => true],
-                                ['label' => 'Daily Utilization Take Off - Total', 'short' => 'Daily Util TO - Total', 'total' => $totalDailyUtilizationTakeOffTotal, 'key' => 'dailyUtilizationTakeOffTotal', 'format' => 'number'],
-                                ['label' => '- Revenue', 'short' => '- Revenue', 'total' => $totalRevenueDailyUtilizationTakeOffTotal, 'key' => 'revenueDailyUtilizationTakeOffTotal', 'format' => 'number', 'indent' => true],
-                                ['label' => 'Technical Delay - Total', 'short' => 'Tech Delay - Total', 'total' => $totalTechnicalDelayTotal, 'key' => 'technicalDelayTotal', 'format' => 'round'],
-                                ['label' => '- Total Duration', 'short' => '- Total Duration', 'total' => $totalTotalDuration, 'key' => 'totalDuration', 'format' => 'time', 'indent' => true],
-                                ['label' => '- Average Duration', 'short' => '- Avg Duration', 'total' => $totalAverageDuration, 'key' => 'averageDuration', 'format' => 'time', 'indent' => true],
-                                ['label' => '- Rate per 100 Take Off', 'short' => '- Rate per 100 TO', 'total' => $totalRatePer100TakeOff, 'key' => 'ratePer100TakeOff', 'format' => 'number', 'indent' => true],
-                                ['label' => 'Technical Incident - Total', 'short' => 'Tech Incident - Total', 'total' => $totalTechnicalIncidentTotal, 'key' => 'technicalIncidentTotal', 'format' => 'round'],
-                                ['label' => '- Rate per 100 Take Off', 'short' => '- Rate per 100 TO', 'total' => $totalTechnicalIncidentRate, 'key' => 'technicalIncidentRate', 'format' => 'number', 'indent' => true],
-                                ['label' => 'Technical Cancellation - Total', 'short' => 'Tech Cancel - Total', 'total' => $totalTechnicalCancellationTotal, 'key' => 'technicalCancellationTotal', 'format' => 'round'],
-                            ] as $row)
+                            @foreach($metrics as $row)
                                 <tr class="table-row bg-sky-50 hover:bg-sky-100 transition-colors duration-200 fade-in-row">
                                     <td class="w-48 sm:w-56 lg:w-60 px-4 sm:px-6 py-3 sm:py-6 whitespace-nowrap text-sm font-bold text-gray-900 sticky left-0 bg-sky-50 z-10 border-r-2 border-sky-200 shadow-lg">
                                         <span class="inline-flex items-center {{ isset($row['indent']) ? 'ml-4 sm:ml-6 lg:ml-8' : '' }}">
@@ -261,19 +186,25 @@
                                             @else
                                                 <div class="w-2 h-2 bg-sky-600 rounded-full mr-2 sm:mr-3"></div>
                                             @endif
-                                            <span class="text-gray-800">
-                                                <span class="hidden lg:inline">{{ $row['label'] }}</span>
-                                                <span class="lg:hidden">{{ $row['short'] ?? $row['label'] }}</span>
-                                            </span>
+                                            <span class="text-gray-800">{{ $row['label'] }}</span>
                                         </span>
                                     </td>
                                     <td class="metric-cell w-16 sm:w-18 lg:w-20 px-2 sm:px-3 py-3 sm:py-6 whitespace-nowrap text-sm text-white text-center font-bold bg-sky-700">
-                                        @if($row['format'] === 'number')
-                                            {{ $formatNumber($row['total'] / 12) }}
-                                        @elseif($row['format'] === 'time')
-                                            {{ $calculateAvgTime($row['total']) }}
+                                        @php
+                                            $yearAvgVal = 0;
+                                            if (isset($hourMetricsConfig[$row['key']])) {
+                                                $avgVarName = $hourMetricsConfig[$row['key']]['average_var'];
+                                                $yearAvgVal = $currentYearData[$avgVarName] ?? '0 : 00';
+                                            } else {
+                                                $yearAvgVal = $currentYearData['averages'][$row['key']]['value'] ?? 0;
+                                            }
+                                        @endphp
+                                        @if($row['format'] === 'time')
+                                            {{ $yearAvgVal }}
+                                        @elseif($row['format'] === 'number')
+                                            {{ $formatNumber($yearAvgVal) }}
                                         @else
-                                            {{ round($safeNumber($row['total'])) }}
+                                            {{ round($safeNumber($yearAvgVal)) }}
                                         @endif
                                     </td>
                                     @for ($i = 11; $i >= 0; $i--)
@@ -291,12 +222,21 @@
                                         </td>
                                     @endfor
                                     <td class="metric-cell w-16 sm:w-18 lg:w-20 px-2 sm:px-3 py-3 sm:py-6 whitespace-nowrap text-sm text-white text-center font-bold bg-sky-800">
-                                        @if($row['format'] === 'number')
-                                            {{ $formatNumber($row['total'] / 12) }}
-                                        @elseif($row['format'] === 'time')
-                                            {{ $calculateAvgTime($row['total']) }}
+                                        @php
+                                            $avgVal = 0;
+                                            if (isset($hourMetricsConfig[$row['key']])) {
+                                                $avgVarName = $hourMetricsConfig[$row['key']]['average_var'];
+                                                $avgVal = $$avgVarName; // Using variable variables
+                                            } else {
+                                                $avgVal = $averages[$row['key']]['value'] ?? 0;
+                                            }
+                                        @endphp
+                                        @if($row['format'] === 'time')
+                                            {{ $avgVal }}
+                                        @elseif($row['format'] === 'number')
+                                            {{ $formatNumber($avgVal) }}
                                         @else
-                                            {{ round($safeNumber($row['total'])) }}
+                                            {{ round($safeNumber($avgVal)) }}
                                         @endif
                                     </td>
                                 </tr>
@@ -314,7 +254,7 @@
                                     </span>
                                 </td>
                                 <td class="metric-cell w-16 sm:w-18 lg:w-20 px-2 sm:px-3 py-3 sm:py-6 whitespace-nowrap text-sm text-white text-center font-bold bg-gradient-to-r from-sky-700 to-lime-600">
-                                    {{ $formatNumber($totalDispatchReliability / 12) }}%
+                                    {{ $formatNumber($currentYearData['averages']['dispatchReliability']['value'] ?? 0) }}%
                                 </td>
                                 @for ($i = 11; $i >= 0; $i--)
                                     @php
@@ -325,7 +265,7 @@
                                     </td>
                                 @endfor
                                 <td class="metric-cell w-16 sm:w-18 lg:w-20 px-2 sm:px-3 py-3 sm:py-6 whitespace-nowrap text-sm text-white text-center font-bold bg-gradient-to-r from-sky-800 to-lime-700">
-                                    {{ $formatNumber($totalDispatchReliability / 12) }}%
+                                    {{ $formatNumber($averages['dispatchReliability']['value'] ?? 0) }}%
                                 </td>
                             </tr>
                         </tbody>
