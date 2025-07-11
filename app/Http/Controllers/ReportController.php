@@ -873,45 +873,37 @@ class ReportController extends Controller
     }
 
     public function aosExcel(Request $request)
-    {
-        $request->validate([
-            'period' => 'required',
-            'aircraft_type' => 'required',
-        ]);
+{
+    $request->validate([
+        'period' => 'required',
+        'aircraft_type' => 'required',
+    ]);
 
-        $period = $request->period;
-        $aircraftType = $request->aircraft_type;
-        $month = date('m', strtotime($period));
-        $year = date('Y', strtotime($period));
+    $period = $request->period;
+    $aircraftType = $request->aircraft_type;
+    $month = date('m', strtotime($period));
+    $year = date('Y', strtotime($period));
 
-        // Tentukan tahun patokan berdasarkan periode data
-        $baseYear = $this->determineBaseYear($period);
-
-        // Data rolling 12 bulan terakhir (Last 12 Months)
-        $processedData = $this->processReportData($aircraftType, $period);
-
-        // Generate data untuk tahun patokan
-        $yearData = $this->processReportDataByYear($aircraftType, $baseYear);
-
-        $data2016 = null;
-        $data2017 = null;
-
-        // Hanya generate data tambahan jika diperlukan
-        if ($baseYear != 2016 && ($year == 2016 || $baseYear == 2015)) {
-            $data2016 = $this->processReportDataByYear($aircraftType, 2016);
-        }
-        if ($baseYear != 2017 && ($year == 2017 || $baseYear == 2016)) {
-            $data2017 = $this->processReportDataByYear($aircraftType, 2017);
-        }
-
-        return Excel::download(new AosExport(
-            $processedData['reportData'],
-            $period,
-            $aircraftType,
-            $processedData,   // Data untuk "Last 12 Months"
-            $yearData,        // Data untuk tahun patokan
-            $data2016,        // Data tahun 2016 (jika relevan)
-            $data2017         // Data tahun 2017 (jika relevan)
-        ), 'AOS-Report-' . substr($period, 0, 7) . '.xlsx');
+    // Tentukan tahun patokan berdasarkan periode data
+    $baseYear = $this->determineBaseYear($period);
+    if (empty($baseYear)) {
+        $baseYear = date('Y');
     }
+    $baseYear = (string) $baseYear;
+
+    // Data rolling 12 bulan terakhir (Last 12 Months)
+    $processedData = $this->processReportData($aircraftType, $period);
+
+    // Generate data untuk tahun patokan
+    $yearData = $this->processReportDataByYear($aircraftType, $baseYear);
+
+    return Excel::download(new AosExport(
+        $processedData['reportData'],
+        $period,
+        $aircraftType,
+        $processedData,
+        $yearData,
+        $baseYear
+    ), 'AOS-Report-' . substr($period, 0, 7) . '.xlsx');
+}
 }

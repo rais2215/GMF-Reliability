@@ -22,10 +22,10 @@
                 Period: {{ $startYear }} - {{ $endYear }}
             </th>
         </tr>
-        <!-- Header Row dengan Start Year + 12 bulan + Last 12 Months -->
+        <!-- Header Row dengan Base Year + 12 bulan + Last 12 Months -->
         <tr style="background-color: #4472C4; color: white; font-weight: bold; text-align: center;">
             <th style="padding: 8px; border: 1px solid #ccc; width: 200px; text-align: center; font-weight: bold;">Metrics</th>
-            <th style="padding: 8px; border: 1px solid #ccc; width: 80px; text-align: center; font-weight: bold;">{{ $startYear }}</th>
+            <th style="padding: 8px; border: 1px solid #ccc; width: 80px; text-align: center; font-weight: bold;">{{ $baseYear }}</th>
             @for ($i = 11; $i >= 0; $i--)
             @php
                 $monthKey = \Carbon\Carbon::parse($period)->subMonth($i)->format('Y-m');
@@ -61,14 +61,27 @@
                 return sprintf('%d:%02d', $hours, $minutes);
             };
 
-            // Select the correct year's data
+            // Logika fleksibel untuk menentukan data tahun berdasarkan baseYear
             $yearColumnData = [];
-            if (isset($data2016) && $startYear == '2016') {
+
+            // Prioritas utama: gunakan yearData yang sesuai dengan baseYear
+            if (isset($yearData) && !empty($yearData)) {
+                $yearColumnData = $yearData;
+            }
+            // Fallback berdasarkan baseYear spesifik
+            elseif ($baseYear == '2016' && isset($data2016) && !empty($data2016)) {
                 $yearColumnData = $data2016;
-            } elseif (isset($data2017) && $startYear == '2017') {
+            }
+            elseif ($baseYear == '2017' && isset($data2017) && !empty($data2017)) {
                 $yearColumnData = $data2017;
             }
-            // Add more years here if needed
+            // Jika tidak ada data untuk tahun tertentu, gunakan data yang tersedia
+            elseif (isset($data2016) && !empty($data2016)) {
+                $yearColumnData = $data2016;
+            }
+            elseif (isset($data2017) && !empty($data2017)) {
+                $yearColumnData = $data2017;
+            }
 
             // Function to get value from nested array safely
             $getValue = function($data, $key, $source) {
@@ -120,7 +133,7 @@
                     {{ $metric['label'] }}
                 </td>
 
-                <!-- Start Year Column -->
+                <!-- Year Column -->
                 <td style="padding: 6px; border: 1px solid #ccc; text-align: center;">
                     @php $yearValue = $getValue($yearColumnData, $metricKey, $metric['source']); @endphp
                     @switch($metric['format'])

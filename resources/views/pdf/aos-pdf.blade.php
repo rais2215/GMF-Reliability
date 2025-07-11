@@ -77,14 +77,15 @@
         $startYear = \Carbon\Carbon::parse($period)->subMonths(11)->format('Y');
         $endYear = \Carbon\Carbon::parse($period)->format('Y');
 
-        // Select the correct year's data based on the start year of the report
+        // Gunakan data tahun yang sesuai dengan baseYear dari controller
         $yearColumnData = [];
-        if (isset($data2016) && $startYear == '2016') {
+        if (isset($yearData)) {
+            $yearColumnData = $yearData;
+        } elseif (isset($data2016) && $baseYear == '2016') {
             $yearColumnData = $data2016;
-        } elseif (isset($data2017) && $startYear == '2017') {
+        } elseif (isset($data2017) && $baseYear == '2017') {
             $yearColumnData = $data2017;
         }
-        // Add more years here if needed
 
         // Function to get value from nested array safely for YEAR data
         $getYearValue = function($data, $key, $source) {
@@ -142,7 +143,7 @@
                 </tr>
                 <tr>
                     <td class="aos-label column-header"></td>
-                    <td class="column-header"><b>{{ $startYear }}</b></td>
+                    <td class="column-header"><b>{{ $baseYear }}</b></td>
                     @for ($i = 11; $i >= 0; $i--)
                         <td class="column-header"><b>{{ substr(\Carbon\Carbon::parse($period)->subMonth($i)->format('F'), 0, 3) }}</b></td>
                     @endfor
@@ -162,7 +163,7 @@
                         @elseif($metric['format'] === 'integer')
                             {{ round($safeNumber($yearValue)) }}
                         @else
-                            {{ $formatNumber($yearValue, $metric['decimals']) }}
+                            {{ $formatNumber($yearValue, $metric['decimals'] ?? 2) }}
                         @endif
                     </td>
 
@@ -175,7 +176,7 @@
                             @elseif($metric['format'] === 'integer')
                                 {{ round($safeNumber($monthValue)) }}
                             @else
-                                {{ $formatNumber($monthValue, $metric['decimals']) }}
+                                {{ $formatNumber($monthValue, $metric['decimals'] ?? 2) }}
                             @endif
                         </td>
                     @endfor
@@ -188,7 +189,7 @@
                         @elseif($metric['format'] === 'integer')
                             {{ round($safeNumber($last12MthsValue)) }}
                         @else
-                            {{ $formatNumber($last12MthsValue, $metric['decimals']) }}
+                            {{ $formatNumber($last12MthsValue, $metric['decimals'] ?? 2) }}
                         @endif
                     </td>
                 </tr>

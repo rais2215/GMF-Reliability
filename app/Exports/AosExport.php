@@ -13,24 +13,23 @@ class AosExport implements FromView, WithTitle, ShouldAutoSize
     protected $period;
     protected $aircraftType;
     protected $processedData; // Untuk "Last 12 Months"
-    protected $data2016;      // Untuk kolom tahun
-    protected $data2017;      // Untuk kolom tahun
+    protected $yearData;      // Data untuk kolom tahun (base year)
+    protected $baseYear;      // Tahun patokan
 
-    // Constructor harus menerima semua 6 argumen
     public function __construct(
         array $reportData,
         string $period,
         string $aircraftType,
         array $processedData,
-        array $data2016,
-        array $data2017
+        array $yearData,
+        string $baseYear
     ) {
         $this->reportData = $reportData;
         $this->period = $period;
         $this->aircraftType = $aircraftType;
         $this->processedData = $processedData;
-        $this->data2016 = $data2016;
-        $this->data2017 = $data2017;
+        $this->yearData = $yearData;
+        $this->baseYear = $baseYear;
     }
 
     /**
@@ -38,20 +37,16 @@ class AosExport implements FromView, WithTitle, ShouldAutoSize
      */
     public function view(): View
     {
-        // Teruskan semua data ke view dengan nama variabel yang benar
         return view('excel.aos-excel', [
             'reportData' => $this->reportData,
             'period' => $this->period,
             'aircraftType' => $this->aircraftType,
-            'processedData' => $this->processedData, // Ini akan mengatasi error
-            'data2016' => $this->data2016,
-            'data2017' => $this->data2017,
+            'processedData' => $this->processedData,
+            'yearData' => $this->yearData,
+            'baseYear' => $this->baseYear,
         ]);
     }
 
-    /**
-     * @return string
-     */
     public function title(): string
     {
         return 'AOS Report';
