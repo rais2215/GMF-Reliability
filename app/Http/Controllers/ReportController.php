@@ -565,20 +565,25 @@ class ReportController extends Controller
                 }
             }
             switch ($config['type']) {
-                case 'average_valid':
-                    if ($metric === 'acInFleet') {
-                        $result = $total / 12;
-                    } else {
-                        $result = $validCount > 0 ? $total / $validCount : 0;
-                    }
-                    break;
-                case 'sum':
-                    $result = $total;
-                    break;
-                default:
-                    $result = $total / 12;
-                    break;
-            }
+            case 'average_valid':
+                if ($metric === 'acInFleet') {
+                    $result = round($total / 12); // Tambahkan round() untuk membulatkan
+                } else {
+                    $result = $validCount > 0 ? $total / $validCount : 0;
+                }
+                break;
+            case 'average_all':
+                // Untuk acInService, gunakan rata-rata dari bulan yang valid
+                $validValues = array_filter($monthlyValues, function($v) { return $v > 0; });
+                $result = count($validValues) > 0 ? array_sum($validValues) / count($validValues) : $total / 12;
+                break;
+            case 'sum':
+                $result = $total;
+                break;
+            default:
+                $result = $total / 12;
+                break;
+        }
             $averages[$metric] = [
                 'value' => $result,
                 'total' => $total,
