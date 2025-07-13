@@ -24,11 +24,11 @@ function formatNumber($value, $decimals = 2) {
         {{-- Flying Hours Info --}}
         <tr>
             <th colspan="2" style="font-weight: bold; background-color: #e8f5e8; border: 1px solid #000;">Total Flight Hours</th>
-            <th style="text-align: center; background-color: #e8f5e8; border: 1px solid #000;">{{ round($flyingHours2Before) }}</th>
-            <th style="text-align: center; background-color: #e8f5e8; border: 1px solid #000;">{{ round($flyingHoursBefore) }}</th>
-            <th style="text-align: center; background-color: #e8f5e8; border: 1px solid #000;">{{ round($flyingHoursTotal) }}</th>
-            <th style="text-align: center; background-color: #e8f5e8; border: 1px solid #000;">{{ round($fh3Last) }}</th>
-            <th style="text-align: center; background-color: #e8f5e8; border: 1px solid #000;">{{ round($fh12Last) }}</th>
+            <th style="text-align: center; font-weight: bold; background-color: #e8f5e8; border: 1px solid #000;">{{ round($flyingHours2Before) }}</th>
+            <th style="text-align: center; font-weight: bold; background-color: #e8f5e8; border: 1px solid #000;">{{ round($flyingHoursBefore) }}</th>
+            <th style="text-align: center; font-weight: bold; background-color: #e8f5e8; border: 1px solid #000;">{{ round($flyingHoursTotal) }}</th>
+            <th style="text-align: center; font-weight: bold; background-color: #e8f5e8; border: 1px solid #000;">{{ round($fh3Last) }}</th>
+            <th style="text-align: center; font-weight: bold; background-color: #e8f5e8; border: 1px solid #000;">{{ round($fh12Last) }}</th>
             <th colspan="8" style="background-color: #e8f5e8; border: 1px solid #000;"></th>
         </tr>
 
