@@ -65,6 +65,21 @@ class CombinedReportController extends Controller
         // ===== GET AOS DATA =====
         $aosData = $this->getAosData($aircraftType, $period);
 
+        // Ambil data tahun dasar (baseYear) dan data tahun berjalan
+        $baseYear = \Carbon\Carbon::parse($period)->subMonths(11)->format('Y');
+        $yearColumnData = $this->getAosYearlySummary($aircraftType, $baseYear);
+
+        // Data rata-rata rolling 12 bulan terakhir
+        $avgFlightHoursPerTakeOffTotal = $aosData['avgFlightHoursPerTakeOffTotal'] ?? '0:00';
+        $avgRevenueFlightHoursPerTakeOff = $aosData['avgRevenueFlightHoursPerTakeOff'] ?? '0:00';
+        $avgDailyUtilizationFlyingHoursTotal = $aosData['avgDailyUtilizationFlyingHoursTotal'] ?? '0:00';
+        $avgRevenueDailyUtilizationFlyingHoursTotal = $aosData['avgRevenueDailyUtilizationFlyingHoursTotal'] ?? '0:00';
+        $avgTotalDuration = $aosData['avgTotalDuration'] ?? '0:00';
+        $avgAverageDuration = $aosData['avgAverageDuration'] ?? '0:00';
+
+        $reportData = $aosData['reportData'] ?? [];
+        $averages = $aosData['averages'] ?? [];
+
         // ===== GET PILOT DATA =====
         $pilotData = $this->getPilotData($aircraftType, $period, $request);
 
@@ -73,7 +88,9 @@ class CombinedReportController extends Controller
             'pilotData' => $pilotData,
             'aircraftType' => $aircraftType,  // Same aircraft type for both
             'period' => $period,
-            'operator' => $operator
+            'operator' => $operator,
+            'baseYear' => $baseYear,
+            'yearColumnData' => $yearColumnData
         ]);
     }
 
@@ -91,6 +108,19 @@ class CombinedReportController extends Controller
         // ===== GET AOS DATA =====
         $aosData = $this->getAosData($aircraftType, $period);
 
+        $baseYear = \Carbon\Carbon::parse($period)->subMonths(11)->format('Y');
+        $yearColumnData = $this->getAosYearlySummary($aircraftType, $baseYear);
+
+        $avgFlightHoursPerTakeOffTotal = $aosData['avgFlightHoursPerTakeOffTotal'] ?? '0:00';
+        $avgRevenueFlightHoursPerTakeOff = $aosData['avgRevenueFlightHoursPerTakeOff'] ?? '0:00';
+        $avgDailyUtilizationFlyingHoursTotal = $aosData['avgDailyUtilizationFlyingHoursTotal'] ?? '0:00';
+        $avgRevenueDailyUtilizationFlyingHoursTotal = $aosData['avgRevenueDailyUtilizationFlyingHoursTotal'] ?? '0:00';
+        $avgTotalDuration = $aosData['avgTotalDuration'] ?? '0:00';
+        $avgAverageDuration = $aosData['avgAverageDuration'] ?? '0:00';
+
+        $reportData = $aosData['reportData'] ?? [];
+        $averages = $aosData['averages'] ?? [];
+
         // ===== GET PILOT DATA =====
         $pilotData = $this->getPilotData($aircraftType, $period, $request);
 
@@ -102,11 +132,21 @@ class CombinedReportController extends Controller
         $data = [
             'aosData' => $aosData,
             'pilotData' => $pilotData,
-            'aircraftType' => $aircraftType,  // Same aircraft type for both
+            'aircraftType' => $aircraftType,
             'period' => $period,
             'operator' => $operator,
-            'formatNumber' => $formatNumber
-        ];
+            'formatNumber' => $formatNumber,
+            'baseYear' => $baseYear,
+            'yearColumnData' => $yearColumnData,
+            'reportData' => $reportData,
+            'averages' => $averages,
+            'avgFlightHoursPerTakeOffTotal' => $avgFlightHoursPerTakeOffTotal,
+            'avgRevenueFlightHoursPerTakeOff' => $avgRevenueFlightHoursPerTakeOff,
+            'avgDailyUtilizationFlyingHoursTotal' => $avgDailyUtilizationFlyingHoursTotal,
+            'avgRevenueDailyUtilizationFlyingHoursTotal' => $avgRevenueDailyUtilizationFlyingHoursTotal,
+            'avgTotalDuration' => $avgTotalDuration,
+            'avgAverageDuration' => $avgAverageDuration,
+        ];;
 
         // Generate PDF
         $pdf = Pdf::loadView('pdf.combined-pdf', $data);
@@ -121,6 +161,119 @@ class CombinedReportController extends Controller
         $filename = "Fleet_Reliability_Report_{$aircraftType}_{$periodFormatted}.pdf";
 
         return $pdf->download($filename);
+    }
+
+    /**
+     * NEW METHOD: Calculates the Aircraft Operation Summary for a full year.
+     * This method fetches aggregated data for an entire year to prevent calculation errors.
+     *
+     * @param string $aircraftType
+     * @param string $year
+     * @return array
+     */
+    private function getAosYearlySummary($aircraftType, $year)
+    {
+        $startDate = Carbon::createFromDate($year)->startOfYear();
+        $endDate = Carbon::createFromDate($year)->endOfYear();
+
+        // 1. Calculate the average number of aircraft in the fleet for the year
+        $avgAcInFleetData = TblMonthlyfhfc::where('Actype', $aircraftType)
+            ->whereBetween('MonthEval', [$startDate, $endDate])
+            ->where(function($query) {
+                $query->whereNull('Remark')
+                      ->orWhere('Remark', '')
+                      ->orWhere('Remark', '!=', 'out')
+                      ->orWhere('Remark', 'not like', '%out%');
+            })
+            ->selectRaw('COUNT(Reg) as ac_in_fleet_monthly')
+            ->groupBy(DB::raw('YEAR(MonthEval)'), DB::raw('MONTH(MonthEval)'))
+            ->get();
+        $acInFleet = $avgAcInFleetData->avg('ac_in_fleet_monthly') ?? 0;
+
+        // 2. Get yearly totals for flying hours, cycles, and days in service
+        $yearlyTotals = TblMonthlyfhfc::where('Actype', $aircraftType)
+            ->whereBetween('MonthEval', [$startDate, $endDate])
+            ->selectRaw('
+                SUM(AvaiDays) as days_in_service,
+                SUM(RevFHHours + (RevFHMin / 60) + NoRevFHHours + (NoRevFHMin / 60)) as flying_hours_total,
+                SUM(RevFHHours + (RevFHMin / 60)) as revenue_flying_hours,
+                SUM(RevFC + NoRevFC) as take_off_total,
+                SUM(RevFC) as revenue_take_off
+            ')
+            ->first();
+
+        // 3. Get yearly totals for technical delays
+        $technicalDelayTotals = Mcdrnew::where('ACType', $aircraftType)
+            ->whereBetween('DateEvent', [$startDate, $endDate])
+            ->where('DCP', 'LIKE', '%D%')
+            ->selectRaw('
+                COUNT(*) as technical_delay_total,
+                SUM(HoursTek + (MinTek / 60)) as total_duration
+            ')
+            ->first();
+
+        // 4. Get yearly total for technical incidents
+        $technicalIncidentTotal = TblSdr::where('ACType', $aircraftType)
+            ->whereBetween('DateOccur', [$startDate, $endDate])
+            ->count();
+
+        // 5. Get yearly total for technical cancellations
+        $technicalCancellationTotal = Mcdrnew::where('ACType', $aircraftType)
+            ->whereBetween('DateEvent', [$startDate, $endDate])
+            ->where('DCP', 'LIKE', '%C%')
+            ->count();
+
+        // 6. Calculate all metrics based on the annual aggregate data
+        $daysInYear = $startDate->isLeapYear() ? 366 : 365;
+        $daysInService = $yearlyTotals->days_in_service ?? 0;
+        $acInService = $daysInYear > 0 ? ($daysInService / $daysInYear) : 0;
+
+        $flyingHoursTotal = $yearlyTotals->flying_hours_total ?? 0;
+        $takeOffTotal = $yearlyTotals->take_off_total ?? 0;
+        $revenueFlyingHours = $yearlyTotals->revenue_flying_hours ?? 0;
+        $revenueTakeOff = $yearlyTotals->revenue_take_off ?? 0;
+
+        $flightHoursPerTakeOffTotal = $takeOffTotal > 0 ? ($flyingHoursTotal / $takeOffTotal) : 0;
+        $revenueFlightHoursPerTakeOff = $revenueTakeOff > 0 ? ($revenueFlyingHours / $revenueTakeOff) : 0;
+        $dailyUtilizationFlyingHoursTotal = $daysInService > 0 ? ($flyingHoursTotal / $daysInService) : 0;
+        $revenueDailyUtilizationFlyingHoursTotal = $daysInService > 0 ? ($revenueFlyingHours / $daysInService) : 0;
+        $dailyUtilizationTakeOffTotal = $daysInService > 0 ? ($takeOffTotal / $daysInService) : 0;
+        $revenueDailyUtilizationTakeOffTotal = $daysInService > 0 ? ($revenueTakeOff / $daysInService) : 0;
+
+        $technicalDelayTotal = $technicalDelayTotals->technical_delay_total ?? 0;
+        $totalDuration = $technicalDelayTotals->total_duration ?? 0;
+        $averageDuration = $technicalDelayTotal > 0 ? ($totalDuration / $technicalDelayTotal) : 0;
+        $ratePer100TakeOff = $revenueTakeOff > 0 ? (($technicalDelayTotal * 100) / $revenueTakeOff) : 0;
+
+        $technicalIncidentRate = $revenueTakeOff > 0 ? (($technicalIncidentTotal * 100) / $revenueTakeOff) : 0;
+
+        $dispatchReliability = $revenueTakeOff > 0 ?
+            ((($revenueTakeOff - $technicalDelayTotal - $technicalCancellationTotal) / $revenueTakeOff) * 100) : 0;
+
+        // 7. Return a single associative array with all calculated metrics
+        return [
+            'acInFleet' => $acInFleet,
+            'acInService' => $acInService,
+            'daysInService' => $daysInService,
+            'flyingHoursTotal' => $flyingHoursTotal,
+            'revenueFlyingHours' => $revenueFlyingHours,
+            'takeOffTotal' => $takeOffTotal,
+            'revenueTakeOff' => $revenueTakeOff,
+            'flightHoursPerTakeOffTotal' => $flightHoursPerTakeOffTotal,
+            'revenueFlightHoursPerTakeOff' => $revenueFlightHoursPerTakeOff,
+            'dailyUtilizationFlyingHoursTotal' => $dailyUtilizationFlyingHoursTotal,
+            'revenueDailyUtilizationFlyingHoursTotal' => $revenueDailyUtilizationFlyingHoursTotal,
+            'dailyUtilizationTakeOffTotal' => $dailyUtilizationTakeOffTotal,
+            'revenueDailyUtilizationTakeOffTotal' => $revenueDailyUtilizationTakeOffTotal,
+            'technicalDelayTotal' => $technicalDelayTotal,
+            'totalDuration' => $totalDuration,
+            'averageDuration' => $averageDuration,
+            'ratePer100TakeOff' => $ratePer100TakeOff,
+            'technicalIncidentTotal' => $technicalIncidentTotal,
+            'technicalIncidentRate' => $technicalIncidentRate,
+            'technicalCancellationTotal' => $technicalCancellationTotal,
+            'dispatchReliability' => $dispatchReliability,
+        ];
     }
 
     // Helper function untuk format number
@@ -288,37 +441,40 @@ class CombinedReportController extends Controller
             $total = 0;
             $validCount = 0;
             $monthlyValues = [];
+
             for ($i = 11; $i >= 0; $i--) {
                 $monthKey = Carbon::parse($period)->subMonth($i)->format('Y-m');
                 $value = $reportData[$monthKey][$metric] ?? 0;
+
                 $monthlyValues[] = $value;
                 $total += $value;
+
+                // Untuk A/C In Fleet, count all months (including zero values) for proper average
                 if ($metric === 'acInFleet') {
                     $validCount++;
                 } else if ($value > 0) {
                     $validCount++;
                 }
             }
+
+            // Calculate based on metric type
             switch ($config['type']) {
                 case 'average_valid':
+                    // Untuk A/C In Fleet, use all 12 months for average calculation
                     if ($metric === 'acInFleet') {
-                        $result = round($total / 12); // dibulatkan
+                        $result = $total / 12;
                     } else {
                         $result = $validCount > 0 ? $total / $validCount : 0;
                     }
                     break;
-                case 'average_all':
-                    // Untuk acInService, gunakan rata-rata dari bulan yang valid
-                    $validValues = array_filter($monthlyValues, function($v) { return $v > 0; });
-                    $result = count($validValues) > 0 ? array_sum($validValues) / count($validValues) : $total / 12;
-                    break;
                 case 'sum':
                     $result = $total;
                     break;
-                default:
+                default: // 'average_all'
                     $result = $total / 12;
                     break;
             }
+
             $averages[$metric] = [
                 'value' => $result,
                 'total' => $total,
@@ -327,6 +483,7 @@ class CombinedReportController extends Controller
                 'format' => $config['format']
             ];
         }
+
         return $averages;
     }
 
