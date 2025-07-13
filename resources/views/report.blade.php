@@ -1,13 +1,11 @@
 <x-app-layout>
-    <!-- Page Loader: 3 Bar Loader - Fixed to match register.blade.php -->
-    <div id="page-loader" class="fixed inset-0 z-50 hidden flex-col items-center justify-center bg-[#112955]/90 backdrop-blur-lg transition-all duration-500">
-        <div class="glass-card rounded-3xl shadow-2xl p-12 border border-white/20 max-w-sm w-full mx-4 bg-white/10 backdrop-blur-xl">
-
+    {{-- Page Loader --}}
+    <div id="page-loader" class="fixed inset-0 z-50 hidden flex-col items-center justify-center backdrop-blur-2xl bg-white/40 transition-all duration-500">
+        <div class="glass-card rounded-3xl shadow-2xl p-12 border border-white/20 max-w-sm w-full mx-4 bg-transparent">
             <div class="text-center space-y-4">
-                <span id="loader-text" class="text-xl font-semibold text-white block">Redirecting page...</span>
-                <p class="text-sm text-gray-300">Please wait while we load the content</p>
+                <span id="loader-text" class="text-2xl font-extrabold" style="color: #0069a1;">Redirecting page......</span>
+                <p class="text-base font-bold" style="color: #0069a1;">Please wait while we load the content</p>
             </div>
-
             <div class="mt-6 w-full h-2 bg-white/20 rounded-full overflow-hidden">
                 <div class="h-full bg-gradient-to-r from-[#7EBB1A] to-[#8DC63F] rounded-full progress-bar"></div>
             </div>
@@ -91,6 +89,18 @@
         .delay-500 { animation-delay: 0.5s !important; }
         .delay-600 { animation-delay: 0.6s !important; }
         .delay-700 { animation-delay: 0.7s !important; }
+        .delay-800  { animation-delay: 0.8s !important; }
+        .delay-900  { animation-delay: 0.9s !important; }
+        .delay-1000 { animation-delay: 1.0s !important; }
+        .delay-1100 { animation-delay: 1.1s !important; }
+        .delay-1200 { animation-delay: 1.2s !important; }
+        .delay-1300 { animation-delay: 1.3s !important; }
+        .delay-1400 { animation-delay: 1.4s !important; }
+        .delay-1500 { animation-delay: 1.5s !important; }
+        .delay-1600 { animation-delay: 1.6s !important; }
+        .delay-1700 { animation-delay: 1.7s !important; }
+        .delay-1800 { animation-delay: 1.8s !important; }
+        .delay-1900 { animation-delay: 1.9s !important; }
 
         /* Responsive Header */
         @media (max-width: 768px) {
@@ -147,26 +157,26 @@
             </div>
             <ul class="space-y-2">
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-400"
-                       data-url="{{ route('report.aos.index') }}">
+                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-300"
+                    data-url="{{ route('report.aos.index') }}">
                         <span class="mr-2 text-xl">✈</span> <strong>Aircraft Operation Summary</strong>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-500"
-                       data-url="{{ route('report.pilot.index') }}">
+                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-400"
+                    data-url="{{ route('report.pilot.index') }}">
                         <span class="mr-2 text-xl">✈</span> <strong>Pilot Report And Technical Delay</strong>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-600"
-                       data-url="{{ route('report.cumulative.index') }}">
+                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-500"
+                    data-url="{{ route('report.cumulative.index') }}">
                         <span class="mr-2 text-xl">✈</span> <strong>Cumulative Flight Hours and Take Off</strong>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-700"
-                       data-url="{{ route('report.etops.index') }}">
+                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-600"
+                    data-url="{{ route('report.etops.index') }}">
                         <span class="mr-2 text-xl">✈</span> <strong>Etops Reliability Report</strong>
                     </a>
                 </li>
@@ -176,61 +186,61 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-700">
+                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-800">
                         <span class="mr-2 text-xl">✈</span> <strong>Reliability Graph</strong>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-700">
+                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-900">
                         <span class="mr-2 text-xl">✈</span> <strong>Engine Operation Summary</strong>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-700">
+                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-1000">
                         <span class="mr-2 text-xl">✈</span> <strong>Engine Removal & Shutdown</strong>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-700">
+                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-1100">
                         <span class="mr-2 text-xl">✈</span> <strong>Weekly Reliability Report</strong>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-700">
+                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-1200">
                         <span class="mr-2 text-xl">✈</span> <strong>Summary Report</strong>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-700">
+                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-1300">
                         <span class="mr-2 text-xl">✈</span> <strong>Graph ATA Pilot</strong>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-700">
+                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-1400">
                         <span class="mr-2 text-xl">✈</span> <strong>Graph ATA Delay</strong>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-700">
+                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-1500">
                         <span class="mr-2 text-xl">✈</span> <strong>APU Operation Summary</strong>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-700">
+                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-1600">
                         <span class="mr-2 text-xl">✈</span> <strong>APU Removal</strong>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-700">
+                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-blue-400 animate-fade-in-up delay-1700">
                         <span class="mr-2 text-xl">✈</span> <strong>Cabin Reliability Report</strong>
                     </a>
                 </li>
-                <li class="my-4 animate-fade-in-up delay-700">
+                <li class="my-4 animate-fade-in-up delay-1800">
                     <hr class="border-t-2 border-gray-300 font-bold transition-all duration-700 ease-in-out">
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-red-50 hover:bg-red-100 text-red-700 hover:text-red-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-red-400 animate-fade-in-up delay-400"
-                       data-url="{{ route('report.combined.index') }}">
+                    <a href="#" class="flex items-center px-3 py-2 rounded-lg transition bg-red-50 hover:bg-red-100 text-red-700 hover:text-red-900 sidebar-item focus:outline-none focus:ring-2 focus:ring-red-400 animate-fade-in-up delay-1900"
+                    data-url="{{ route('report.combined.index') }}">
                         <i data-lucide="download" class="mr-2 w-5 h-5"></i> <strong>Export AOS & Pilot Report (PDF)</strong>
                     </a>
                 </li>

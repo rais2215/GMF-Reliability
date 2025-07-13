@@ -1,12 +1,11 @@
 <x-app-layout>
     {{-- Page Loader --}}
-    <div id="page-loader" class="fixed inset-0 z-50 hidden flex-col items-center justify-center bg-[#112955]/90 backdrop-blur-lg transition-all duration-500">
-        <div class="glass-card rounded-3xl shadow-2xl p-12 border border-white/20 max-w-sm w-full mx-4 bg-white/10 backdrop-blur-xl">
+    <div id="page-loader" class="fixed inset-0 z-50 hidden flex-col items-center justify-center backdrop-blur-2xl bg-white/40 transition-all duration-500">
+        <div class="glass-card rounded-3xl shadow-2xl p-12 border border-white/20 max-w-sm w-full mx-4 bg-transparent">
             <div class="text-center space-y-4">
-                <span id="loader-text" class="text-xl font-semibold text-white block">Loading Dashboard...</span>
-                <p class="text-sm text-gray-300">Please wait while we prepare your data</p>
+                <span id="loader-text" class="text-2xl font-extrabold" style="color: #0069a1;">Loading Dashboard...</span>
+                <p class="text-base font-bold" style="color: #0069a1;">Please wait while we prepare your data</p>
             </div>
-
             <div class="mt-6 w-full h-2 bg-white/20 rounded-full overflow-hidden">
                 <div class="h-full bg-gradient-to-r from-[#7EBB1A] to-[#8DC63F] rounded-full progress-bar"></div>
             </div>
@@ -260,43 +259,20 @@
                     <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent"></div>
 
                     {{-- Content --}}
-                    <div class="relative h-full p-6 md:p-8 flex flex-col justify-between">
-                        <div class="flex justify-between items-start">
-                            <div class="space-y-2">
-                                <img src="{{ asset('images/gmfwhite.png') }}" alt="Engineering Services" class="h-1 w-auto rounded-xl shadow-lg bg-white/30 backdrop-blur-sm">
-                            </div>
+                    <div class="relative h-full flex flex-col justify-center items-start p-6 md:p-10 z-10">
+                        <div class="mb-4">
+                            <h2 class="text-xl md:text-3xl font-light opacity-90 mb-1">Welcome,</h2>
+                            <h1 class="text-3xl md:text-5xl font-bold leading-tight mb-2">{{ Auth::user()->name }}</h1>
                         </div>
-
-                        <div class="space-y-4">
-                            <div>
-                                <h2 class="text-xl md:text-3xl font-light leading-tight opacity-90">Welcome,</h2>
-                                <h1 class="text-3xl md:text-5xl font-bold leading-tight">{{ Auth::user()->name }}</h1>
-                            </div>
-
-                            <div class="flex flex-wrap gap-4">
-                                <div class="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    <span class="text-sm font-medium">Secure Access</span>
-                                </div>
-                                <div class="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                                    </svg>
-                                    <span class="text-sm font-medium">Real-time Data</span>
-                                </div>
-                            </div>
-
-                            <p class="text-sm md:text-base opacity-90">
-                                Need help?
-                                <a href="mailto:spoc-ict@gmf-aeroasia.co.id" class="underline font-semibold hover:text-blue-200 transition-colors">
-                                    spoc-ict@gmf-aeroasia.co.id
-                                </a>
-                            </p>
-                        </div>
+                        <p class="text-sm md:text-base opacity-90">
+                            Need help?
+                            <a href="mailto:spoc-ict@gmf-aeroasia.co.id" class="underline font-semibold hover:text-blue-200 transition-colors">
+                                spoc-ict@gmf-aeroasia.co.id
+                            </a>
+                        </p>
                     </div>
                 </div>
+            </div>
             </div>
 
             {{-- Quick Navigation Cards Section --}}
