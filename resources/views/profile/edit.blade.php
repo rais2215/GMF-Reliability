@@ -12,6 +12,34 @@
         </div>
     </div>
 
+    {{-- Notifikasi Sukses & Error --}}
+    @if (session('status'))
+        <div id="notif-success" class="notif-animate fixed top-8 right-8 z-[9999] flex items-center gap-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-4 rounded-2xl shadow-2xl font-semibold border-l-4 border-green-700">
+            <svg class="w-6 h-6 text-white animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            <span>{{ session('status') }}</span>
+            <button onclick="document.getElementById('notif-success').style.display='none'" class="ml-4 focus:outline-none">
+                <svg class="w-5 h-5 text-white/80 hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+    @endif
+    @if (session('error'))
+        <div id="notif-error" class="notif-animate fixed top-8 right-8 z-[9999] flex items-center gap-3 bg-gradient-to-r from-red-500 to-rose-500 text-white px-6 py-4 rounded-2xl shadow-2xl font-semibold border-l-4 border-red-700">
+            <svg class="w-6 h-6 text-white animate-shake" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+            <span>{{ session('error') }}</span>
+            <button onclick="document.getElementById('notif-error').style.display='none'" class="ml-4 focus:outline-none">
+                <svg class="w-5 h-5 text-white/80 hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+    @endif
+
     <x-slot name="header">
         <div class="flex items-center justify-between px-6 py-3 bg-white border-b header-responsive animate-element"
             style="border-color:#006ba1; border-bottom-width:1.5px; border-style:solid; border-bottom-left-radius:1rem; border-bottom-right-radius:1rem; box-shadow:0 1px 4px 0 rgba(0,107,161,0.07);">
@@ -110,6 +138,37 @@
             100% {
                 transform: translateX(100%);
             }
+        }
+
+        /* Notif Animations */
+        @keyframes notif-slide-in {
+            0% {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.95);
+            }
+            60% {
+                opacity: 1;
+                transform: translateY(10px) scale(1.03);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        @keyframes notif-shake {
+            0% { transform: translateX(0);}
+            20% { transform: translateX(-6px);}
+            40% { transform: translateX(6px);}
+            60% { transform: translateX(-4px);}
+            80% { transform: translateX(4px);}
+            100% { transform: translateX(0);}
+        }
+        .notif-animate {
+            animation: notif-slide-in 0.7s cubic-bezier(.4,2,.6,1);
+            box-shadow: 0 8px 32px 0 rgba(16, 112, 202, 0.10), 0 2px 8px 0 rgba(0,0,0,0.10);
+        }
+        .animate-shake {
+            animation: notif-shake 0.7s cubic-bezier(.4,2,.6,1);
         }
 
         /* ==============================================
@@ -227,6 +286,15 @@
            RESPONSIVE
         ============================================== */
         @media (max-width: 768px) {
+            .notif-animate, #notif-success, #notif-error {
+                right: 50% !important;
+                left: 50% !important;
+                top: 1.5rem !important;
+                transform: translateX(-50%) !important;
+                width: 90vw !important;
+                max-width: 95vw !important;
+                min-width: 0 !important;
+            }
             .header-responsive {
                 flex-direction: column !important;
                 align-items: flex-start !important;
@@ -329,6 +397,24 @@
             messages.forEach(message => {
                 message.style.animation = 'fade-in 0.5s ease-out';
             });
+
+            // ==============================================
+            // NOTIF AUTO HIDE
+            // ==============================================
+            setTimeout(() => {
+                const notifSuccess = document.getElementById('notif-success');
+                const notifError = document.getElementById('notif-error');
+                if (notifSuccess) {
+                    notifSuccess.style.opacity = '0';
+                    notifSuccess.style.transform = 'translateY(-30px) scale(0.95)';
+                    setTimeout(() => { notifSuccess.style.display = 'none'; }, 400);
+                }
+                if (notifError) {
+                    notifError.style.opacity = '0';
+                    notifError.style.transform = 'translateY(-30px) scale(0.95)';
+                    setTimeout(() => { notifError.style.display = 'none'; }, 400);
+                }
+            }, 3000);
         });
     </script>
 </x-app-layout>
