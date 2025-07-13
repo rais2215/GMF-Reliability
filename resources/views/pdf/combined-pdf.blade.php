@@ -550,260 +550,260 @@
                 <!-- Aircraft Fleet Metrics -->
                 <tr>
                     <td class="aos-label">A/C in Fleet</td>
-                    <td>{{ $formatNumber($totalAcInFleet / 12) }}</td>
+                    <td>{{ $formatNumber($aosData['averages']['acInFleet']['value']) }}</td>
                     @foreach ($periods as $monthKey)
                         @php
                             $acInFleet = $safeNumber($aosData['reportData'][$monthKey]['acInFleet'] ?? 0);
                         @endphp
                         <td>{{ round($acInFleet) }}</td>
                     @endforeach
-                    <td>{{ $formatNumber($totalAcInFleet / 12) }}</td>
+                    <td>{{ $formatNumber($aosData['averages']['acInFleet']['value']) }}</td>
                 </tr>
 
                 <tr>
                     <td class="aos-label">A/C in Service</td>
-                    <td>{{ $formatNumber($totalAcInService / 12) }}</td>
+                    <td>{{ $formatNumber($aosData['averages']['acInService']['value']) }}</td>
                     @foreach ($periods as $monthKey)
                         @php
                             $acInService = $safeNumber($aosData['reportData'][$monthKey]['acInService'] ?? 0);
                         @endphp
                         <td>{{ $formatNumber($acInService) }}</td>
                     @endforeach
-                    <td>{{ $formatNumber($totalAcInService / 12) }}</td>
+                    <td>{{ $formatNumber($aosData['averages']['acInService']['value']) }}</td>
                 </tr>
 
                 <tr>
                     <td class="aos-label">A/C Days in Service</td>
-                    <td>{{ round($safeNumber($totalDaysInService)) }}</td>
+                    <td>{{ round($aosData['averages']['daysInService']['value']) }}</td>
                     @foreach ($periods as $monthKey)
                         @php
                             $daysInService = $safeNumber($aosData['reportData'][$monthKey]['daysInService'] ?? 0);
                         @endphp
                         <td>{{ round($daysInService) }}</td>
                     @endforeach
-                    <td>{{ round($safeNumber($totalDaysInService)) }}</td>
+                    <td>{{ round($aosData['averages']['daysInService']['value']) }}</td>
                 </tr>
 
                 <!-- Flight Operations Metrics -->
                 <tr>
                     <td class="aos-label">Flying Hours - Total</td>
-                    <td>{{ round($safeNumber($totalFlyingHoursTotal)) }}</td>
+                    <td>{{ round($aosData['averages']['flyingHoursTotal']['value']) }}</td>
                     @foreach ($periods as $monthKey)
                         @php
                             $flyingHoursTotal = $safeNumber($aosData['reportData'][$monthKey]['flyingHoursTotal'] ?? 0);
                         @endphp
                         <td>{{ round($flyingHoursTotal) }}</td>
                     @endforeach
-                    <td>{{ round($safeNumber($totalFlyingHoursTotal)) }}</td>
+                    <td>{{ round($aosData['averages']['flyingHoursTotal']['value']) }}</td>
                 </tr>
 
                 <tr>
                     <td class="aos-label">- Revenue</td>
-                    <td>{{ round($safeNumber($totalRevenueFlyingHours)) }}</td>
+                    <td>{{ round($aosData['averages']['revenueFlyingHours']['value']) }}</td>
                     @foreach ($periods as $monthKey)
                         @php
                             $revenueFlyingHours = $safeNumber($aosData['reportData'][$monthKey]['revenueFlyingHours'] ?? 0);
                         @endphp
                         <td>{{ round($revenueFlyingHours) }}</td>
                     @endforeach
-                    <td>{{ round($safeNumber($totalRevenueFlyingHours)) }}</td>
+                    <td>{{ round($aosData['averages']['revenueFlyingHours']['value']) }}</td>
                 </tr>
 
                 <tr>
                     <td class="aos-label">Take Off - Total</td>
-                    <td>{{ round($safeNumber($totalTakeOffTotal)) }}</td>
+                    <td>{{ round($aosData['averages']['takeOffTotal']['value']) }}</td>
                     @foreach ($periods as $monthKey)
                         @php
                             $takeOffTotal = $safeNumber($aosData['reportData'][$monthKey]['takeOffTotal'] ?? 0);
                         @endphp
                         <td>{{ round($takeOffTotal) }}</td>
                     @endforeach
-                    <td>{{ round($safeNumber($totalTakeOffTotal)) }}</td>
+                    <td>{{ round($aosData['averages']['takeOffTotal']['value']) }}</td>
                 </tr>
 
                 <tr>
                     <td class="aos-label">- Revenue</td>
-                    <td>{{ round($safeNumber($totalRevenueTakeOff)) }}</td>
+                    <td>{{ round($aosData['averages']['revenueTakeOff']['value']) }}</td>
                     @foreach ($periods as $monthKey)
                         @php
                             $revenueTakeOff = $safeNumber($aosData['reportData'][$monthKey]['revenueTakeOff'] ?? 0);
                         @endphp
                         <td>{{ round($revenueTakeOff) }}</td>
                     @endforeach
-                    <td>{{ round($safeNumber($totalRevenueTakeOff)) }}</td>
+                    <td>{{ round($aosData['averages']['revenueTakeOff']['value']) }}</td>
                 </tr>
 
                 <!-- Flight Efficiency Metrics -->
                 <tr>
                     <td class="aos-label">Flight Hours per Take Off - Total</td>
-                    <td>{{ $calculateAvgTime($totalFlightHoursPerTakeOffTotal) }}</td>
+                    <td>{{ $aosData['avgFlightHoursPerTakeOffTotal'] }}</td>
                     @foreach ($periods as $monthKey)
                         @php
                             $flightHoursPerTakeOffTotal = $aosData['reportData'][$monthKey]['flightHoursPerTakeOffTotal'] ?? 0;
                         @endphp
                         <td>{{ $formatTime($flightHoursPerTakeOffTotal) }}</td>
                     @endforeach
-                    <td>{{ $calculateAvgTime($totalFlightHoursPerTakeOffTotal) }}</td>
+                    <td>{{ $aosData['avgFlightHoursPerTakeOffTotal'] }}</td>
                 </tr>
 
                 <tr>
                     <td class="aos-label">- Revenue</td>
-                    <td>{{ $calculateAvgTime($totalRevenueFlightHoursPerTakeOff) }}</td>
+                    <td>{{ $aosData['avgRevenueFlightHoursPerTakeOff'] }}</td>
                     @foreach ($periods as $monthKey)
                         @php
                             $revenueFlightHoursPerTakeOff = $aosData['reportData'][$monthKey]['revenueFlightHoursPerTakeOff'] ?? 0;
                         @endphp
                         <td>{{ $formatTime($revenueFlightHoursPerTakeOff) }}</td>
                     @endforeach
-                    <td>{{ $calculateAvgTime($totalRevenueFlightHoursPerTakeOff) }}</td>
+                    <td>{{ $aosData['avgRevenueFlightHoursPerTakeOff'] }}</td>
                 </tr>
 
                 <!-- Daily Utilization Metrics -->
                 <tr>
                     <td class="aos-label">Daily Utiliz - Total FH</td>
-                    <td>{{ $calculateAvgTime($totalDailyUtilizationFlyingHoursTotal) }}</td>
+                    <td>{{ $aosData['avgDailyUtilizationFlyingHoursTotal'] }}</td>
                     @foreach ($periods as $monthKey)
                         @php
                             $dailyUtilizationFlyingHoursTotal = $aosData['reportData'][$monthKey]['dailyUtilizationFlyingHoursTotal'] ?? 0;
                         @endphp
                         <td>{{ $formatTime($dailyUtilizationFlyingHoursTotal) }}</td>
                     @endforeach
-                    <td>{{ $calculateAvgTime($totalDailyUtilizationFlyingHoursTotal) }}</td>
+                    <td>{{ $aosData['avgDailyUtilizationFlyingHoursTotal'] }}</td>
                 </tr>
 
                 <tr>
                     <td class="aos-label">- Revenue FH</td>
-                    <td>{{ $calculateAvgTime($totalRevenueDailyUtilizationFlyingHoursTotal) }}</td>
+                    <td>{{ $aosData['avgRevenueDailyUtilizationFlyingHoursTotal'] }}</td>
                     @foreach ($periods as $monthKey)
                         @php
                             $revenueDailyUtilizationFlyingHoursTotal = $aosData['reportData'][$monthKey]['revenueDailyUtilizationFlyingHoursTotal'] ?? 0;
                         @endphp
                         <td>{{ $formatTime($revenueDailyUtilizationFlyingHoursTotal) }}</td>
                     @endforeach
-                    <td>{{ $calculateAvgTime($totalRevenueDailyUtilizationFlyingHoursTotal) }}</td>
+                    <td>{{ $aosData['avgRevenueDailyUtilizationFlyingHoursTotal'] }}</td>
                 </tr>
 
                 <tr>
                     <td class="aos-label">- Total FC</td>
-                    <td>{{ $formatNumber($totalDailyUtilizationTakeOffTotal / 12) }}</td>
+                    <td>{{ $formatNumber($aosData['averages']['dailyUtilizationTakeOffTotal']['value']) }}</td>
                     @foreach ($periods as $monthKey)
                         @php
                             $dailyUtilizationTakeOffTotal = $safeNumber($aosData['reportData'][$monthKey]['dailyUtilizationTakeOffTotal'] ?? 0);
                         @endphp
                         <td>{{ $formatNumber($dailyUtilizationTakeOffTotal) }}</td>
                     @endforeach
-                    <td>{{ $formatNumber($totalDailyUtilizationTakeOffTotal / 12) }}</td>
+                    <td>{{ $formatNumber($aosData['averages']['dailyUtilizationTakeOffTotal']['value']) }}</td>
                 </tr>
 
                 <tr>
                     <td class="aos-label">- Revenue FC</td>
-                    <td>{{ $formatNumber($totalRevenueDailyUtilizationTakeOffTotal / 12) }}</td>
+                    <td>{{ $formatNumber($aosData['averages']['revenueDailyUtilizationTakeOffTotal']['value']) }}</td>
                     @foreach ($periods as $monthKey)
                         @php
                             $revenueDailyUtilizationTakeOffTotal = $safeNumber($aosData['reportData'][$monthKey]['revenueDailyUtilizationTakeOffTotal'] ?? 0);
                         @endphp
                         <td>{{ $formatNumber($revenueDailyUtilizationTakeOffTotal) }}</td>
                     @endforeach
-                    <td>{{ $formatNumber($totalRevenueDailyUtilizationTakeOffTotal / 12) }}</td>
+                    <td>{{ $formatNumber($aosData['averages']['revenueDailyUtilizationTakeOffTotal']['value']) }}</td>
                 </tr>
 
                 <!-- Technical Performance Metrics -->
                 <tr>
                     <td class="aos-label">Technical Delay - Total</td>
-                    <td>{{ round($safeNumber($totalTechnicalDelayTotal)) }}</td>
+                    <td>{{ round($aosData['averages']['technicalDelayTotal']['value']) }}</td>
                     @foreach ($periods as $monthKey)
                         @php
                             $technicalDelayTotal = $safeNumber($aosData['reportData'][$monthKey]['technicalDelayTotal'] ?? 0);
                         @endphp
                         <td>{{ round($technicalDelayTotal) }}</td>
                     @endforeach
-                    <td>{{ round($safeNumber($totalTechnicalDelayTotal)) }}</td>
+                    <td>{{ round($aosData['averages']['technicalDelayTotal']['value']) }}</td>
                 </tr>
 
                 <tr>
                     <td class="aos-label">- Tot Duration</td>
-                    <td>{{ $calculateAvgTime($totalTotalDuration) }}</td>
+                    <td>{{ $aosData['avgTotalDuration'] }}</td>
                     @foreach ($periods as $monthKey)
                         @php
                             $totalDuration = $aosData['reportData'][$monthKey]['totalDuration'] ?? 0;
                         @endphp
                         <td>{{ $formatTime($totalDuration) }}</td>
                     @endforeach
-                    <td>{{ $calculateAvgTime($totalTotalDuration) }}</td>
+                    <td>{{ $aosData['avgTotalDuration'] }}</td>
                 </tr>
 
                 <tr>
                     <td class="aos-label">- Avg Duration</td>
-                    <td>{{ $calculateAvgTime($totalAverageDuration) }}</td>
+                    <td>{{ $aosData['avgAverageDuration'] }}</td>
                     @foreach ($periods as $monthKey)
                         @php
                             $averageDuration = $aosData['reportData'][$monthKey]['averageDuration'] ?? 0;
                         @endphp
                         <td>{{ $formatTime($averageDuration) }}</td>
                     @endforeach
-                    <td>{{ $calculateAvgTime($totalAverageDuration) }}</td>
+                    <td>{{ $aosData['avgAverageDuration'] }}</td>
                 </tr>
 
                 <tr>
                     <td class="aos-label">- Rate / 100 Take Off</td>
-                    <td>{{ $formatNumber($totalRatePer100TakeOff / 12) }}</td>
+                    <td>{{ $formatNumber($aosData['averages']['ratePer100TakeOff']['value']) }}</td>
                     @foreach ($periods as $monthKey)
                         @php
                             $ratePer100TakeOff = $safeNumber($aosData['reportData'][$monthKey]['ratePer100TakeOff'] ?? 0);
                         @endphp
                         <td>{{ $formatNumber($ratePer100TakeOff) }}</td>
                     @endforeach
-                    <td>{{ $formatNumber($totalRatePer100TakeOff / 12) }}</td>
+                    <td>{{ $formatNumber($aosData['averages']['ratePer100TakeOff']['value']) }}</td>
                 </tr>
 
                 <!-- Technical Incident Metrics -->
                 <tr>
                     <td class="aos-label">Technical Incident - Total</td>
-                    <td>{{ round($safeNumber($totalTechnicalIncidentTotal)) }}</td>
+                    <td>{{ round($aosData['averages']['technicalIncidentTotal']['value']) }}</td>
                     @foreach ($periods as $monthKey)
                         @php
                             $technicalIncidentTotal = $safeNumber($aosData['reportData'][$monthKey]['technicalIncidentTotal'] ?? 0);
                         @endphp
                         <td>{{ round($technicalIncidentTotal) }}</td>
                     @endforeach
-                    <td>{{ round($safeNumber($totalTechnicalIncidentTotal)) }}</td>
+                    <td>{{ round($aosData['averages']['technicalIncidentTotal']['value']) }}</td>
                 </tr>
 
                 <tr>
                     <td class="aos-label">- Rate/100 FC</td>
-                    <td>{{ $formatNumber($totalTechnicalIncidentRate / 12) }}</td>
+                    <td>{{ $formatNumber($aosData['averages']['technicalIncidentRate']['value']) }}</td>
                     @foreach ($periods as $monthKey)
                         @php
                             $technicalIncidentRate = $safeNumber($aosData['reportData'][$monthKey]['technicalIncidentRate'] ?? 0);
                         @endphp
                         <td>{{ $formatNumber($technicalIncidentRate) }}</td>
                     @endforeach
-                    <td>{{ $formatNumber($totalTechnicalIncidentRate / 12) }}</td>
+                    <td>{{ $formatNumber($aosData['averages']['technicalIncidentRate']['value']) }}</td>
                 </tr>
 
                 <!-- Technical Cancellation and Reliability Metrics -->
                 <tr>
                     <td class="aos-label">Technical Cancellation - Total</td>
-                    <td>{{ round($safeNumber($totalTechnicalCancellationTotal)) }}</td>
+                    <td>{{ round($aosData['averages']['technicalCancellationTotal']['value']) }}</td>
                     @foreach ($periods as $monthKey)
                         @php
                             $technicalCancellationTotal = $safeNumber($aosData['reportData'][$monthKey]['technicalCancellationTotal'] ?? 0);
                         @endphp
                         <td>{{ round($technicalCancellationTotal) }}</td>
                     @endforeach
-                    <td>{{ round($safeNumber($totalTechnicalCancellationTotal)) }}</td>
+                    <td>{{ round($aosData['averages']['technicalCancellationTotal']['value']) }}</td>
                 </tr>
 
                 <tr>
                     <td class="aos-label">Dispatch Reliability (%)</td>
-                    <td>{{ $formatNumber($totalDispatchReliability / 12) }}%</td>
+                    <td>{{ $formatNumber($aosData['averages']['dispatchReliability']['value']) }}%</td>
                     @foreach ($periods as $monthKey)
                         @php
                             $dispatchReliability = $safeNumber($aosData['reportData'][$monthKey]['dispatchReliability'] ?? 0);
                         @endphp
                         <td>{{ $formatNumber($dispatchReliability) }}%</td>
                     @endforeach
-                    <td>{{ $formatNumber($totalDispatchReliability / 12) }}%</td>
+                    <td>{{ $formatNumber($aosData['averages']['dispatchReliability']['value']) }}%</td>
                 </tr>
             </tbody>
         </table>

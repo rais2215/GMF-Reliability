@@ -288,40 +288,37 @@ class CombinedReportController extends Controller
             $total = 0;
             $validCount = 0;
             $monthlyValues = [];
-
             for ($i = 11; $i >= 0; $i--) {
                 $monthKey = Carbon::parse($period)->subMonth($i)->format('Y-m');
                 $value = $reportData[$monthKey][$metric] ?? 0;
-
                 $monthlyValues[] = $value;
                 $total += $value;
-
-                // Untuk A/C In Fleet, count all months (including zero values) for proper average
                 if ($metric === 'acInFleet') {
                     $validCount++;
                 } else if ($value > 0) {
                     $validCount++;
                 }
             }
-
-            // Calculate based on metric type
             switch ($config['type']) {
                 case 'average_valid':
-                    // Untuk A/C In Fleet, use all 12 months for average calculation
                     if ($metric === 'acInFleet') {
-                        $result = $total / 12;
+                        $result = round($total / 12); // dibulatkan
                     } else {
                         $result = $validCount > 0 ? $total / $validCount : 0;
                     }
                     break;
+                case 'average_all':
+                    // Untuk acInService, gunakan rata-rata dari bulan yang valid
+                    $validValues = array_filter($monthlyValues, function($v) { return $v > 0; });
+                    $result = count($validValues) > 0 ? array_sum($validValues) / count($validValues) : $total / 12;
+                    break;
                 case 'sum':
                     $result = $total;
                     break;
-                default: // 'average_all'
+                default:
                     $result = $total / 12;
                     break;
             }
-
             $averages[$metric] = [
                 'value' => $result,
                 'total' => $total,
@@ -330,7 +327,6 @@ class CombinedReportController extends Controller
                 'format' => $config['format']
             ];
         }
-
         return $averages;
     }
 
