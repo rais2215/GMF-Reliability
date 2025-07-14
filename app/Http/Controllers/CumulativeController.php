@@ -147,96 +147,95 @@ class CumulativeController extends Controller
 
         $data = $processedData->toArray();
 
-        // --- Kumulatif dengan pengurangan (nilai akhir - nilai awal) ---
-        $cumulativeData = [];
-if ($request->filled('period')) {
-    $periodYear = Carbon::parse($request->period)->year;
-    $endMonth = 1;
-    $endYear = $periodYear;
-    $beforeMonth = 1;
-    $beforeYear = $periodYear - 1;
+        // --- Kumulatif: nilai akhir (Januari tahun sebelum periode) - nilai awal (Desember tahun dua sebelum periode) ---
+        if ($request->filled('period')) {
+        $periodYear = Carbon::parse($request->period)->year;
+        $endMonth = 1;
+        $endYear = $periodYear; // Januari tahun akhir periode
+        $beforeMonth = 1;
+        $beforeYear = $periodYear - 1; // Januari tahun sebelum periode
 
-    $regData = [];
-    foreach ($data as $record) {
-        $reg = $record['reg'] ?? null;
-        $monthEval = isset($record['month_eval']) ? Carbon::parse($record['month_eval']) : null;
-        if (!$reg || !$monthEval) continue;
-        $regData[$reg][] = [
-            'month_eval' => $monthEval,
-            'csn_by_fh' => $record['csn_by_fh'],
-            'csn_by_fc' => $record['csn_by_fc'],
-        ];
-    }
-
-    foreach ($regData as $reg => $items) {
-        usort($items, function($a, $b) {
-            return $a['month_eval']->timestamp <=> $b['month_eval']->timestamp;
-        });
-
-        // Cari nilai akhir (Januari tahun akhir periode)
-        $fh_end = null;
-        $fc_end = null;
-        foreach ($items as $item) {
-            $m = $item['month_eval']->month;
-            $y = $item['month_eval']->year;
-            if ($m == $endMonth && $y == $endYear) {
-                $fh_end = $item['csn_by_fh'];
-                $fc_end = $item['csn_by_fc'];
-                break;
-            }
-        }
-        $fh_end = $fh_end ?? 0;
-        $fc_end = $fc_end ?? 0;
-
-        // Cari nilai before year (Januari tahun sebelum tahun akhir periode)
-        $fh_before = null;
-        $fc_before = null;
-        foreach ($items as $item) {
-            $m = $item['month_eval']->month;
-            $y = $item['month_eval']->year;
-            if ($m == $beforeMonth && $y == $beforeYear) {
-                $fh_before = $item['csn_by_fh'];
-                $fc_before = $item['csn_by_fc'];
-                break;
-            }
+        $regData = [];
+        foreach ($data as $record) {
+            $reg = $record['reg'] ?? null;
+            $monthEval = isset($record['month_eval']) ? Carbon::parse($record['month_eval']) : null;
+            if (!$reg || !$monthEval) continue;
+            $regData[$reg][] = [
+                'month_eval' => $monthEval,
+                'csn_by_fh' => $record['csn_by_fh'],
+                'csn_by_fc' => $record['csn_by_fc'],
+            ];
         }
 
-        // Jika tidak ada data Januari before year, lakukan estimasi linear dari dua data terdekat setelahnya
-        if ($fh_before === null || $fc_before === null) {
-            $after = [];
+        foreach ($regData as $reg => $items) {
+            usort($items, function($a, $b) {
+                return $a['month_eval']->timestamp <=> $b['month_eval']->timestamp;
+            });
+
+            // Cari nilai akhir (Januari tahun akhir periode)
+            $fh_end = null;
+            $fc_end = null;
             foreach ($items as $item) {
-                $y = $item['month_eval']->year;
                 $m = $item['month_eval']->month;
-                if ($y > $beforeYear || ($y == $beforeYear && $m > $beforeMonth)) {
-                    $after[] = $item;
+                $y = $item['month_eval']->year;
+                if ($m == $endMonth && $y == $endYear) {
+                    $fh_end = $item['csn_by_fh'];
+                    $fc_end = $item['csn_by_fc'];
+                    break;
                 }
             }
-            if (count($after) >= 2) {
-                // Estimasi linear: nilai = y2 - (y3 - y2)
-                $fh_before = $after[0]['csn_by_fh'] - ($after[1]['csn_by_fh'] - $after[0]['csn_by_fh']);
-                $fc_before = $after[0]['csn_by_fc'] - ($after[1]['csn_by_fc'] - $after[0]['csn_by_fc']);
-            } elseif (count($after) == 1) {
-                $fh_before = 0;
-                $fc_before = 0;
-            } else {
-                $fh_before = 0;
-                $fc_before = 0;
-            }
-        }
+            $fh_end = $fh_end ?? 0;
+            $fc_end = $fc_end ?? 0;
 
-        $cumulativeData[$reg] = [
-            'cumulative_fh' => $fh_end - $fh_before,
-            'cumulative_fc' => $fc_end - $fc_before,
-        ];
+            // Cari nilai awal (Januari tahun sebelum periode)
+            $fh_before = null;
+            $fc_before = null;
+            foreach ($items as $item) {
+                $m = $item['month_eval']->month;
+                $y = $item['month_eval']->year;
+                if ($m == $beforeMonth && $y == $beforeYear) {
+                    $fh_before = $item['csn_by_fh'];
+                    $fc_before = $item['csn_by_fc'];
+                    break;
+                }
+            }
+
+            // Jika tidak ada data Januari tahun sebelum periode, lakukan estimasi linear dari dua data terdekat setelahnya
+            if ($fh_before === null || $fc_before === null) {
+                $after = [];
+                foreach ($items as $item) {
+                    $y = $item['month_eval']->year;
+                    $m = $item['month_eval']->month;
+                    if ($y > $beforeYear || ($y == $beforeYear && $m > $beforeMonth)) {
+                        $after[] = $item;
+                    }
+                }
+                if (count($after) >= 2) {
+                    // Estimasi linear: nilai = y2 - (y3 - y2)
+                    $fh_before = $after[0]['csn_by_fh'] - ($after[1]['csn_by_fh'] - $after[0]['csn_by_fh']);
+                    $fc_before = $after[0]['csn_by_fc'] - ($after[1]['csn_by_fc'] - $after[0]['csn_by_fc']);
+                } elseif (count($after) == 1) {
+                    $fh_before = 0;
+                    $fc_before = 0;
+                } else {
+                    $fh_before = 0;
+                    $fc_before = 0;
+                }
+            }
+
+            $cumulativeData[$reg] = [
+                'cumulative_fh' => $fh_end - $fh_before,
+                'cumulative_fc' => $fc_end - $fc_before,
+            ];
+        }
     }
-}
 
         return view('report.cumulative-result', compact(
             'data',
             'summary',
             'formatted_period',
             'cumulativeData'
-        ))->with([
+         ))->with([
             'operator' => $request->operator,
             'aircraft_type' => $request->aircraft_type,
             'reg' => $request->reg,
