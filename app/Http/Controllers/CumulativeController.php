@@ -242,4 +242,176 @@ class CumulativeController extends Controller
             'period' => $request->period
         ]);
     }
+
+    public function cumulativeExportPdf(Request $request)
+    {
+        $request->validate([
+            'aircraft_type' => 'nullable|string',
+            'operator' => 'nullable|string',
+            'period' => 'nullable|date',
+            'reg' => 'nullable|string',
+        ]);
+
+        // Ambil semua data sesuai filter, JANGAN batasi reg kecuali user memilih reg tertentu
+        $query = TblMonthlyfhfc::select(
+            'tbl_monthlyfhfc.Reg',
+            'tbl_monthlyfhfc.MonthEval',
+            'tbl_monthlyfhfc.TSN',
+            'tbl_monthlyfhfc.TSNMin',
+            'tbl_monthlyfhfc.CSN'
+        );
+
+        // Filter operator/aircraft_type jika ada
+        if ($request->filled('operator') || $request->filled('aircraft_type')) {
+            $masteracQuery = TblMasterac::where('active', 1);
+
+            if ($request->filled('operator')) {
+                $masteracQuery->where('Operator', $request->operator);
+            }
+
+            if ($request->filled('aircraft_type')) {
+                $masteracQuery->where('ACType', $request->aircraft_type);
+            }
+
+            $registrations = $masteracQuery->pluck('ACReg');
+            $query->whereIn('tbl_monthlyfhfc.Reg', $registrations);
+        } else {
+            // Ambil semua reg aktif
+            $activeRegistrations = TblMasterac::where('active', 1)->pluck('ACReg');
+            $query->whereIn('tbl_monthlyfhfc.Reg', $activeRegistrations);
+        }
+
+        // Filter periode jika ada
+        if ($request->filled('period')) {
+            $endDate = Carbon::parse($request->period)->endOfMonth();
+            $startDate = Carbon::parse($request->period)->startOfMonth()->subMonths(11);
+            $query->whereBetween('tbl_monthlyfhfc.MonthEval', [$startDate, $endDate]);
+        }
+
+        // Ambil data
+        $rawData = $query->orderBy('tbl_monthlyfhfc.MonthEval', 'desc')
+                    ->orderBy('tbl_monthlyfhfc.Reg')
+                    ->get();
+
+        // Proses data
+        $processedData = $rawData->map(function($item) {
+            $cumulativeFH = round($item->TSN + ($item->TSNMin / 60));
+            $cumulativeFC = $item->CSN;
+            return [
+                'reg' => $item->Reg,
+                'month_eval' => $item->MonthEval,
+                'csn_by_fh' => $cumulativeFH,
+                'csn_by_fc' => $cumulativeFC,
+            ];
+        });
+
+        $groupedData = $processedData->groupBy('reg');
+
+        $summary = [
+            'total_records' => $processedData->count(),
+            'total_aircraft' => $groupedData->count(),
+            'date_range' => [
+                'from' => $rawData->count() > 0 ? Carbon::parse($rawData->min('MonthEval'))->format('F Y') : null,
+                'to' => $rawData->count() > 0 ? Carbon::parse($rawData->max('MonthEval'))->format('F Y') : null
+            ]
+        ];
+
+        $formatted_period = null;
+        if ($request->filled('period')) {
+            $formatted_period = Carbon::parse($request->period)->format('F Y');
+        }
+
+        $data = $processedData->toArray();
+
+        // Hitung kumulatif per reg (jika diperlukan di PDF)
+        $cumulativeData = [];
+        if ($request->filled('period')) {
+            $periodYear = Carbon::parse($request->period)->year;
+            $endMonth = 1;
+            $endYear = $periodYear;
+            $beforeMonth = 1;
+            $beforeYear = $periodYear - 1;
+
+            $regData = [];
+            foreach ($data as $record) {
+                $reg = $record['reg'] ?? null;
+                $monthEval = isset($record['month_eval']) ? Carbon::parse($record['month_eval']) : null;
+                if (!$reg || !$monthEval) continue;
+                $regData[$reg][] = [
+                    'month_eval' => $monthEval,
+                    'csn_by_fh' => $record['csn_by_fh'],
+                    'csn_by_fc' => $record['csn_by_fc'],
+                ];
+            }
+
+            foreach ($regData as $reg => $items) {
+                usort($items, function($a, $b) {
+                    return $a['month_eval']->timestamp <=> $b['month_eval']->timestamp;
+                });
+
+                $fh_end = null;
+                $fc_end = null;
+                foreach ($items as $item) {
+                    $m = $item['month_eval']->month;
+                    $y = $item['month_eval']->year;
+                    if ($m == $endMonth && $y == $endYear) {
+                        $fh_end = $item['csn_by_fh'];
+                        $fc_end = $item['csn_by_fc'];
+                        break;
+                    }
+                }
+                $fh_end = $fh_end ?? 0;
+                $fc_end = $fc_end ?? 0;
+
+                $fh_before = null;
+                $fc_before = null;
+                foreach ($items as $item) {
+                    $m = $item['month_eval']->month;
+                    $y = $item['month_eval']->year;
+                    if ($m == $beforeMonth && $y == $beforeYear) {
+                        $fh_before = $item['csn_by_fh'];
+                        $fc_before = $item['csn_by_fc'];
+                        break;
+                    }
+                }
+
+                if ($fh_before === null || $fc_before === null) {
+                    $after = [];
+                    foreach ($items as $item) {
+                        $y = $item['month_eval']->year;
+                        $m = $item['month_eval']->month;
+                        if ($y > $beforeYear || ($y == $beforeYear && $m > $beforeMonth)) {
+                            $after[] = $item;
+                        }
+                    }
+                    if (count($after) >= 2) {
+                        $fh_before = $after[0]['csn_by_fh'] - ($after[1]['csn_by_fh'] - $after[0]['csn_by_fh']);
+                        $fc_before = $after[0]['csn_by_fc'] - ($after[1]['csn_by_fc'] - $after[0]['csn_by_fc']);
+                    } elseif (count($after) == 1) {
+                        $fh_before = 0;
+                        $fc_before = 0;
+                    } else {
+                        $fh_before = 0;
+                        $fc_before = 0;
+                    }
+                }
+
+                $cumulativeData[$reg] = [
+                    'cumulative_fh' => $fh_end - $fh_before,
+                    'cumulative_fc' => $fc_end - $fc_before,
+                ];
+            }
+        }
+
+        // Kirim ke view PDF
+        $pdf = Pdf::loadView('pdf.cumulative-pdf', compact(
+            'data',
+            'summary',
+            'formatted_period',
+            'cumulativeData'
+        ));
+
+        $pdf->setPaper('A4', 'landscape');
+        return $pdf->download('Cumulative-Report.pdf');
+    }
 }
