@@ -15,6 +15,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use App\Exports\AosExport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Jobs\ProcessReportJob;
 
 class ReportController extends Controller
 {
@@ -873,37 +874,52 @@ class ReportController extends Controller
     }
 
     public function aosExcel(Request $request)
-{
-    $request->validate([
-        'period' => 'required',
-        'aircraft_type' => 'required',
-    ]);
+    {
+        $request->validate([
+            'period' => 'required',
+            'aircraft_type' => 'required',
+        ]);
 
-    $period = $request->period;
-    $aircraftType = $request->aircraft_type;
-    $month = date('m', strtotime($period));
-    $year = date('Y', strtotime($period));
+        $period = $request->period;
+        $aircraftType = $request->aircraft_type;
+        $month = date('m', strtotime($period));
+        $year = date('Y', strtotime($period));
 
-    // Tentukan tahun patokan berdasarkan periode data
-    $baseYear = $this->determineBaseYear($period);
-    if (empty($baseYear)) {
-        $baseYear = date('Y');
+        // Tentukan tahun patokan berdasarkan periode data
+        $baseYear = $this->determineBaseYear($period);
+        if (empty($baseYear)) {
+            $baseYear = date('Y');
+        }
+        $baseYear = (string) $baseYear;
+
+        // Data rolling 12 bulan terakhir (Last 12 Months)
+        $processedData = $this->processReportData($aircraftType, $period);
+
+        // Generate data untuk tahun patokan
+        $yearData = $this->processReportDataByYear($aircraftType, $baseYear);
+
+        return Excel::download(new AosExport(
+            $processedData['reportData'],
+            $period,
+            $aircraftType,
+            $processedData,
+            $yearData,
+            $baseYear
+        ), 'AOS-Report-' . substr($period, 0, 7) . '.xlsx');
     }
-    $baseYear = (string) $baseYear;
 
-    // Data rolling 12 bulan terakhir (Last 12 Months)
-    $processedData = $this->processReportData($aircraftType, $period);
+   public function processMultipleReports(Request $request)
+    {
+        $reportIds = $request->input('report_ids'); // array of IDs
 
-    // Generate data untuk tahun patokan
-    $yearData = $this->processReportDataByYear($aircraftType, $baseYear);
+        if (!is_array($reportIds) || empty($reportIds)) {
+            return response()->json(['status' => 'No report IDs provided'], 400);
+        }
 
-    return Excel::download(new AosExport(
-        $processedData['reportData'],
-        $period,
-        $aircraftType,
-        $processedData,
-        $yearData,
-        $baseYear
-    ), 'AOS-Report-' . substr($period, 0, 7) . '.xlsx');
-}
+        foreach ($reportIds as $id) {
+            dispatch(new ProcessReportJob($id));
+        }
+
+        return response()->json(['status' => 'Jobs dispatched!']);
+    }
 }

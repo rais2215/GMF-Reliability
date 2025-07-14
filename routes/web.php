@@ -117,6 +117,7 @@ Route::middleware(['auth', 'verified'])->prefix('report')->name('report.')->grou
 
 Route::get('/get-aircraft-types', [ReportController::class, 'getAircraftTypes'])->name('get.aircraft.types');
 
+Route::post('/process-multiple-reports', [ReportController::class, 'processMultipleReports']);
 /*
 |--------------------------------------------------------------------------
 | Auth Routes (from Breeze/Fortify/etc)
