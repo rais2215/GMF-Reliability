@@ -77,12 +77,57 @@
                 </div>
             </div>
 
+            {{-- Delete Account Button --}}
             <div class="p-8 bg-white rounded-2xl shadow-2xl border border-blue-100 animate-element card-enhanced" data-delay="600">
-                <div class="max-w-xl mx-auto">
-                    @include('profile.partials.delete-user-form')
+                <div class="max-w-xl mx-auto text-center space-y-6">
+                    <p class="text-gray-700 text-base text-justify">
+                        Once your account is deleted, all of its resources and data will be
+                        <span class="font-semibold text-red-600">permanently deleted</span>.
+                        Before deleting your account, please download any data or information that you wish to retain.
+                    </p>
+                    <button
+                        onclick="openDeleteModal()"
+                        class="px-6 py-3 rounded-xl bg-gradient-to-r from-red-500 to-rose-500 text-white font-bold shadow-lg hover:from-red-600 hover:to-rose-600 transition btn-enhanced"
+                    >
+                        Delete Account
+                    </button>
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Modal Delete Account -->
+    <div id="deleteAccountModal" class="fixed inset-0 z-[9999] items-center justify-center bg-white/60 backdrop-blur-sm hidden">
+        <div class="relative bg-white rounded-3xl shadow-2xl border border-blue-100 max-w-md w-full p-8 flex flex-col items-center">
+            <div class="flex flex-col items-center text-center space-y-4 w-full">
+                <div class="bg-red-100 rounded-full p-3 mb-2">
+                    <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/>
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold text-red-700">Delete Account?</h3>
+                <p class="text-gray-700 text-base text-center">
+                    Once deleted, all your data will be <span class="font-semibold text-red-600">permanently removed</span>.<br>
+                    Please enter your password to confirm.
+                </p>
+                <form method="POST" action="{{ route('profile.destroy') }}" class="w-full space-y-4 flex flex-col items-center">
+                    @csrf
+                    @method('DELETE')
+                    <input type="password" name="password" required placeholder="Password"
+                        class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-red-500 focus:ring-2 focus:ring-red-200 transition input-enhanced bg-white" autocomplete="current-password">
+                    <div class="flex justify-between gap-3 mt-2 w-full">
+                        <button type="button" onclick="closeDeleteModal()" class="flex-1 px-4 py-2 rounded-lg bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition">Cancel</button>
+                        <button type="submit" class="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-red-500 to-rose-500 text-white font-bold shadow-lg hover:from-red-600 hover:to-rose-600 transition">Delete Account</button>
+                    </div>
+                </form>
+            </div>
+            <button onclick="closeDeleteModal()" class="absolute top-3 right-3 text-gray-400 hover:text-red-500 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+    </div>
     </div>
 
     <style>
@@ -313,6 +358,17 @@
     </style>
 
     <script>
+        function openDeleteModal() {
+            const modal = document.getElementById('deleteAccountModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+        function closeDeleteModal() {
+            const modal = document.getElementById('deleteAccountModal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             // ==============================================
             // SIMPLE PAGE LOAD ANIMATIONS

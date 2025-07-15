@@ -412,6 +412,11 @@ class CumulativeController extends Controller
         ));
 
         $pdf->setPaper('A4', 'landscape');
-        return $pdf->download('Cumulative-Report.pdf');
+        // Tambahkan type of aircraft dan period ke nama file
+        $aircraftType = $request->aircraft_type ? str_replace(' ', '_', $request->aircraft_type) : 'AllTypes';
+        $period = $formatted_period ? str_replace(' ', '_', $formatted_period) : 'AllPeriods';
+        $filename = "Cumulative-Report-{$aircraftType}-{$period}.pdf";
+
+        return $pdf->download($filename);
     }
 }
