@@ -64,10 +64,7 @@
             <tr>
                 <td style="border: 1px solid #000; text-align: center;">{{ $registration }}</td>
                 <td style="border: 1px solid #000; text-align: center;">
-                    {{ isset($monthlyData['fh']) && count($monthlyData['fh']) > 0
-                        ? \Carbon\Carbon::parse(array_key_first($monthlyData['fh']) . ' 1 ' . $startYearForDisplay)->year
-                        : $startYearForDisplay
-                    }}
+                    {{ getCumulativeValue($registration, 'fh', $cumulativeData ?? []) }}
                 </td>
                 @foreach ($months as $month)
                     <td style="border: 1px solid #000; text-align: center;">
@@ -104,10 +101,7 @@
             <tr>
                 <td style="border: 1px solid #000; text-align: center;">{{ $registration }}</td>
                 <td style="border: 1px solid #000; text-align: center;">
-                    {{ isset($monthlyData['fh']) && count($monthlyData['fh']) > 0
-                        ? \Carbon\Carbon::parse(array_key_first($monthlyData['fh']) . ' 1 ' . $startYearForDisplay)->year
-                        : $startYearForDisplay
-                    }}
+                    {{ getCumulativeValue($registration, 'fc', $cumulativeData ?? []) }}
                 </td>
                 @foreach ($months as $month)
                     <td style="border: 1px solid #000; text-align: center;">

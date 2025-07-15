@@ -65,6 +65,13 @@
             if (!is_numeric($value)) return '';
             return number_format((float)$value, 0, '.', '');
         }
+
+        function getCumulativeValue($registration, $type, $cumulativeData) {
+            if (!isset($cumulativeData[$registration])) return '-';
+            $key = $type === 'fh' ? 'cumulative_fh' : 'cumulative_fc';
+            $value = $cumulativeData[$registration][$key] ?? 0;
+            return $value > 0 ? number_format((float)$value, 0, '.', '') : '-';
+        }
     @endphp
 
     <div class="main-title">
@@ -101,14 +108,12 @@
                 @foreach ($pivotedData as $registration => $monthlyData)
                     <tr>
                         <td class="reg-col">{{ $registration }}</td>
-                        <td></td>
+                        <td>
+                            {{ getCumulativeValue($registration, 'fh', $cumulativeData ?? []) }}
+                        </td>
                         @foreach ($months as $month)
                             <td>
-                                @if(isset($monthlyData['fh'][$month]) && $monthlyData['fh'][$month] !== null)
-                                    {{ formatTableNumber($monthlyData['fh'][$month]) }}
-                                @else
-                                    -
-                                @endif
+                                {{ isset($monthlyData['fh'][$month]) && $monthlyData['fh'][$month] !== null ? number_format((float)$monthlyData['fh'][$month], 0, '.', '') : '-' }}
                             </td>
                         @endforeach
                     </tr>
@@ -148,14 +153,12 @@
                 @foreach ($pivotedData as $registration => $monthlyData)
                     <tr>
                         <td class="reg-col">{{ $registration }}</td>
-                        <td></td>
+                        <td>
+                            {{ getCumulativeValue($registration, 'fc', $cumulativeData ?? []) }}
+                        </td>
                         @foreach ($months as $month)
                             <td>
-                                @if(isset($monthlyData['fc'][$month]) && $monthlyData['fc'][$month] !== null)
-                                    {{ formatTableNumber($monthlyData['fc'][$month]) }}
-                                @else
-                                    -
-                                @endif
+                                {{ isset($monthlyData['fc'][$month]) && $monthlyData['fc'][$month] !== null ? number_format((float)$monthlyData['fc'][$month], 0, '.', '') : '-' }}
                             </td>
                         @endforeach
                     </tr>
