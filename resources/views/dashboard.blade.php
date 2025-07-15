@@ -35,7 +35,7 @@
                     </div>
 
                     <h3 class="font-bold text-gray-800 text-lg text-center mb-1 tracking-wide">{{ Auth::user()->name }}</h3>
-                    <p class="text-xs text-blue-600 text-center mb-4 font-semibold tracking-wider uppercase">Engineer</p>
+                    <div class="mb-2"></div>
 
                     <a href="javascript:void(0)" onclick="fadeNavigate('{{ route('profile.edit') }}')" class="group flex items-center justify-center space-x-2 bg-white hover:bg-blue-100 text-gray-700 hover:text-blue-700 py-2 px-4 rounded-xl transition-all duration-200 border border-gray-200 hover:border-blue-400 w-full shadow hover:shadow-md">
                         <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
