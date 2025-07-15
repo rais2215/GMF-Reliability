@@ -17,6 +17,13 @@
         .header-main { background: #0369a1; color: #fff; }
         .header-main-fc { background: #65a30d; color: #fff; }
         .month-col { background: #f9fafb; }
+        /* Style untuk memastikan page break bekerja */
+        .page-container {
+            page-break-after: always;
+        }
+        .page-container:last-child {
+            page-break-after: never;
+        }
     </style>
 </head>
 <body>
@@ -72,103 +79,114 @@
             $value = $cumulativeData[$registration][$key] ?? 0;
             return $value > 0 ? number_format((float)$value, 0, '.', '') : '-';
         }
+
+        // --- MODIFIKASI DI SINI ---
+        // Mengubah jumlah registrasi per halaman menjadi 10
+        $registrationsPerPage = 10;
+        $pagedData = array_chunk($pivotedData, $registrationsPerPage, true);
     @endphp
 
-    <div class="main-title">
-        CUMULATIVE FLIGHT HOURS AND TAKE OFF {{ $yearRange }}
-    </div>
-    <div class="subtitle">
-        {{ $aircraftType }}
-    </div>
+    @if (!empty($pagedData))
+        @foreach ($pagedData as $pageIndex => $currentPageData)
+            <div class="page-container">
+                <div class="main-title">
+                    CUMULATIVE FLIGHT HOURS AND TAKE OFF {{ $yearRange }}
+                </div>
+                <div class="subtitle">
+                    {{ $aircraftType }}
+                </div>
 
-    {{-- FLIGHT HOURS TABLE --}}
-    <table>
-        <thead>
-            <tr>
-                <th colspan="2" style="text-align:left;">FLIGHT HOURS</th>
-                <th colspan="12" class="header-main">{{ $yearRange }}</th>
-            </tr>
-            <tr>
-                <th class="reg-col">A/C REG</th>
-                <th class="year-col">YEAR</th>
-                @foreach ($months as $month)
-                    <th class="month-col">{{ $month }}</th>
-                @endforeach
-            </tr>
-            <tr>
-                <th></th>
-                <th class="year-col">{{ $startYearForDisplay }}</th>
-                @foreach ($months as $month)
-                    <th></th>
-                @endforeach
-            </tr>
-        </thead>
-        <tbody>
-            @if (!empty($pivotedData))
-                @foreach ($pivotedData as $registration => $monthlyData)
-                    <tr>
-                        <td class="reg-col">{{ $registration }}</td>
-                        <td>
-                            {{ getCumulativeValue($registration, 'fh', $cumulativeData ?? []) }}
-                        </td>
-                        @foreach ($months as $month)
-                            <td>
-                                {{ isset($monthlyData['fh'][$month]) && $monthlyData['fh'][$month] !== null ? number_format((float)$monthlyData['fh'][$month], 0, '.', '') : '-' }}
-                            </td>
+                {{-- FLIGHT HOURS TABLE --}}
+                <table>
+                    <thead>
+                        <tr>
+                            <th colspan="2" style="text-align:left;">FLIGHT HOURS</th>
+                            <th colspan="12" class="header-main">{{ $yearRange }}</th>
+                        </tr>
+                        <tr>
+                            <th class="reg-col">A/C REG</th>
+                            <th class="year-col">YEAR</th>
+                            @foreach ($months as $month)
+                                <th class="month-col">{{ $month }}</th>
+                            @endforeach
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th class="year-col">{{ $startYearForDisplay }}</th>
+                            @foreach ($months as $month)
+                                <th></th>
+                            @endforeach
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($currentPageData as $registration => $monthlyData)
+                            <tr>
+                                <td class="reg-col">{{ $registration }}</td>
+                                <td>
+                                    {{ getCumulativeValue($registration, 'fh', $cumulativeData ?? []) }}
+                                </td>
+                                @foreach ($months as $month)
+                                    <td>
+                                        {{ isset($monthlyData['fh'][$month]) && $monthlyData['fh'][$month] !== null ? number_format((float)$monthlyData['fh'][$month], 0, '.', '') : '-' }}
+                                    </td>
+                                @endforeach
+                            </tr>
                         @endforeach
-                    </tr>
-                @endforeach
-            @else
-                <tr>
-                    <td colspan="14" style="text-align:center; color:#888;">No data found for the selected criteria.</td>
-                </tr>
-            @endif
-        </tbody>
-    </table>
+                    </tbody>
+                </table>
 
-    {{-- FLIGHT CYCLE TABLE --}}
-    <table>
-        <thead>
-            <tr>
-                <th colspan="2" style="text-align:left;">FLIGHT CYCLE</th>
-                <th colspan="12" class="header-main-fc">{{ $yearRange }}</th>
-            </tr>
-            <tr>
-                <th class="reg-col">A/C REG</th>
-                <th class="year-col">YEAR</th>
-                @foreach ($months as $month)
-                    <th class="month-col">{{ $month }}</th>
-                @endforeach
-            </tr>
-            <tr>
-                <th></th>
-                <th class="year-col">{{ $startYearForDisplay }}</th>
-                @foreach ($months as $month)
-                    <th></th>
-                @endforeach
-            </tr>
-        </thead>
-        <tbody>
-            @if (!empty($pivotedData))
-                @foreach ($pivotedData as $registration => $monthlyData)
-                    <tr>
-                        <td class="reg-col">{{ $registration }}</td>
-                        <td>
-                            {{ getCumulativeValue($registration, 'fc', $cumulativeData ?? []) }}
-                        </td>
-                        @foreach ($months as $month)
-                            <td>
-                                {{ isset($monthlyData['fc'][$month]) && $monthlyData['fc'][$month] !== null ? number_format((float)$monthlyData['fc'][$month], 0, '.', '') : '-' }}
-                            </td>
+                {{-- FLIGHT CYCLE TABLE --}}
+                <table>
+                    <thead>
+                        <tr>
+                            <th colspan="2" style="text-align:left;">FLIGHT CYCLE</th>
+                            <th colspan="12" class="header-main-fc">{{ $yearRange }}</th>
+                        </tr>
+                        <tr>
+                            <th class="reg-col">A/C REG</th>
+                            <th class="year-col">YEAR</th>
+                            @foreach ($months as $month)
+                                <th class="month-col">{{ $month }}</th>
+                            @endforeach
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th class="year-col">{{ $startYearForDisplay }}</th>
+                            @foreach ($months as $month)
+                                <th></th>
+                            @endforeach
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($currentPageData as $registration => $monthlyData)
+                            <tr>
+                                <td class="reg-col">{{ $registration }}</td>
+                                <td>
+                                    {{ getCumulativeValue($registration, 'fc', $cumulativeData ?? []) }}
+                                </td>
+                                @foreach ($months as $month)
+                                    <td>
+                                        {{ isset($monthlyData['fc'][$month]) && $monthlyData['fc'][$month] !== null ? number_format((float)$monthlyData['fc'][$month], 0, '.', '') : '-' }}
+                                    </td>
+                                @endforeach
+                            </tr>
                         @endforeach
-                    </tr>
-                @endforeach
-            @else
-                <tr>
-                    <td colspan="14" style="text-align:center; color:#888;">No data found for the selected criteria.</td>
-                </tr>
-            @endif
-        </tbody>
-    </table>
+                    </tbody>
+                </table>
+            </div>
+        @endforeach
+    @else
+        <div class="main-title">
+            CUMULATIVE FLIGHT HOURS AND TAKE OFF {{ $yearRange }}
+        </div>
+        <div class="subtitle">
+            {{ $aircraftType }}
+        </div>
+        <table>
+            <tr>
+                <td colspan="14" style="text-align:center; color:#888;">No data found for the selected criteria.</td>
+            </tr>
+        </table>
+    @endif
 </body>
 </html>
