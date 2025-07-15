@@ -45,6 +45,11 @@
 <table border="1" style="border-collapse: collapse; width: 100%;">
     <thead>
         <tr>
+            <th colspan="14" style="background-color: #cfe2f3; text-align: center; font-weight: bold; border: 1px solid #000; font-size: 14px;">
+                FLIGHT HOURS
+            </th>
+        </tr>
+        <tr>
             <th rowspan="2" style="background-color: #f2f2f2; vertical-align: middle; text-align: center; font-weight: bold; border: 1px solid #000; font-size: 12px;"><b>A/C REG</b></th>
             <th rowspan="2" style="background-color: #f2f2f2; vertical-align: middle; text-align: center; font-weight: bold; border: 1px solid #000; font-size: 12px;"><b>YEAR</b></th>
             <th colspan="12" style="background-color: #f2f2f2; text-align: center; font-weight: bold; text-align: center; border: 1px solid #000; font-size: 12px;">
@@ -81,6 +86,11 @@
 {{-- FLIGHT CYCLE TABLE --}}
 <table border="1" style="border-collapse: collapse; width: 100%;">
     <thead>
+        <tr>
+            <th colspan="14" style="background-color: #d9ead3; text-align: center; font-weight: bold; border: 1px solid #000; font-size: 14px;">
+                FLIGHT CYCLE
+            </th>
+        </tr>
         <tr>
             <th rowspan="2" style="background-color: #f2f2f2; vertical-align: middle; text-align: center; font-weight: bold; border: 1px solid #000; font-size: 12px;"><b>A/C REG</b></th>
             <th rowspan="2" style="background-color: #f2f2f2; vertical-align: middle; text-align: center; font-weight: bold; border: 1px solid #000; font-size: 12px;"><b>YEAR</b></th>
